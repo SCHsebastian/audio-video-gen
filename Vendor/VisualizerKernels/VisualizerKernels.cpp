@@ -86,22 +86,26 @@ extern "C" void vk_scope_envelope(const float *in,
                                   float gain) {
     if (!in || !out || count == 0) return;
 
-    // First pass: 3-tap low-pass with reflected edges.
-    // (Separate from output write so we can also DC-remove in one sweep.)
-    const float w0 = 0.25f, w1 = 0.5f, w2 = 0.25f;
-
-    // Compute DC over the window for a one-shot high-pass.
+    // DC removal then a 7-tap binomial low-pass — much smoother than the
+    // previous 3-tap, removes high-frequency hash but keeps the waveform shape.
     double dc = 0.0;
     for (uint32_t i = 0; i < count; ++i) dc += in[i];
     const float meanv = static_cast<float>(dc / static_cast<double>(count));
 
+    // Binomial weights (1,6,15,20,15,6,1)/64.
+    const float k[7] = { 1.f/64.f, 6.f/64.f, 15.f/64.f, 20.f/64.f,
+                         15.f/64.f, 6.f/64.f, 1.f/64.f };
+
+    auto sample = [&](int32_t i) -> float {
+        if (i < 0) i = 0;
+        if (i >= static_cast<int32_t>(count)) i = static_cast<int32_t>(count) - 1;
+        return in[i] - meanv;
+    };
+
     for (uint32_t i = 0; i < count; ++i) {
-        float prev = in[i == 0 ? 0 : i - 1] - meanv;
-        float cur  = in[i] - meanv;
-        float next = in[i + 1 >= count ? count - 1 : i + 1] - meanv;
-        float smoothed = w0 * prev + w1 * cur + w2 * next;
-        // Soft saturation — keeps loud transients on screen without clipping.
-        float x = smoothed * gain * 1.3f;
+        float sum = 0.0f;
+        for (int o = -3; o <= 3; ++o) sum += k[o + 3] * sample(static_cast<int32_t>(i) + o);
+        float x = sum * gain * 0.95f;
         out[i] = std::tanh(x);
     }
 }

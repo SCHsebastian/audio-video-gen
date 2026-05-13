@@ -125,8 +125,9 @@ vertex AlchemyVertOut alchemy_vertex(uint vid [[vertex_id]],
     float angle = atan2(q.pos.y, q.pos.x) / 6.2831853 + 0.5;
     o.hue = fract(angle * 1.3 + (1.0 - o.life) * 0.35 + u.bass * 0.25 + q.seed * 0.15);
     // Intensity envelope: brighter at mid-life, dim at spawn and death.
+    // Toned down (was 0.65 + beat*0.9) so 120k additive sprites don't blow out.
     float env = sin(o.life * 3.14159265);
-    o.intensity = env * (0.65 + u.beat * 0.9);
+    o.intensity = env * (0.32 + u.beat * 0.45);
     return o;
 }
 
@@ -141,7 +142,7 @@ fragment float4 alchemy_fragment(AlchemyVertOut in [[stage_in]],
     float a = (core + halo) * in.intensity;
 
     float3 col = palette.sample(s, float2(in.hue, 0.5)).rgb;
-    // Slight white-hot core on bright particles.
-    col = mix(col, float3(1.0), core * 0.35);
+    // Subtle white-hot core only on the very centre.
+    col = mix(col, float3(1.0), core * 0.18);
     return float4(col * a, a);
 }

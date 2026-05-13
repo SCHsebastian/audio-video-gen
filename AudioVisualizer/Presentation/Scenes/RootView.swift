@@ -13,6 +13,9 @@ struct RootView: View {
         ZStack(alignment: .top) {
             MetalCanvas(renderer: renderer)
                 .ignoresSafeArea()
+                .onTapGesture {
+                    if vm.currentScene == .lissajous { vm.randomizeLissajous() }
+                }
             switch vm.state {
             case .waitingForPermission:
                 PermissionGate(localizer: localizer) {

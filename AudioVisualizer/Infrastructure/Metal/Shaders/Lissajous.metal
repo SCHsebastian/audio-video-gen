@@ -24,14 +24,19 @@ vertex LVertexOut lissajous_vertex(uint vid [[vertex_id]],
     uint i1 = min(iid + 1, count - 1);
     float2 a = points[i0];
     float2 b = points[i1];
-    float2 dir = normalize(b - a + float2(1e-6, 0));
+    // Tangent direction in screen pixels (so the perpendicular is in pixel space).
+    float2 along = b - a;
+    along.x *= u.aspect;
+    float2 dir = normalize(along + float2(1e-6, 0));
     float2 nor = float2(-dir.y, dir.x);
+    // Convert pixel-space normal back to NDC so on-screen thickness is uniform.
     nor.x /= max(0.0001, u.aspect);
     float th = u.thickness;
     float2 quad[6] = { a - nor*th, b - nor*th, a + nor*th,
                        b - nor*th, b + nor*th, a + nor*th };
     LVertexOut o;
-    o.position = float4(quad[vid].x / u.aspect, quad[vid].y, 0.0, 1.0);
+    // Curve fills the full NDC rectangle (no /aspect on position).
+    o.position = float4(quad[vid].x, quad[vid].y, 0.0, 1.0);
     o.t = float(iid) / float(max(1u, count - 1));
     return o;
 }

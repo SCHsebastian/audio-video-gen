@@ -81,6 +81,11 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         Log.render.info("setSpeed: \(self.speed, privacy: .public)")
     }
 
+    func randomizeLissajous() {
+        (scenes[.lissajous] as? LissajousScene)?.randomize()
+        Log.render.info("randomizeLissajous")
+    }
+
     func peekRMS() -> Float {
         stateLock.withLock { $0.spectrum.rms }
     }

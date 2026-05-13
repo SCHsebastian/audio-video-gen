@@ -12,6 +12,15 @@ final class LissajousScene: VisualizerScene {
     private var bass: Float = 0
     private var alternate: Bool = false
     private var swapTimer: Float = 0
+    // Tunable parameters — `randomize()` jitters these for variety on click.
+    private var aBase: Float = 3
+    private var bBase: Float = 2
+    private var aJitter: Float = 1.0
+    private var bJitter: Float = 1.0
+    private var phaseOffset: Float = 0
+    private var petalsBase: Int32 = 5
+    private var rotation: Float = 0
+    private var modeIsRose: Bool = false
 
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws {
         self.paletteTexture = paletteTexture
@@ -34,20 +43,28 @@ final class LissajousScene: VisualizerScene {
         rms = spectrum.rms
         bass = spectrum.bands.prefix(8).reduce(0, +) / 8
         swapTimer += dt
-        if let b = beat, b.strength > 0.6, swapTimer > 0.4 {
-            alternate.toggle()
-            swapTimer = 0
-        }
         let ptr = pointsBuffer.contents().bindMemory(to: Float.self, capacity: pointCount * 2)
-        if alternate {
-            let petals: Int32 = 5 + Int32(min(3.0, bass * 30))
-            vk_rose(ptr, UInt32(pointCount), time, petals, rms)
+        if modeIsRose {
+            let petals = petalsBase + Int32(min(3.0, bass * 30))
+            vk_rose(ptr, UInt32(pointCount), time + rotation, petals, rms)
         } else {
-            let a: Float = 3 + bass * 6
-            let b: Float = 2 + rms * 5
-            let delta = sin(time * 0.4) * .pi
-            vk_lissajous(ptr, UInt32(pointCount), time, a, b, delta, rms)
+            let a = aBase + bass * aJitter * 4
+            let b = bBase + rms  * bJitter * 4
+            let delta = sin(time * 0.4) * .pi + phaseOffset
+            vk_lissajous(ptr, UInt32(pointCount), time + rotation, a, b, delta, rms)
         }
+    }
+
+    func randomize() {
+        // Pick a fresh figure — half the time a Lissajous, half a polar rose.
+        modeIsRose = Bool.random()
+        aBase = Float(Int.random(in: 2...7))
+        bBase = Float(Int.random(in: 2...7))
+        aJitter = Float.random(in: 0.5...1.8)
+        bJitter = Float.random(in: 0.5...1.8)
+        phaseOffset = Float.random(in: 0..<(.pi * 2))
+        petalsBase = Int32.random(in: 3...9)
+        rotation = Float.random(in: 0..<(.pi * 2))
     }
 
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {

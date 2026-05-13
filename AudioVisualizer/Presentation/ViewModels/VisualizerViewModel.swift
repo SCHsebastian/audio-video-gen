@@ -56,6 +56,10 @@ final class VisualizerViewModel {
         changeScene.execute(k)
     }
 
+    func randomizeLissajous() {
+        renderer.randomizeLissajous()
+    }
+
     func setSpeed(_ s: Float) {
         let clamped = max(0.1, min(3.0, s))
         speed = clamped
