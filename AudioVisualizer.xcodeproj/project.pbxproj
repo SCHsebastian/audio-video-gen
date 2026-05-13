@@ -24,6 +24,7 @@
 		BC013271989B876F10199BA6 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 97B6E5018EBBCD6964AEEC50 /* Domain */; };
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
 		DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */; };
+		FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */; };
 		FFEE78CA3D545FAF887B76C1 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0BA6759B8D541765628417 /* Application */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioObjectID+Properties.swift"; sourceTree = "<group>"; };
 		C1A4B6B9B4B4C4C3B29B6E96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCAudioCapturePermission.swift; sourceTree = "<group>"; };
+		D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAudioTapCapture.swift; sourceTree = "<group>"; };
 		D4CCF341189D337EEF681242 /* AudioVisualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioVisualizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB42E07EF64ABEA50B4AF8B7 /* audio-video-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "audio-video-gen"; path = .; sourceTree = SOURCE_ROOT; };
 		F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +106,7 @@
 			isa = PBXGroup;
 			children = (
 				BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */,
+				D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */,
 				6BD4350024811F6CAF800549 /* RingBuffer.swift */,
 				5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */,
 				CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */,
@@ -294,6 +297,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */,
+				FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */,
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
 				4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */,
 				5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */,

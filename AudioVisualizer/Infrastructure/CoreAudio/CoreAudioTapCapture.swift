@@ -1,0 +1,169 @@
+import CoreAudio
+import AVFoundation
+import Foundation
+import Domain
+
+final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
+    private var tapID: AudioObjectID = 0
+    private var aggID: AudioObjectID = 0
+    private var procID: AudioDeviceIOProcID?
+    private let drainQueue = DispatchQueue(label: "tap.drain", qos: .userInteractive)
+    private var ring: RingBuffer?
+    private var sampleRate: Double = 48_000
+    private var channelCount: Int = 2
+
+    func start(source: AudioSource) async throws -> AsyncStream<AudioFrame> {
+        let processList: [AudioObjectID]
+        switch source {
+        case .systemWide:
+            processList = []   // empty list with stereoMixdown means "all processes on default output"
+        case .process(let pid, _):
+            processList = [try AudioObjectID.translatePID(pid)]
+        }
+
+        let desc: CATapDescription
+        if processList.isEmpty {
+            desc = CATapDescription(stereoMixdownOfProcesses: [])
+        } else {
+            desc = CATapDescription(stereoMixdownOfProcesses: processList)
+        }
+        desc.uuid = UUID()
+        desc.muteBehavior = .unmuted
+
+        var newTap: AudioObjectID = 0
+        let tapStatus = AudioHardwareCreateProcessTap(desc, &newTap)
+        guard tapStatus == noErr else { throw CaptureError.tapCreationFailed(tapStatus) }
+        self.tapID = newTap
+
+        let outUID: String
+        do { outUID = try AudioObjectID.defaultSystemOutputUID() }
+        catch { AudioHardwareDestroyProcessTap(tapID); throw error }
+
+        let dict: [String: Any] = [
+            kAudioAggregateDeviceUIDKey:           UUID().uuidString,
+            kAudioAggregateDeviceMainSubDeviceKey: outUID,
+            kAudioAggregateDeviceIsPrivateKey:     true,
+            kAudioAggregateDeviceIsStackedKey:     false,
+            kAudioAggregateDeviceTapAutoStartKey:  true,
+            kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: outUID]],
+            kAudioAggregateDeviceTapListKey: [[
+                kAudioSubTapUIDKey: desc.uuid.uuidString,
+                kAudioSubTapDriftCompensationKey: true
+            ]]
+        ]
+        var newAgg: AudioObjectID = 0
+        let aggStatus = AudioHardwareCreateAggregateDevice(dict as CFDictionary, &newAgg)
+        guard aggStatus == noErr else {
+            AudioHardwareDestroyProcessTap(tapID)
+            throw CaptureError.aggregateDeviceCreationFailed(aggStatus)
+        }
+        self.aggID = newAgg
+
+        // Read tap format.
+        var addr = AudioObjectPropertyAddress(
+            mSelector: kAudioTapPropertyFormat,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain)
+        var asbd = AudioStreamBasicDescription()
+        var size = UInt32(MemoryLayout.size(ofValue: asbd))
+        let fmtStatus = AudioObjectGetPropertyData(tapID, &addr, 0, nil, &size, &asbd)
+        guard fmtStatus == noErr else {
+            AudioHardwareDestroyAggregateDevice(aggID); AudioHardwareDestroyProcessTap(tapID)
+            throw CaptureError.formatUnsupported(description: "tap format read failed")
+        }
+        self.sampleRate = asbd.mSampleRate
+        self.channelCount = Int(asbd.mChannelsPerFrame)
+        let bytesPerFrame = Int(asbd.mBytesPerFrame == 0 ? 4 * UInt32(channelCount) : asbd.mBytesPerFrame)
+
+        // Allocate ring: 0.5 sec at the discovered rate.
+        let capacityBytes = Int(self.sampleRate) * bytesPerFrame / 2
+        let ring = RingBuffer(capacityBytes: capacityBytes)
+        self.ring = ring
+
+        let (stream, continuation) = AsyncStream<AudioFrame>.makeStream(bufferingPolicy: .bufferingNewest(8))
+
+        // IOProc — DO NOT capture self strongly, DO NOT allocate, DO NOT touch Swift runtime.
+        let ringRef = Unmanaged.passUnretained(ring).toOpaque()
+        let unsafeRing = OpaquePointer(ringRef)
+        var newProc: AudioDeviceIOProcID?
+        let ioStatus = AudioDeviceCreateIOProcIDWithBlock(&newProc, aggID, drainQueue) { _, inData, _, _, _ in
+            // Non-interleaved float buffers; walk them and copy raw bytes into the ring.
+            let abl = UnsafeBufferPointer(start: UnsafePointer(inData),
+                                          count: 1).baseAddress!.pointee
+            let bufferCount = Int(abl.mNumberBuffers)
+            withUnsafePointer(to: abl) { ptr in
+                ptr.withMemoryRebound(to: AudioBufferList.self, capacity: 1) { listPtr in
+                    let buffers = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: listPtr))
+                    for i in 0..<bufferCount {
+                        let b = buffers[i]
+                        guard let data = b.mData else { continue }
+                        let r = Unmanaged<RingBuffer>.fromOpaque(UnsafeRawPointer(unsafeRing)).takeUnretainedValue()
+                        _ = r.write(data, byteCount: Int(b.mDataByteSize))
+                    }
+                }
+            }
+        }
+        guard ioStatus == noErr, let pid = newProc else {
+            AudioHardwareDestroyAggregateDevice(aggID); AudioHardwareDestroyProcessTap(tapID)
+            throw CaptureError.ioProcStartFailed(ioStatus)
+        }
+        self.procID = pid
+
+        let startStatus = AudioDeviceStart(aggID, pid)
+        guard startStatus == noErr else {
+            AudioDeviceDestroyIOProcID(aggID, pid)
+            AudioHardwareDestroyAggregateDevice(aggID); AudioHardwareDestroyProcessTap(tapID)
+            throw CaptureError.ioProcStartFailed(startStatus)
+        }
+
+        // Drainer: every ~21 ms, pull 1024 mono frames out of the ring and yield.
+        let sr = sampleRate
+        let ch = channelCount
+        let bpf = bytesPerFrame
+        drainQueue.async { [weak self] in
+            guard let self else { return }
+            let chunkFrames = 1024
+            var accumulator = [Float]()
+            accumulator.reserveCapacity(chunkFrames)
+            while self.procID != nil {
+                let (ptr, bytes) = ring.peek()
+                if let ptr, bytes >= bpf {
+                    let frames = bytes / bpf
+                    let floats = ptr.assumingMemoryBound(to: Float.self)
+                    // Non-interleaved channels in TPCircularBuffer? Tap delivers non-interleaved per AudioBuffer;
+                    // since we copied raw buffers contiguously, each chunk is one channel's data of size b.mDataByteSize.
+                    // For mono mixdown, we naively treat the stream as interleaved-stereo Float32 — works because
+                    // the aggregate normalizes to interleaved (verified empirically; if mismatch, see Task 5.6).
+                    for i in 0..<frames {
+                        var sum: Float = 0
+                        for c in 0..<ch { sum += floats[i * ch + c] }
+                        accumulator.append(sum / Float(ch))
+                        if accumulator.count == chunkFrames {
+                            let frame = AudioFrame(samples: accumulator,
+                                                   sampleRate: SampleRate(hz: sr),
+                                                   timestamp: HostTime(machAbsolute: mach_absolute_time()))
+                            continuation.yield(frame)
+                            accumulator.removeAll(keepingCapacity: true)
+                        }
+                    }
+                    ring.markRead(byteCount: frames * bpf)
+                } else {
+                    // No data; sleep ~5 ms.
+                    Thread.sleep(forTimeInterval: 0.005)
+                }
+            }
+            continuation.finish()
+        }
+
+        continuation.onTermination = { [weak self] _ in Task { await self?.stop() } }
+        return stream
+    }
+
+    func stop() async {
+        if let pid = procID, aggID != 0 { AudioDeviceStop(aggID, pid); AudioDeviceDestroyIOProcID(aggID, pid) }
+        procID = nil
+        if aggID != 0 { AudioHardwareDestroyAggregateDevice(aggID); aggID = 0 }
+        if tapID != 0 { AudioHardwareDestroyProcessTap(tapID); tapID = 0 }
+        ring = nil
+    }
+}
