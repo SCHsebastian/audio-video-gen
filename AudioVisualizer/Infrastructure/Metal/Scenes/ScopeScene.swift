@@ -12,7 +12,7 @@ final class ScopeScene: VisualizerScene {
         let desc = MTLRenderPipelineDescriptor()
         desc.vertexFunction = library.makeFunction(name: "scope_vertex")
         desc.fragmentFunction = library.makeFunction(name: "scope_fragment")
-        desc.colorAttachments[0].pixelFormat = .bgra8Unorm
+        desc.colorAttachments[0].pixelFormat = .bgra8Unorm_srgb
         desc.colorAttachments[0].isBlendingEnabled = true
         desc.colorAttachments[0].rgbBlendOperation = .add
         desc.colorAttachments[0].sourceRGBBlendFactor = .one
