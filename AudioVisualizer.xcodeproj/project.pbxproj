@@ -10,11 +10,13 @@
 		111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */; };
 		26884600E006F72B2D17E67C /* VDSPSpectrumAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */; };
 		2BF53352D03E7D477837AEEE /* VDSPSpectrumAnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47830BB5EB67565ECDB10B8A /* VDSPSpectrumAnalyzerTests.swift */; };
+		2E41DE7CB65832525BAF1A4F /* MetalDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */; };
 		347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */; };
 		368E756989688059F7A61697 /* VisualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832E146FD2B148356484937B /* VisualizerApp.swift */; };
 		42E2C620A618EC40CF48A1DD /* RunningApplicationsDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */; };
 		4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */; };
 		4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD4350024811F6CAF800549 /* RingBuffer.swift */; };
+		51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF2518C9DE9AAE618476A0 /* MetalCanvas.swift */; };
 		54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */; };
 		5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */; };
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
@@ -53,10 +55,12 @@
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
 		BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioObjectID+Properties.swift"; sourceTree = "<group>"; };
 		C1A4B6B9B4B4C4C3B29B6E96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C7EF2518C9DE9AAE618476A0 /* MetalCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalCanvas.swift; sourceTree = "<group>"; };
 		CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCAudioCapturePermission.swift; sourceTree = "<group>"; };
 		D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAudioTapCapture.swift; sourceTree = "<group>"; };
 		D4CCF341189D337EEF681242 /* AudioVisualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioVisualizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EB42E07EF64ABEA50B4AF8B7 /* audio-video-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "audio-video-gen"; path = .; sourceTree = SOURCE_ROOT; };
+		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
 		F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -88,6 +92,7 @@
 			children = (
 				7D4630AB1F70A58F44C09426 /* Analysis */,
 				24C1F88E6E4A5E797ACC378F /* CoreAudio */,
+				E7B69D8BC87EEACD15030FF5 /* Metal */,
 				BC36BD45045DA0243540DC00 /* Persistence */,
 			);
 			path = Infrastructure;
@@ -119,6 +124,7 @@
 			children = (
 				9E463E5D0576A1C0B0B60368 /* App */,
 				09D95D7DDAFF5DE8E15841A9 /* Infrastructure */,
+				EB02BF0975290A69B16427F1 /* Presentation */,
 				BEF6E531585159ABA688A9C4 /* Resources */,
 				E0FA60FAFD2DABE9187A79B6 /* Tests */,
 			);
@@ -132,6 +138,14 @@
 				F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		5DEA2238F516AEA89A4F14C7 /* Renderer */ = {
+			isa = PBXGroup;
+			children = (
+				EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */,
+			);
+			path = Renderer;
 			sourceTree = "<group>";
 		};
 		7D4630AB1F70A58F44C09426 /* Analysis */ = {
@@ -149,6 +163,14 @@
 				832E146FD2B148356484937B /* VisualizerApp.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		AA013CBEF4EDCE4B70D60822 /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				C7EF2518C9DE9AAE618476A0 /* MetalCanvas.swift */,
+			);
+			path = Scenes;
 			sourceTree = "<group>";
 		};
 		BBA513EBD7425767ED78B01C /* Packages */ = {
@@ -194,6 +216,22 @@
 				EE2A295646572E94C8AE0605 /* Smoke */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		E7B69D8BC87EEACD15030FF5 /* Metal */ = {
+			isa = PBXGroup;
+			children = (
+				5DEA2238F516AEA89A4F14C7 /* Renderer */,
+			);
+			path = Metal;
+			sourceTree = "<group>";
+		};
+		EB02BF0975290A69B16427F1 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				AA013CBEF4EDCE4B70D60822 /* Scenes */,
+			);
+			path = Presentation;
 			sourceTree = "<group>";
 		};
 		EE2A295646572E94C8AE0605 /* Smoke */ = {
@@ -299,6 +337,8 @@
 				347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */,
 				FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */,
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
+				51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */,
+				2E41DE7CB65832525BAF1A4F /* MetalDevice.swift in Sources */,
 				4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */,
 				5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */,
 				B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */,
