@@ -64,6 +64,28 @@ final class VisualizerViewModel {
         renderer.randomizeCurrent()
     }
 
+    /// Display name of the active palette, observed by the UI.
+    var paletteName: String { currentPaletteName }
+    private(set) var currentPaletteName: String = PaletteFactory.xpNeon.name
+
+    func cyclePalette() {
+        let all = PaletteFactory.all
+        let idx = all.firstIndex(where: { $0.name == currentPaletteName }) ?? 0
+        let next = all[(idx + 1) % all.count]
+        currentPaletteName = next.name
+        renderer.setPalette(next)
+        var prefs = preferences.load()
+        prefs.lastPaletteName = next.name
+        preferences.save(prefs)
+    }
+
+    func applyInitialPalette(named name: String) {
+        let all = PaletteFactory.all
+        let palette = all.first(where: { $0.name == name }) ?? all[0]
+        currentPaletteName = palette.name
+        renderer.setPalette(palette)
+    }
+
     func setSpeed(_ s: Float) {
         let clamped = max(0.1, min(3.0, s))
         speed = clamped

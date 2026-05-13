@@ -257,6 +257,22 @@
         }
       }
     },
+    "toolbar.palette.cycle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cycle color palette (P)"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar paleta de colores (P)"
+          }
+        }
+      }
+    },
     "toolbar.speed.label" : {
       "localizations" : {
         "en" : {

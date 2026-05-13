@@ -54,6 +54,17 @@ struct RootView: View {
                                     speed: Binding(
                                        get: { vm.speed },
                                        set: { vm.setSpeed($0); nudgeToolbar() }))
+                        Button {
+                            vm.cyclePalette(); nudgeToolbar()
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "paintpalette.fill")
+                                Text(vm.paletteName).font(.caption.weight(.medium))
+                            }
+                            .foregroundStyle(.white.opacity(0.85))
+                        }
+                        .buttonStyle(.plain)
+                        .help(localizer.string(.paletteCycle))
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 18)
@@ -96,6 +107,9 @@ struct RootView: View {
         ]
         if let ch = press.characters.first, let s = sceneByKey[ch] {
             vm.selectScene(s); nudgeToolbar(); return .handled
+        }
+        if press.characters == "p" || press.characters == "P" {
+            vm.cyclePalette(); nudgeToolbar(); return .handled
         }
         switch press.key {
         case .space:

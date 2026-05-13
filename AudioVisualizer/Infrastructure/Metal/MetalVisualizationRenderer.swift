@@ -12,6 +12,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     private var scenes: [SceneKind: VisualizerScene] = [:]
     private var currentKind: SceneKind = .bars
     private var paletteTexture: MTLTexture
+    private(set) var currentPaletteName: String = PaletteFactory.xpNeon.name
     private var lastTimestamp: CFTimeInterval = 0
     private var speed: Float = 1.0
 
@@ -68,6 +69,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         Log.render.info("setPalette: \(palette.name, privacy: .public)")
         guard let pal = PaletteFactory.texture(from: palette, device: device) else { return }
         self.paletteTexture = pal
+        self.currentPaletteName = palette.name
         // Re-build scenes with new palette (cheap — pipelines are unchanged).
         if let bars = scenes[.bars] as? BarsScene { try? bars.build(device: device, library: library, paletteTexture: pal) }
         if let scope = scenes[.scope] as? ScopeScene { try? scope.build(device: device, library: library, paletteTexture: pal) }

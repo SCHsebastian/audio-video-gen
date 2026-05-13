@@ -18,7 +18,26 @@ enum PaletteFactory {
         RGB(r: 0.05, g: 0, b: 0.1), RGB(r: 0.4, g: 0, b: 0.2),
         RGB(r: 1, g: 0.3, b: 0.2), RGB(r: 1, g: 0.8, b: 0.3)
     ])
-    static let all = [xpNeon, aurora, sunset]
+    static let inferno = ColorPalette(name: "Inferno", stops: [
+        RGB(r: 0, g: 0, b: 0.04),
+        RGB(r: 0.25, g: 0.04, b: 0.30),
+        RGB(r: 0.75, g: 0.12, b: 0.18),
+        RGB(r: 0.99, g: 0.45, b: 0.08),
+        RGB(r: 0.99, g: 0.98, b: 0.64)
+    ])
+    static let ocean = ColorPalette(name: "Ocean", stops: [
+        RGB(r: 0.0, g: 0.05, b: 0.12),
+        RGB(r: 0.0, g: 0.25, b: 0.45),
+        RGB(r: 0.05, g: 0.65, b: 0.85),
+        RGB(r: 0.55, g: 0.95, b: 0.85),
+        RGB(r: 0.95, g: 1.0,  b: 0.95)
+    ])
+    static let mono = ColorPalette(name: "Mono", stops: [
+        RGB(r: 0.04, g: 0.04, b: 0.06),
+        RGB(r: 0.45, g: 0.48, b: 0.55),
+        RGB(r: 0.92, g: 0.94, b: 0.98)
+    ])
+    static let all = [xpNeon, aurora, sunset, inferno, ocean, mono]
 
     static func texture(from palette: ColorPalette, device: MTLDevice) -> MTLTexture? {
         let n = 256
