@@ -6,26 +6,51 @@ import Domain
 /// help button, from the Help menu, and via the `?` key.
 struct AboutView: View {
     @Bindable var localizer: BundleLocalizer
+    /// When true, on appear the scroll view jumps to the shortcuts section.
+    /// Used by Help → Keyboard Shortcuts in the menu bar.
+    var scrollToShortcuts: Bool = false
     @Environment(\.dismiss) private var dismiss
 
+    private enum AboutAnchor: Hashable { case top, shortcuts }
+
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                header
-                Divider()
-                section(title: localizer.string(.aboutAuthorHeader),
-                        icon: "person.crop.circle.fill",
-                        body: localizer.string(.aboutAuthorBody))
-                section(title: localizer.string(.aboutAssistantHeader),
-                        icon: "sparkles",
-                        body: localizer.string(.aboutAssistantBody))
-                shortcuts
-                Divider()
-                versionRow
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    header.id(AboutAnchor.top)
+                    Divider()
+                    section(title: localizer.string(.aboutAuthorHeader),
+                            icon: "person.crop.circle.fill",
+                            body: localizer.string(.aboutAuthorBody))
+                    section(title: localizer.string(.aboutAssistantHeader),
+                            icon: "sparkles",
+                            body: localizer.string(.aboutAssistantBody))
+                    shortcuts.id(AboutAnchor.shortcuts)
+                    Divider()
+                    versionRow
+                }
+            // Asymmetric padding: more at the bottom so the last row never
+            // butts up against the sheet's frame on macOS sheets (whose
+            // content area shrinks slightly compared to the nominal height).
+            .padding(.horizontal, 32)
+            .padding(.top, 24)
+            .padding(.bottom, 36)
+            .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(28)
+            .scrollIndicators(.automatic)
+            .onAppear {
+                if scrollToShortcuts {
+                    // One-shot jump after layout settles.
+                    DispatchQueue.main.async {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            proxy.scrollTo(AboutAnchor.shortcuts, anchor: .top)
+                        }
+                    }
+                }
+            }
         }
-        .frame(width: 560, height: 620)
+        .frame(minWidth: 480, idealWidth: 560, maxWidth: 720,
+               minHeight: 480, idealHeight: 640, maxHeight: 820)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(localizer.string(.settingsClose)) { dismiss() }

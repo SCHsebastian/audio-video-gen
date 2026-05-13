@@ -10,6 +10,9 @@ struct RootView: View {
 
     @State private var showingSettings = false
     @State private var showingAbout = false
+    /// Bumped whenever the user wants the About sheet to scroll to its
+    /// keyboard-shortcuts anchor on next display (Help → Keyboard Shortcuts).
+    @State private var aboutScrollToShortcuts = false
     @State private var toolbarVisible = true
     @State private var hideTask: Task<Void, Never>? = nil
     @FocusState private var keyboardFocused: Bool
@@ -55,7 +58,18 @@ struct RootView: View {
                          onChange: { lang in vm.changeLanguage(lang) })
         }
         .sheet(isPresented: $showingAbout) {
-            NavigationStack { AboutView(localizer: localizer) }
+            NavigationStack {
+                AboutView(localizer: localizer,
+                          scrollToShortcuts: aboutScrollToShortcuts)
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: AppMenuNotification.showAbout)) { _ in
+            aboutScrollToShortcuts = false
+            showingAbout = true
+        }
+        .onReceive(NotificationCenter.default.publisher(for: AppMenuNotification.showShortcuts)) { _ in
+            aboutScrollToShortcuts = true
+            showingAbout = true
         }
         .focusable()
         .focusEffectDisabled()
