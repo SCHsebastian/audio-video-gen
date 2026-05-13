@@ -326,9 +326,21 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
               let rpd = view.currentRenderPassDescriptor,
               let cmd = queue.makeCommandBuffer() else { return }
 
+        let aspect = Float(view.drawableSize.width / max(1, view.drawableSize.height))
+
         // Compute pass for Alchemy.
         if let alch = scene as? AlchemyScene {
-            alch.dispatchCompute(into: cmd, dt: dt, aspect: Float(view.drawableSize.width / max(1, view.drawableSize.height)))
+            alch.dispatchCompute(into: cmd, dt: dt, aspect: aspect)
+        }
+        // Milkdrop's ping-pong feedback loop (warp + waveform) renders into
+        // its own offscreen target before the drawable's render pass.
+        if let md = scene as? MilkdropScene {
+            md.prepass(into: cmd, drawableSize: view.drawableSize, aspect: aspect, dt: dt)
+        }
+        // Lissajous renders its phosphor-persistence trace into an offscreen
+        // accumulator before compositing into the drawable.
+        if let li = scene as? LissajousScene {
+            li.prepass(into: cmd, drawableSize: view.drawableSize, aspect: aspect, dt: dt)
         }
 
         rpd.colorAttachments[0].loadAction = .clear

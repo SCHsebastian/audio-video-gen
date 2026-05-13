@@ -1,18 +1,33 @@
+import Foundation
 import Metal
 import Domain
 
-/// Scrolling spectrogram waterfall. A ring-buffer texture stores recent
-/// spectrum frames (rows = time, columns = bands); each `update()` writes one
-/// fresh row at `writeIndex` and advances the index. The fragment shader maps
-/// screen Y to a history offset and samples the texture.
+/// Canonical spectrogram waterfall. Time runs horizontally (newest at the
+/// right edge), frequency vertically on a log axis (bass at the bottom).
+/// The CPU bakes a *column* per frame — log-Hz remap of the 64 linear FFT
+/// bands, then 20·log10 + 80 dB normalization — and writes one column into
+/// a ring-buffer texture. The shader rotates the texture so the write head
+/// always lives at the right edge.
 final class SpectrogramScene: VisualizerScene {
-    private let bandCount: Int = 64
-    private let historyRows: Int = 256
-    private var writeIndex: Int = 0
+    private static let W = 1024              // history columns (~17 s @ 60 fps)
+    private static let H = 256               // log-frequency rows
+    private static let fMin: Float = 20
+    private static let fMax: Float = 24_000  // Nyquist for 48 kHz capture
+    private static let dbFloor: Float = -80
+    private static let dbCeil:  Float = 0
 
+    private static let inputBands: Int = 64
+    private static let hzPerInputBin: Float = (48_000 * 0.5) / Float(inputBands)
+
+    private var writeCol: Int = 0
     private var pipeline: MTLRenderPipelineState!
     private var paletteTexture: MTLTexture!
     private var historyTexture: MTLTexture!
+
+    // Per-row "max-with-decay" memory so sustained tones look stable.
+    private var previousColumn = [Float](repeating: 0, count: H)
+    // Precomputed log-Hz → linear-bin lookup table (one entry per H row).
+    private var binTable: [Float] = []   // length H — fractional bin index per row
 
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws {
         self.paletteTexture = paletteTexture
@@ -26,47 +41,98 @@ final class SpectrogramScene: VisualizerScene {
 
         let tdesc = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .r32Float,
-            width: bandCount, height: historyRows, mipmapped: false)
-        tdesc.usage = [.shaderRead, .renderTarget]
+            width: Self.W, height: Self.H, mipmapped: false)
+        tdesc.usage = [.shaderRead]
         tdesc.storageMode = .shared
         guard let tex = device.makeTexture(descriptor: tdesc) else {
             throw RenderError.pipelineCreationFailed(name: "Spectrogram.history")
         }
-        // Zero-fill so the first frames aren't garbage.
-        var zeros = [Float](repeating: 0, count: bandCount * historyRows)
+        // Zero-fill so empty regions render as the dark end of the palette.
+        let zeros = [Float](repeating: 0, count: Self.W * Self.H)
         zeros.withUnsafeBytes { raw in
-            tex.replace(region: MTLRegionMake2D(0, 0, bandCount, historyRows),
+            tex.replace(region: MTLRegionMake2D(0, 0, Self.W, Self.H),
                         mipmapLevel: 0,
                         withBytes: raw.baseAddress!,
-                        bytesPerRow: bandCount * MemoryLayout<Float>.size)
+                        bytesPerRow: Self.W * MemoryLayout<Float>.size)
         }
         self.historyTexture = tex
-        self.writeIndex = 0
+        self.writeCol = 0
+
+        // Build the log-Hz → linear-bin table for row k ∈ [0, H).
+        let ratio = log2f(Self.fMax / Self.fMin)
+        binTable.reserveCapacity(Self.H)
+        for k in 0..<Self.H {
+            let t = Float(k) / Float(Self.H - 1)
+            let f = Self.fMin * exp2f(ratio * t)
+            binTable.append(f / Self.hzPerInputBin)
+        }
     }
 
     func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
-        // Write one row at `writeIndex`. The shader knows the ring direction.
-        let n = min(bandCount, spectrum.bands.count)
-        var row = [Float](repeating: 0, count: bandCount)
-        for i in 0..<n { row[i] = spectrum.bands[i] }
-        row.withUnsafeBytes { raw in
-            historyTexture.replace(region: MTLRegionMake2D(0, writeIndex, bandCount, 1),
+        // Build one log-Hz, dB-scaled, normalized column [0..1] over H rows.
+        let bands = spectrum.bands
+        let n = bands.count
+        guard n > 0 else { return }
+        var column = [Float](repeating: 0, count: Self.H)
+        let lastBin = n - 1
+        let dbRange = Self.dbCeil - Self.dbFloor
+
+        for k in 0..<Self.H {
+            let frac = binTable[k]
+            let b0 = max(0, min(lastBin, Int(frac.rounded(.down))))
+            let b1 = min(lastBin, b0 + 1)
+            let t = frac - Float(b0)
+            let mag = bands[b0] * (1 - t) + bands[b1] * t
+            // dB scale → normalize over [floor, ceil] → clamp to [0, 1].
+            let db = 20.0 * log10f(max(mag, 1e-6))
+            var v = (db - Self.dbFloor) / dbRange
+            if v < 0 { v = 0 }
+            if v > 1 { v = 1 }
+            // Per-row "peak hold with decay" — same idea as RX/Spek.
+            let prev = previousColumn[k] * 0.85
+            column[k] = max(v, prev)
+            previousColumn[k] = column[k]
+        }
+
+        // Bottom of the screen should be bass — but ndc.y maps top→1, so when
+        // the shader does `v_tex = uv.y` row 0 ends up at the bottom of the
+        // screen. We want row 0 = bass = bottom, so this matches naturally —
+        // ndc.y=-1 (bottom) → uv.y=0 → row 0. Good.
+
+        column.withUnsafeBytes { raw in
+            historyTexture.replace(region: MTLRegionMake2D(writeCol, 0, 1, Self.H),
                                    mipmapLevel: 0,
                                    withBytes: raw.baseAddress!,
-                                   bytesPerRow: bandCount * MemoryLayout<Float>.size)
+                                   bytesPerRow: MemoryLayout<Float>.size)
         }
-        writeIndex = (writeIndex + 1) % historyRows
+        writeCol = (writeCol + 1) % Self.W
     }
 
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {
         enc.setRenderPipelineState(pipeline)
-        var u = (aspect: uniforms.aspect,
-                 bandCount: Int32(bandCount),
-                 historyRows: Int32(historyRows),
-                 writeIndex: Int32(writeIndex))
+        // writeColNorm sits at the *next* slot — that's where the newest
+        // column is about to land. Shader uses `fract(uv.x + writeColNorm)`
+        // to put the newest column at the right edge.
+        let writeColNorm = Float(writeCol) / Float(Self.W)
+        var u = SU(aspect: uniforms.aspect,
+                   W: Int32(Self.W), H: Int32(Self.H),
+                   writeColNorm: 1.0 - writeColNorm,
+                   showPitchGrid: 0,
+                   _pad0: 0, _pad1: 0, _pad2: 0)
         enc.setFragmentBytes(&u, length: MemoryLayout.size(ofValue: u), index: 1)
         enc.setFragmentTexture(paletteTexture, index: 0)
         enc.setFragmentTexture(historyTexture, index: 1)
         enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
+    }
+
+    private struct SU {
+        var aspect: Float
+        var W: Int32
+        var H: Int32
+        var writeColNorm: Float
+        var showPitchGrid: Int32
+        var _pad0: Float
+        var _pad1: Float
+        var _pad2: Float
     }
 }

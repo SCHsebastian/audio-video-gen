@@ -26,26 +26,55 @@ void vk_rose(float *out_xy,
              int32_t petals,
              float rms);
 
-/// Post-process a raw spectrum into displayed bar heights with perceptual scaling,
-/// attack-fast / release-slow smoothing and a per-bar peak-decay envelope.
-/// `state` is caller-owned scratch of length `count` and persists across calls
-/// (initialise to zero). `beat` adds a brief overall lift on transients.
-/// `in`/`out` have length `count`. `dt` is the frame interval in seconds.
-void vk_bars_process(const float *in,
-                     float *out,
-                     float *state,
-                     uint32_t count,
-                     float dt,
-                     float beat);
+/// Catmull-Rom subdivision of an XY polyline. Given `inCount` 2D control points in
+/// `in_xy` (length = inCount*2), produces `(inCount-3)*subdivs + 1` evenly-spaced
+/// curve samples in `out_xy` (length must be `(inCount-3)*subdivs + 1` pairs).
+/// Used by Lissajous to smooth the parametric trace into a continuous "phosphor"
+/// curve before per-pixel SDF rendering.
+void vk_catmull_rom(const float *in_xy,
+                    uint32_t inCount,
+                    float *out_xy,
+                    uint32_t subdivs);
 
-/// Smooth and shape an oscilloscope tail into a glow-friendly envelope.
-/// Applies a small 3-tap low-pass, a soft non-linear gain (tanh-style) and a
-/// gentle high-pass to remove DC, then writes `count` samples in `out`.
-/// `gain` is the input amplitude scale (use 1.0 to start). In/out may not alias.
-void vk_scope_envelope(const float *in,
-                       float *out,
-                       uint32_t count,
-                       float gain);
+/// Canonical bars-spectrum kernel.
+///
+/// Input: `in[inCount]` is a linear-frequency FFT magnitude band array (typically
+/// 64 bands covering [0, sampleRate/2]).
+///
+/// Output: `out[outCount]` are normalized bar heights in [0, 1] (post log-frequency
+/// rebinning, dB scaling, perceptual +3 dB/oct slope, and asymmetric attack/release
+/// smoothing). `peaks[outCount]` are the floating peak-cap positions.
+///
+/// `state` is caller-owned scratch of length `2*outCount` (initialise to zero):
+/// the first `outCount` floats hold the per-bar smoothing state, the next
+/// `outCount` hold the per-bar peak-hold timers.
+///
+/// `dt` is the frame interval in seconds. `sampleRate` is the audio sample rate
+/// (Hz, e.g. 48000).
+void vk_bars_process(const float *in,
+                     uint32_t inCount,
+                     float *out,
+                     uint32_t outCount,
+                     float *state,
+                     float *peaks,
+                     float sampleRate,
+                     float dt);
+
+/// Canonical oscilloscope pre-processor.
+///
+/// `in[inCount]` is a window of PCM samples in [-1, 1]; typically 1024.
+/// `out[outCount]` receives `outCount` samples (typically 512) sliced from `in`
+/// starting at the first positive-going zero-crossing past `inCount/4` (Schmitt
+/// trigger with `±hysteresis` deadband). DC is removed before the slice so the
+/// trace doesn't drift vertically. `gain` is multiplied in after triggering.
+///
+/// The trigger-sync is what makes a sustained tone hold still on the display
+/// instead of jittering like jelly.
+void vk_scope_prepare(const float *in,
+                      uint32_t inCount,
+                      float *out,
+                      uint32_t outCount,
+                      float gain);
 
 /// Returns the build identifier of the kernels library. Used as a smoke-test that
 /// the C++ target is linked in. Caller must NOT free the returned pointer.

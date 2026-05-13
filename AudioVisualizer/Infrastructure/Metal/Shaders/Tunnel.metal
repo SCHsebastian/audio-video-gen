@@ -1,15 +1,27 @@
 #include <metal_stdlib>
 using namespace metal;
 
+// Canonical 2D-trick tunnel (Inigo Quilez's "Tunnel" technique).
+// Project each fragment onto a cylinder by (u, v) = (angle/π, 1/r + scroll);
+// shade a checkerboard pattern in (u, v) space with derivative AA via
+// `fwidth(cell)`; fog the result with `exp(-depth * k)` so the centre fades
+// into a vanishing point.
+
 struct TunnelUniforms {
     float time;
     float aspect;
     float rms;
-    float beat;
-    float twist;       // ring twist frequency (per turn)
-    float depth;       // depth-curve coefficient
-    float tight;       // ring tightness (band width scaler)
-    float _pad;
+    float beat;          // [0, 1] beat envelope (decays in the scene)
+    float beatAge;       // [0, 1] seconds-since-last-beat ramp
+    float bass;
+    float treble;
+    float twist;         // depth-coupled twist freq (per `randomize`)
+    float depth;         // tunnel radius / depth coefficient
+    float nAng;          // angular checker cell count
+    float nDep;          // depth checker cell count
+    float direction;     // ±1 — flips scroll
+    float _pad0;
+    float _pad1;
 };
 
 struct TVertexOut {
@@ -30,25 +42,56 @@ fragment float4 tunnel_fragment(TVertexOut in [[stage_in]],
                                 constant TunnelUniforms &u [[buffer(0)]],
                                 texture2d<float> palette [[texture(0)]]) {
     constexpr sampler s(filter::linear);
+
+    // Aspect-correct fragment coord, then a slow audio-coupled camera roll.
     float2 p = in.uv;
     p.x *= u.aspect;
+    float roll = u.time * 0.10
+               + u.bass * 0.50 * sin(u.time * 0.30)
+               + 0.05 * sin(u.time * 0.70);
+    float cR = cos(roll), sR = sin(roll);
+    p = float2(cR * p.x - sR * p.y, sR * p.x + cR * p.y);
+
+    // Polar + the depth trick: r → screen radius, 1/r is the projection of
+    // depth along a cylinder. `max(r, eps)` guards the singularity at centre.
     float r = length(p);
     float a = atan2(p.y, p.x);
-    // Tunnel coordinates: depth ~ 1/r, twist ~ a + time.
-    float depth = u.depth / max(r, 0.001);
-    float twist = a / 3.14159265 + 0.5;
-    float band = fract(depth - u.time * (0.35 + u.rms * 2.5));
-    float w = 0.12 / max(0.4, u.tight);
-    float ring1 = smoothstep(0.5 - w, 0.5, band) - smoothstep(0.5, 0.5 + w, band);
-    float ring2 = exp(-pow((band - 0.5) * 3.0 * u.tight, 2.0)) * 0.6;
-    float rings = ring1 * 0.75 + ring2 * 0.55;
-    float swirl = 0.5 + 0.5 * sin(twist * u.twist + u.time * 0.9);
-    // Soft vignette + beat lift.
-    float vignette = smoothstep(1.8, 0.15, r);
-    float pulse = 1.0 + 0.5 * u.beat;
-    float intensity = (rings * 0.95 + swirl * 0.10) * vignette * pulse;
-    float4 col = palette.sample(s, float2(saturate(intensity + u.rms * 0.4), 0.5));
-    col.rgb *= intensity * 1.4;
-    col.a = 1.0;
-    return col;
+    float depthZ = u.depth / max(r, 1e-3);
+    float scroll = u.time * u.direction * (0.35 + u.rms * 2.5);
+
+    // (u, v) cylinder coordinates with bass-driven depth-coupled twist.
+    float angU = a / 3.14159265;
+    float twistAmt = 0.40 + 1.20 * u.bass;
+    float depthV = depthZ + scroll
+                 + u.treble * 0.04 * sin(a * 12.0 + u.time * 8.0);   // hi-freq ripple
+    angU += twistAmt * sin(depthV * 0.7);                            // spiral
+
+    // Checkerboard in (u, v) — derivative-based AA via `fwidth(cell)`.
+    float2 cell = float2(angU * u.nAng * 0.5, depthV * u.nDep);
+    float2 g  = fract(cell) - 0.5;
+    float2 fw = max(fwidth(cell), 1e-4);
+    float2 e  = smoothstep(0.5 - fw, 0.5 + fw, abs(g));
+    float chk = 1.0 - (e.x * (1.0 - e.y) + e.y * (1.0 - e.x));   // 0..1 AA checker
+
+    // Palette advances with depth so colour visibly flies past.
+    float palU = fract(depthV * 0.25 + u.rms * 0.30 + u.treble * 0.15);
+    float3 colorBand = palette.sample(s, float2(palU, 0.5)).rgb;
+    float shade = mix(0.30, 1.00, chk);
+    float3 col = colorBand * shade;
+
+    // Exponential depth fog.
+    float fog = exp(-depthZ * 0.15);
+    col *= fog;
+    // Vanishing-point glow so the centre never reads as pure black.
+    col += float3(0.04, 0.05, 0.08) * smoothstep(0.30, 0.00, r);
+
+    // Beat shockwave — a decaying ring outward from the vanishing point.
+    float beatBand = exp(-3.0 * fabs(r - 0.5 * (1.0 - u.beatAge)));
+    col += u.beat * beatBand * float3(1.0, 0.7, 0.9) * 0.7;
+
+    // Soft vignette.
+    float vign = smoothstep(1.65, 0.40, length(in.uv));
+    col *= vign;
+
+    return float4(col, 1.0);
 }

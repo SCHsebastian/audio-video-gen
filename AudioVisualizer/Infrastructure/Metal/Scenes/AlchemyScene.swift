@@ -1,6 +1,11 @@
 import Metal
 import Domain
 
+/// GPU compute-shader particle scene driven by a curl-noise flow field.
+/// Bass loosens the cloud (drag), mid changes the curl frequency, treble
+/// shortens lifetimes (sparkle feel), beats deliver a one-shot radial
+/// impulse. Velocity is capped so dense beat sequences can't fling particles
+/// off-screen; drag is in per-second form so 60/120 Hz refresh rates match.
 final class AlchemyScene: VisualizerScene {
     private let particleCount = 120_000
     private var particles: MTLBuffer!
@@ -11,9 +16,9 @@ final class AlchemyScene: VisualizerScene {
     private var mid: Float = 0
     private var treble: Float = 0
     private var beatEnv: Float = 0
+    private var beatTriggered: Bool = false
     private var simTime: Float = 0
 
-    // Randomizable behavior parameters — `randomize()` perturbs them.
     private var attractorSpeedX: Float = 0.55
     private var attractorSpeedY: Float = 0.71
     private var attractorAmpX: Float = 0.60
@@ -36,7 +41,7 @@ final class AlchemyScene: VisualizerScene {
         desc.colorAttachments[0].isBlendingEnabled = true
         desc.colorAttachments[0].rgbBlendOperation = .add
         desc.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
-        desc.colorAttachments[0].destinationRGBBlendFactor = .one    // additive
+        desc.colorAttachments[0].destinationRGBBlendFactor = .one
         desc.colorAttachments[0].alphaBlendOperation = .add
         desc.colorAttachments[0].sourceAlphaBlendFactor = .one
         desc.colorAttachments[0].destinationAlphaBlendFactor = .one
@@ -61,28 +66,37 @@ final class AlchemyScene: VisualizerScene {
 
     func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
         let bandCount = spectrum.bands.count
-        let lo = bandCount / 4
-        let hi = bandCount * 3 / 4
-        let bassAvg = bandCount > 0 ? spectrum.bands.prefix(lo).reduce(0, +) / Float(max(1, lo)) : 0
-        let midAvg = bandCount > 0 ? spectrum.bands[lo..<hi].reduce(0, +) / Float(max(1, hi - lo)) : 0
-        let trebleAvg = bandCount > 0 ? spectrum.bands[hi..<bandCount].reduce(0, +) / Float(max(1, bandCount - hi)) : 0
-        bass = max(bassAvg, bass * 0.88)
-        mid = max(midAvg, mid * 0.85)
-        treble = max(trebleAvg, treble * 0.80)
-        if let b = beat { beatEnv = max(beatEnv, b.strength) }
-        beatEnv *= 0.90
+        // Explicit bass/mid/treble ranges — match the spec, not bandCount/4.
+        let bassEnd = min(8, bandCount)
+        let midStart = min(8, bandCount - 1)
+        let midEnd   = min(32, bandCount)
+        let hiStart  = min(32, bandCount - 1)
+        let hiEnd    = bandCount
+        let bassAvg = bandCount > 0 ? spectrum.bands.prefix(bassEnd).reduce(0, +) / Float(bassEnd) : 0
+        let midAvg = (midStart..<midEnd).reduce(Float(0)) { $0 + spectrum.bands[$1] } / Float(max(1, midEnd - midStart))
+        let trebAvg = (hiStart..<hiEnd).reduce(Float(0)) { $0 + spectrum.bands[$1] } / Float(max(1, hiEnd - hiStart))
+        bass   = max(bassAvg, bass * 0.88)
+        mid    = max(midAvg,  mid  * 0.85)
+        treble = max(trebAvg, treble * 0.80)
+
+        // Beat: triggered only on the frame the event arrives; envelope decays.
+        beatTriggered = false
+        if let b = beat {
+            beatEnv = max(beatEnv, b.strength)
+            beatTriggered = true
+        }
+        beatEnv *= expf(-dt / 0.150)
         simTime += dt
     }
 
     func randomize() {
-        // Speeds are kept distinct so x and y don't lock in phase → visible motion.
         attractorSpeedX = Float.random(in: 0.4...1.1)
         attractorSpeedY = Float.random(in: 0.4...1.1)
         if abs(attractorSpeedX - attractorSpeedY) < 0.1 { attractorSpeedY += 0.25 }
         attractorAmpX = Float.random(in: 0.40...0.70)
         attractorAmpY = Float.random(in: 0.35...0.60)
-        curlScale = Float.random(in: 1.0...3.5)
-        swirlBias = Float.random(in: 0.7...1.8)
+        curlScale = Float.random(in: 1.0...3.0)
+        swirlBias = Float.random(in: 0.7...1.6)
         hueShift = Float.random(in: 0..<1)
     }
 
@@ -122,7 +136,7 @@ final class AlchemyScene: VisualizerScene {
         var curlScale: Float
         var swirlBias: Float
         var hueShift: Float
-        var _pad0: Float = 0
+        var beatTriggered: Float = 0
         var _pad1: Float = 0
     }
 
@@ -131,6 +145,7 @@ final class AlchemyScene: VisualizerScene {
                   dt: dt, aspect: aspect, time: simTime,
                   attractorSpeedX: attractorSpeedX, attractorSpeedY: attractorSpeedY,
                   attractorAmpX: attractorAmpX, attractorAmpY: attractorAmpY,
-                  curlScale: curlScale, swirlBias: swirlBias, hueShift: hueShift)
+                  curlScale: curlScale, swirlBias: swirlBias, hueShift: hueShift,
+                  beatTriggered: beatTriggered ? 1.0 : 0.0)
     }
 }

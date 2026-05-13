@@ -111,6 +111,7 @@
 		6BD4350024811F6CAF800549 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
 		7180AC02064B64F9D2A8ADC8 /* MilkdropScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilkdropScene.swift; sourceTree = "<group>"; };
 		78640E93FCEAA978C26DFEC6 /* RenderBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderBus.swift; sourceTree = "<group>"; };
+		7E90845CB044F1B26614E635 /* youthful-almeida-53ac93 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "youthful-almeida-53ac93"; path = .; sourceTree = SOURCE_ROOT; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
 		881865058AC789F7F65FA676 /* PaletteTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteTexture.swift; sourceTree = "<group>"; };
 		8A79CD1C85F3DFE42E4766D2 /* VisualizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerViewModel.swift; sourceTree = "<group>"; };
@@ -121,7 +122,6 @@
 		9BBBD60354247251BD907B01 /* SynthwaveScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthwaveScene.swift; sourceTree = "<group>"; };
 		9CE7987B00B0E970D32C03AF /* AmbientVignette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientVignette.swift; sourceTree = "<group>"; };
 		A693DF52CB2769B94E01BD74 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		A8AB876AEE331330FE6E92E0 /* practical-black-5de856 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "practical-black-5de856"; path = .; sourceTree = SOURCE_ROOT; };
 		AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = AlchemyParticles.metal; sourceTree = "<group>"; };
 		B03E0DD61CB8364D25CED809 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
@@ -338,7 +338,7 @@
 		BBA513EBD7425767ED78B01C /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				A8AB876AEE331330FE6E92E0 /* practical-black-5de856 */,
+				7E90845CB044F1B26614E635 /* youthful-almeida-53ac93 */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
