@@ -181,18 +181,63 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         return min(1, raw * audioGain)
     }
 
-    /// Smoothed beat strength in [0, 1] for use by ambient UI effects (e.g. vignette).
-    /// Attack and release are deliberately gentle: a hard attack reads as a
-    /// strobe on bright scenes and is fatiguing to look at. Bars are the only
-    /// scene whose own shader brightens with beats — the rest of the scenes
-    /// only react through these ambient overlays, so softening here calms
-    /// everything except Bars (which is what the user asked for).
-    private var smoothedBeat: Float = 0
+    // Time-based beat envelope state. peekBeat() shapes a one-shot pulse on
+    // every new beat: ramp from the current value up to the peak over
+    // `attackDuration`, then ease back down to zero over `releaseDuration`.
+    // Total pulse length ≈ 0.55s — perceptibly rhythmic, never strobe.
+    private let beatAttackDuration: CFTimeInterval = 0.10
+    private let beatReleaseDuration: CFTimeInterval = 0.45
+    private var beatPulseStart: CFTimeInterval = 0
+    private var beatPulseFromValue: Float = 0
+    private var beatPulsePeak: Float = 0
+    private var lastSeenBeatMachTime: UInt64 = 0
+
+    /// Smoothed beat strength in [0, 1] for use by ambient UI effects.
+    ///
+    /// Replaces the previous per-frame exponential smoothing with a time-based
+    /// envelope so the curve is independent of call rate. The shape is:
+    ///
+    ///   t ∈ [0, attack)            → cubic ease-out from fromValue to peak
+    ///   t ∈ [attack, attack+rel)   → cubic ease-in  from peak to 0
+    ///   t ≥ attack+release         → 0
+    ///
+    /// A new beat (detected by a fresh timestamp) takeover-restarts the pulse
+    /// from whatever value we're currently at, so back-to-back beats don't
+    /// snap downward before ramping up again.
     func peekBeat() -> Float {
-        let target = stateLock.withLock { s -> Float in s.beat?.strength ?? 0 }
-        let coef: Float = target > smoothedBeat ? 0.22 : 0.05
-        smoothedBeat += (target - smoothedBeat) * coef
-        return min(1, smoothedBeat * beatSensitivity)
+        let now = CACurrentMediaTime()
+
+        // Pick up new beat events from the analyzer.
+        let observed = stateLock.withLock { s -> (UInt64, Float)? in
+            guard let b = s.beat else { return nil }
+            return (b.timestamp.machAbsolute, b.strength)
+        }
+        if let (ts, strength) = observed, ts != lastSeenBeatMachTime {
+            lastSeenBeatMachTime = ts
+            beatPulseFromValue = currentEnvelopeValue(at: now)
+            beatPulsePeak = max(strength, beatPulseFromValue)
+            beatPulseStart = now
+        }
+
+        return min(1, currentEnvelopeValue(at: now) * beatSensitivity)
+    }
+
+    private func currentEnvelopeValue(at now: CFTimeInterval) -> Float {
+        guard beatPulseStart > 0 else { return 0 }
+        let t = now - beatPulseStart
+        if t < 0 { return beatPulseFromValue }
+        if t < beatAttackDuration {
+            let u = Float(t / beatAttackDuration)
+            let eased = 1 - pow(1 - u, 3)                    // ease-out cubic
+            return beatPulseFromValue + (beatPulsePeak - beatPulseFromValue) * eased
+        }
+        let r = t - beatAttackDuration
+        if r < beatReleaseDuration {
+            let u = Float(r / beatReleaseDuration)
+            let eased = u * u * u                              // ease-in cubic
+            return beatPulsePeak * (1 - eased)
+        }
+        return 0
     }
 
     var currentScene: SceneKind { currentKind }
