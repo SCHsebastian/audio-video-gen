@@ -46,12 +46,26 @@ Built end-to-end with [Claude](https://www.anthropic.com/claude) by
 
 ## Install (pre-built)
 
-Download the latest `.zip` from the [Releases page](https://github.com/SCHsebastian/audio-video-gen/releases),
-unzip, and drag **AudioVisualizer.app** to `/Applications`.
+Download the latest `AudioVisualizer-<version>.dmg` from the
+[Releases page](https://github.com/SCHsebastian/audio-video-gen/releases),
+open it, and drag **AudioVisualizer.app** onto the **Applications** alias —
+the installer window already shows the two side-by-side with an arrow.
 
 > The binary is ad-hoc signed (not notarized). On first launch macOS Gatekeeper
 > may complain. Right-click → Open, or run
 > `xattr -dr com.apple.quarantine /Applications/AudioVisualizer.app` once.
+
+### Building the installer yourself
+
+```bash
+./scripts/make-dmg.sh
+# → dist/AudioVisualizer-<version>.dmg
+```
+
+The script does a Release build, stages it alongside a `/Applications`
+symlink and the branded background, then uses AppleScript to set the Finder
+window's icon positions and background image, and finally compresses the
+result with `hdiutil convert -format UDZO`.
 
 ## Use
 
