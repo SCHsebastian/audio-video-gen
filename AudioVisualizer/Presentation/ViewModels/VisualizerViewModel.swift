@@ -16,6 +16,8 @@ final class VisualizerViewModel {
     var beatSensitivity: Float = 1.0
     var reduceMotion: Bool = false
     var showDiagnostics: Bool = false
+    /// FPS cap fed to the MTKView. 0 = unlimited.
+    var maxFPS: Int = 120
     /// Toast surfaced after a snapshot was saved (or failed). Auto-clears.
     var snapshotToast: String? = nil
     private var clearSnapshotToastTask: Task<Void, Never>? = nil
@@ -163,11 +165,20 @@ final class VisualizerViewModel {
 
     func toggleDiagnostics() { setShowDiagnostics(!showDiagnostics) }
 
+    func setMaxFPS(_ fps: Int) {
+        let clamped = max(0, min(240, fps))
+        maxFPS = clamped
+        var prefs = preferences.load()
+        prefs.maxFPS = clamped
+        preferences.save(prefs)
+    }
+
     func applyInitial(prefs: UserPreferences) {
         audioGain = prefs.audioGain
         beatSensitivity = prefs.beatSensitivity
         reduceMotion = prefs.reduceMotion
         showDiagnostics = prefs.showDiagnostics
+        maxFPS = prefs.maxFPS
         renderer.setAudioGain(prefs.audioGain)
         renderer.setBeatSensitivity(prefs.beatSensitivity)
     }
@@ -179,6 +190,7 @@ final class VisualizerViewModel {
         setBeatSensitivity(d.beatSensitivity)
         setReduceMotion(d.reduceMotion)
         setShowDiagnostics(d.showDiagnostics)
+        setMaxFPS(d.maxFPS)
         applyInitialPalette(named: d.lastPaletteName)
         var prefs = preferences.load()
         prefs.lastPaletteName = d.lastPaletteName

@@ -41,6 +41,9 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case settingsPaletteSection   = "settings.palette.section"
     case settingsDefaultSceneLabel = "settings.defaultScene.label"
     case settingsSpeedLabel       = "settings.speed.label"
+    case settingsFPSLabel         = "settings.fps.label"
+    case settingsFPSHint          = "settings.fps.hint"
+    case settingsFPSUnlimited     = "settings.fps.unlimited"
 
     // Settings — Audio
     case settingsAudioGainLabel   = "settings.audioGain.label"

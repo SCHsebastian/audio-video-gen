@@ -34,6 +34,7 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
         let beatSensitivity: Float?
         let reduceMotion: Bool?
         let showDiagnostics: Bool?
+        let maxFPS: Int?
 
         init(domain p: UserPreferences) {
             switch p.lastSource {
@@ -48,6 +49,7 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
             beatSensitivity = p.beatSensitivity
             reduceMotion = p.reduceMotion
             showDiagnostics = p.showDiagnostics
+            maxFPS = p.maxFPS
         }
 
         func toDomain() -> UserPreferences {
@@ -66,7 +68,8 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
                 audioGain: audioGain ?? 1.0,
                 beatSensitivity: beatSensitivity ?? 1.0,
                 reduceMotion: reduceMotion ?? false,
-                showDiagnostics: showDiagnostics ?? false)
+                showDiagnostics: showDiagnostics ?? false,
+                maxFPS: maxFPS ?? 120)
         }
     }
 }

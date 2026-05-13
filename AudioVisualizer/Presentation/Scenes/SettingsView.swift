@@ -84,6 +84,20 @@ struct SettingsView: View {
                 .pickerStyle(.menu)
             }
             Section {
+                Picker(localizer.string(.settingsFPSLabel), selection: Binding(
+                    get: { vm.maxFPS },
+                    set: { vm.setMaxFPS($0) })) {
+                    Text("30 fps").tag(30)
+                    Text("60 fps").tag(60)
+                    Text("90 fps").tag(90)
+                    Text("120 fps").tag(120)
+                    Text(localizer.string(.settingsFPSUnlimited)).tag(0)
+                }
+                .pickerStyle(.menu)
+                Text(localizer.string(.settingsFPSHint))
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            Section {
                 LabeledContent(localizer.string(.settingsSpeedLabel)) {
                     HStack {
                         Slider(value: Binding(

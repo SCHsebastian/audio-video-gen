@@ -18,7 +18,7 @@ struct RootView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            MetalCanvas(renderer: renderer)
+            MetalCanvas(renderer: renderer, preferredFPS: vm.maxFPS)
                 .ignoresSafeArea()
                 .onTapGesture {
                     vm.randomizeCurrent()

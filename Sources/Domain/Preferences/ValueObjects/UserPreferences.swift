@@ -8,6 +8,9 @@ public struct UserPreferences: Equatable, Sendable {
     public var beatSensitivity: Float
     public var reduceMotion: Bool
     public var showDiagnostics: Bool
+    /// Target frames per second for the Metal view. `0` means "unlimited"
+    /// (i.e. the display's preferred refresh rate, typically 120 on ProMotion).
+    public var maxFPS: Int
     public init(lastSource: AudioSource,
                 lastScene: SceneKind,
                 lastPaletteName: String,
@@ -16,7 +19,8 @@ public struct UserPreferences: Equatable, Sendable {
                 audioGain: Float = 1.0,
                 beatSensitivity: Float = 1.0,
                 reduceMotion: Bool = false,
-                showDiagnostics: Bool = false) {
+                showDiagnostics: Bool = false,
+                maxFPS: Int = 120) {
         self.lastSource = lastSource
         self.lastScene = lastScene
         self.lastPaletteName = lastPaletteName
@@ -26,6 +30,7 @@ public struct UserPreferences: Equatable, Sendable {
         self.beatSensitivity = beatSensitivity
         self.reduceMotion = reduceMotion
         self.showDiagnostics = showDiagnostics
+        self.maxFPS = maxFPS
     }
     public static let `default` = UserPreferences(
         lastSource: .systemWide,
@@ -36,5 +41,6 @@ public struct UserPreferences: Equatable, Sendable {
         audioGain: 1.0,
         beatSensitivity: 1.0,
         reduceMotion: false,
-        showDiagnostics: false)
+        showDiagnostics: false,
+        maxFPS: 120)
 }

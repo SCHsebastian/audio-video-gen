@@ -425,6 +425,24 @@
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Velocidad de animación" } }
       }
     },
+    "settings.fps.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Frame rate cap" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Límite de FPS" } }
+      }
+    },
+    "settings.fps.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Lower caps save battery and GPU; higher feels smoother on ProMotion displays." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Límites más bajos ahorran batería y GPU; más altos se sienten más suaves en pantallas ProMotion." } }
+      }
+    },
+    "settings.fps.unlimited" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlimited (display max)" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sin límite (máx. de la pantalla)" } }
+      }
+    },
     "settings.audioGain.label" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio gain" } },
