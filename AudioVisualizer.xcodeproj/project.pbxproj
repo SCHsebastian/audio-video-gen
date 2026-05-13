@@ -27,6 +27,7 @@
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
 		7F0EBC6E0AA4DDDB47984B8B /* BarsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEDD2639B1779651F9867675 /* BarsScene.swift */; };
 		7F376ACBAD0CC19FCF94701C /* SceneToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281753387399B49B8FEFE387 /* SceneToolbar.swift */; };
+		81D3E428750CD2E6DFAEF06B /* CompositionRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7531C1C10C4294CC4EBFE9F /* CompositionRoot.swift */; };
 		8691A03CE3647051B86CAA42 /* AlchemyParticles.metal in Sources */ = {isa = PBXBuildFile; fileRef = AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
@@ -89,6 +90,7 @@
 		E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeScene.swift; sourceTree = "<group>"; };
 		EB42E07EF64ABEA50B4AF8B7 /* audio-video-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "audio-video-gen"; path = .; sourceTree = SOURCE_ROOT; };
 		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
+		F7531C1C10C4294CC4EBFE9F /* CompositionRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionRoot.swift; sourceTree = "<group>"; };
 		F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -198,6 +200,7 @@
 		9E463E5D0576A1C0B0B60368 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				F7531C1C10C4294CC4EBFE9F /* CompositionRoot.swift */,
 				832E146FD2B148356484937B /* VisualizerApp.swift */,
 			);
 			path = App;
@@ -405,6 +408,7 @@
 				347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */,
 				4556350D218716AD953145D4 /* Bars.metal in Sources */,
 				7F0EBC6E0AA4DDDB47984B8B /* BarsScene.swift in Sources */,
+				81D3E428750CD2E6DFAEF06B /* CompositionRoot.swift in Sources */,
 				FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */,
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
 				51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */,
