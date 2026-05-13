@@ -18,6 +18,13 @@ final class VisualizerViewModel {
     var showDiagnostics: Bool = false
     /// FPS cap fed to the MTKView. 0 = unlimited.
     var maxFPS: Int = 120
+    /// User-defined order of scenes (drives toolbar order, ←/→ cycle, shuffle).
+    var sceneOrder: [SceneKind] = SceneKind.allCases
+    /// When true, advance through `sceneOrder` automatically every
+    /// `shuffleIntervalSec` seconds.
+    var shuffleEnabled: Bool = false
+    var shuffleIntervalSec: Int = 180
+    private var shuffleTask: Task<Void, Never>? = nil
     /// Toast surfaced after a snapshot was saved (or failed). Auto-clears.
     var snapshotToast: String? = nil
     private var clearSnapshotToastTask: Task<Void, Never>? = nil
@@ -179,8 +186,75 @@ final class VisualizerViewModel {
         reduceMotion = prefs.reduceMotion
         showDiagnostics = prefs.showDiagnostics
         maxFPS = prefs.maxFPS
+        sceneOrder = prefs.sceneOrder
+        shuffleEnabled = prefs.shuffleEnabled
+        shuffleIntervalSec = prefs.shuffleIntervalSec
         renderer.setAudioGain(prefs.audioGain)
         renderer.setBeatSensitivity(prefs.beatSensitivity)
+        if shuffleEnabled { startShuffleLoop() }
+    }
+
+    func setSceneOrder(_ order: [SceneKind]) {
+        // Drop duplicates, then append any missing scenes (e.g. when the user
+        // upgrades to a build with new ones) at the tail so they stay
+        // accessible.
+        var seen: Set<SceneKind> = []
+        var clean: [SceneKind] = []
+        for k in order where !seen.contains(k) { clean.append(k); seen.insert(k) }
+        for k in SceneKind.allCases where !seen.contains(k) { clean.append(k) }
+        sceneOrder = clean
+        var prefs = preferences.load()
+        prefs.sceneOrder = clean
+        preferences.save(prefs)
+    }
+
+    func setShuffleEnabled(_ on: Bool) {
+        shuffleEnabled = on
+        var prefs = preferences.load()
+        prefs.shuffleEnabled = on
+        preferences.save(prefs)
+        if on { startShuffleLoop() } else { stopShuffleLoop() }
+    }
+
+    func setShuffleIntervalSec(_ s: Int) {
+        let clamped = max(15, min(3600, s))
+        shuffleIntervalSec = clamped
+        var prefs = preferences.load()
+        prefs.shuffleIntervalSec = clamped
+        preferences.save(prefs)
+        if shuffleEnabled { startShuffleLoop() }
+    }
+
+    private func startShuffleLoop() {
+        stopShuffleLoop()
+        let interval = TimeInterval(shuffleIntervalSec)
+        shuffleTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(interval))
+                guard let self, !Task.isCancelled, self.shuffleEnabled else { return }
+                self.advanceShuffleStep()
+            }
+        }
+    }
+
+    private func stopShuffleLoop() {
+        shuffleTask?.cancel()
+        shuffleTask = nil
+    }
+
+    /// Move to the next scene in the user's order. Wraps around. Surfaces the
+    /// new scene name in the same "randomized" toast used by Space/click.
+    private func advanceShuffleStep() {
+        guard sceneOrder.count > 1 else { return }
+        let idx = sceneOrder.firstIndex(of: currentScene) ?? -1
+        let next = sceneOrder[(idx + 1) % sceneOrder.count]
+        selectScene(next)
+        lastRandomizedLabel = "\(next.rawValue) (shuffle)"
+        clearLabelTask?.cancel()
+        clearLabelTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(1400))
+            if !Task.isCancelled { lastRandomizedLabel = nil }
+        }
     }
 
     func resetToDefaults() {

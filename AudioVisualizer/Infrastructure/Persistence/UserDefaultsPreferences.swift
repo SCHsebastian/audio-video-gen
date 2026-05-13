@@ -21,6 +21,23 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
         }
     }
 
+    /// Map persisted scene-order strings to `SceneKind`, drop unknowns, and
+    /// append any cases the user has never seen (e.g. after upgrading to a
+    /// build that adds new scenes) at the tail. Returns `allCases` for nil/
+    /// empty input.
+    private static func reconcileSceneOrder(from raw: [String]?) -> [SceneKind] {
+        guard let raw, !raw.isEmpty else { return SceneKind.allCases }
+        var seen: Set<SceneKind> = []
+        var out: [SceneKind] = []
+        for s in raw {
+            if let k = SceneKind(rawValue: s), !seen.contains(k) {
+                out.append(k); seen.insert(k)
+            }
+        }
+        for k in SceneKind.allCases where !seen.contains(k) { out.append(k) }
+        return out
+    }
+
     private struct DTO: Codable {
         let sourceKind: String              // "systemWide" or "process"
         let pid: Int32?
@@ -35,6 +52,9 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
         let reduceMotion: Bool?
         let showDiagnostics: Bool?
         let maxFPS: Int?
+        let sceneOrder: [String]?
+        let shuffleEnabled: Bool?
+        let shuffleIntervalSec: Int?
 
         init(domain p: UserPreferences) {
             switch p.lastSource {
@@ -50,6 +70,9 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
             reduceMotion = p.reduceMotion
             showDiagnostics = p.showDiagnostics
             maxFPS = p.maxFPS
+            sceneOrder = p.sceneOrder.map(\.rawValue)
+            shuffleEnabled = p.shuffleEnabled
+            shuffleIntervalSec = p.shuffleIntervalSec
         }
 
         func toDomain() -> UserPreferences {
@@ -69,7 +92,10 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
                 beatSensitivity: beatSensitivity ?? 1.0,
                 reduceMotion: reduceMotion ?? false,
                 showDiagnostics: showDiagnostics ?? false,
-                maxFPS: maxFPS ?? 120)
+                maxFPS: maxFPS ?? 120,
+                sceneOrder: UserDefaultsPreferences.reconcileSceneOrder(from: sceneOrder),
+                shuffleEnabled: shuffleEnabled ?? false,
+                shuffleIntervalSec: shuffleIntervalSec ?? 180)
         }
     }
 }

@@ -259,6 +259,72 @@
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Anillos" } }
       }
     },
+    "toolbar.scene.synthwave" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Synthwave" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Synthwave" } }
+      }
+    },
+    "toolbar.scene.spectrogram" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Spectrogram" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Espectrograma" } }
+      }
+    },
+    "toolbar.scene.milkdrop" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Milkdrop" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Milkdrop" } }
+      }
+    },
+    "toolbar.scene.kaleidoscope" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kaleidoscope" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Caleidoscopio" } }
+      }
+    },
+    "settings.sceneOrder.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scene order" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Orden de escenas" } }
+      }
+    },
+    "settings.sceneOrder.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Drag to reorder. This controls the segmented toolbar order, ←/→ cycle, and shuffle mode." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Arrastrá para reordenar. Define el orden en la barra, el ciclo con ←/→ y el modo aleatorio." } }
+      }
+    },
+    "settings.shuffle.enabled" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shuffle scenes automatically" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar escenas automáticamente" } }
+      }
+    },
+    "settings.shuffle.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Auto-advance through the scene order on a timer." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Avanza por el orden de escenas en un temporizador." } }
+      }
+    },
+    "settings.shuffle.interval" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Change every" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar cada" } }
+      }
+    },
+    "settings.shuffle.minutes" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "min" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "min" } }
+      }
+    },
+    "overlay.shuffleSwitched" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "shuffle" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "aleatorio" } }
+      }
+    },
     "toolbar.splitView.toggle" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Toggle split view (V)" } },
