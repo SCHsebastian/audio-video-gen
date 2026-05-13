@@ -8,9 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		368E756989688059F7A61697 /* VisualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832E146FD2B148356484937B /* VisualizerApp.swift */; };
+		4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */; };
 		54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */; };
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
+		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
 		BC013271989B876F10199BA6 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 97B6E5018EBBCD6964AEEC50 /* Domain */; };
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
 		FFEE78CA3D545FAF887B76C1 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0BA6759B8D541765628417 /* Application */; };
@@ -27,6 +29,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferences.swift; sourceTree = "<group>"; };
+		2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferencesTests.swift; sourceTree = "<group>"; };
 		4272C3F4212C49A23281F643 /* AudioVisualizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AudioVisualizer.entitlements; sourceTree = "<group>"; };
 		4FB965E9116803E67E2A6371 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
@@ -59,6 +63,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		09D95D7DDAFF5DE8E15841A9 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				BC36BD45045DA0243540DC00 /* Persistence */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
 		1577DC35DC0E9E70F6167076 = {
 			isa = PBXGroup;
 			children = (
@@ -72,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				9E463E5D0576A1C0B0B60368 /* App */,
+				09D95D7DDAFF5DE8E15841A9 /* Infrastructure */,
 				BEF6E531585159ABA688A9C4 /* Resources */,
 				E0FA60FAFD2DABE9187A79B6 /* Tests */,
 			);
@@ -103,6 +116,14 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
+		BC36BD45045DA0243540DC00 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
 		BEF6E531585159ABA688A9C4 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,9 +133,18 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		BF0C2C94C0910328D3CBCFE4 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
 		E0FA60FAFD2DABE9187A79B6 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				BF0C2C94C0910328D3CBCFE4 /* Infrastructure */,
 				EE2A295646572E94C8AE0605 /* Smoke */,
 			);
 			path = Tests;
@@ -220,6 +250,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */,
 				368E756989688059F7A61697 /* VisualizerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -229,6 +260,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */,
+				9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,6 +405,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -390,6 +423,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
