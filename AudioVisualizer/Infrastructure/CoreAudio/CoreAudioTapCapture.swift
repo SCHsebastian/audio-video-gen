@@ -12,6 +12,8 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
     private var sampleRate: Double = 48_000
     private var channelCount: Int = 2
     private var isInterleaved: Bool = true
+    private var deviceChangeListener: AudioObjectPropertyListenerBlock?
+    private var currentSource: AudioSource?
 
     func start(source: AudioSource) async throws -> AsyncStream<AudioFrame> {
         let processList: [AudioObjectID]
@@ -186,10 +188,50 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         }
 
         continuation.onTermination = { [weak self] _ in Task { await self?.stop() } }
+
+        // Save source so restart() can document the limitation when device changes.
+        currentSource = source
+
+        // Register a listener for default output device changes.
+        // When the user switches the system output device the aggregate becomes stale;
+        // we stop capture so the next explicit start() builds against the new device.
+        // (Documented limitation in v0.1.0 — full reconnect requires the use-case to retry.)
+        var deviceAddr = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDefaultSystemOutputDevice,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain)
+        let listener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in
+            guard let self else { return }
+            Task { await self.restart() }
+        }
+        AudioObjectAddPropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &deviceAddr, drainQueue, listener)
+        deviceChangeListener = listener
+
         return stream
     }
 
+    /// Called when the default system output device changes.
+    /// Stops the current capture; the downstream AsyncStream will finish.
+    /// The user must restart visualization explicitly to pick up the new device.
+    private func restart() async {
+        // Default output device changed. Stop current capture.
+        // The downstream AsyncStream will finish; user will need to restart explicitly.
+        // (Documented limitation in v0.1.0.)
+        await stop()
+    }
+
     func stop() async {
+        // Remove the default-output-device change listener before tearing down hardware.
+        if let listener = deviceChangeListener {
+            var deviceAddr = AudioObjectPropertyAddress(
+                mSelector: kAudioHardwarePropertyDefaultSystemOutputDevice,
+                mScope: kAudioObjectPropertyScopeGlobal,
+                mElement: kAudioObjectPropertyElementMain)
+            AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &deviceAddr, drainQueue, listener)
+            deviceChangeListener = nil
+        }
+        currentSource = nil
+
         if let pid = procID, aggID != 0 { AudioDeviceStop(aggID, pid); AudioDeviceDestroyIOProcID(aggID, pid) }
         procID = nil
         if aggID != 0 { AudioHardwareDestroyAggregateDevice(aggID); aggID = 0 }
