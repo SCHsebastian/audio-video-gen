@@ -34,19 +34,16 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
 
     func start(source: AudioSource) async throws -> AsyncStream<AudioFrame> {
         CoreAudioTapCapture.sweepStaleAggregates()
-        let processList: [AudioObjectID]
+        let desc: CATapDescription
         switch source {
         case .systemWide:
-            processList = []   // empty list with stereoMixdown means "all processes on default output"
-        case .process(let pid, _):
-            processList = [try AudioObjectID.translatePID(pid)]
-        }
-
-        let desc: CATapDescription
-        if processList.isEmpty {
-            desc = CATapDescription(stereoMixdownOfProcesses: [])
-        } else {
-            desc = CATapDescription(stereoMixdownOfProcesses: processList)
+            // Global tap with no exclusions = tap every process on the default output.
+            desc = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
+        case .process(_, let bundleID):
+            // Resolve by bundle ID, not PID — helper processes (e.g. Chrome's audio service)
+            // get respawned with new PIDs but the bundle ID is stable.
+            let processObj = try AudioObjectID.translateBundleID(bundleID)
+            desc = CATapDescription(stereoMixdownOfProcesses: [processObj])
         }
         desc.uuid = UUID()
         desc.muteBehavior = .unmuted

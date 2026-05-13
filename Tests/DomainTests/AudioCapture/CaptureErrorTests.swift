@@ -7,5 +7,9 @@ final class CaptureErrorTests: XCTestCase {
         XCTAssertEqual(CaptureError.processNotFound(42), CaptureError.processNotFound(42))
         XCTAssertNotEqual(CaptureError.processNotFound(42), CaptureError.processNotFound(43))
         XCTAssertEqual(CaptureError.tapCreationFailed(-50), CaptureError.tapCreationFailed(-50))
+        XCTAssertEqual(CaptureError.processNotFoundByBundleID("com.foo.bar"),
+                       CaptureError.processNotFoundByBundleID("com.foo.bar"))
+        XCTAssertNotEqual(CaptureError.processNotFoundByBundleID("com.foo.bar"),
+                          CaptureError.processNotFoundByBundleID("com.foo.baz"))
     }
 }
