@@ -1,81 +1,213 @@
-# Audio Video Gen
+# Audio Visualizer
 
-A macOS visualizer that captures system audio output and renders Windows XP Media Player–style visualizations in Metal. Tap any app's audio or all system audio — no virtual audio device, no microphone, no setup beyond a one-time permission prompt.
+A native macOS app that taps **system audio output** in real time and renders
+Windows XP Media Player–style visualizations in Metal. Five scenes, six
+palettes, bilingual UI (EN/ES), no virtual audio device, no microphone, no
+kernel extension — just one TCC permission prompt and you're seeing your
+music.
 
-![Bars / Scope / Alchemy](docs/screenshots/preview.png) <!-- placeholder; remove or replace later -->
+Built end-to-end with [Claude](https://www.anthropic.com/claude) by
+[Sebastián Cardona Henao](https://github.com/SCHsebastian).
+
+![Bars / Scope / Alchemy / Tunnel / Lissajous](docs/screenshots/preview.png) <!-- placeholder; replace once recorded -->
+
+---
 
 ## Highlights
 
-- **Real-time system-audio capture** via Core Audio Taps (macOS 14.2+ API). No BlackHole or kernel extensions required.
-- **Three visualizers**: Bars (spectrum analyzer), Scope (oscilloscope with additive glow), Alchemy (80 000-particle compute shader reacting to bass + beat detection).
-- **Per-app or system-wide audio source** — pick "All system audio" or a specific running app (Spotify, Chrome, Music, …). The picker refreshes once per second.
-- **Live language switching** (English + Spanish) via Xcode 15 String Catalog. No restart.
-- **Clean Architecture + DDD** — pure-Swift Domain and Application layers (no Apple framework imports), Infrastructure adapters isolated behind ports.
+- **System audio capture, no third-party driver.** Uses [Core Audio Taps](https://developer.apple.com/documentation/coreaudio/capturing-system-audio-with-core-audio-taps)
+  (the public macOS 14.2+ API). No BlackHole, no Soundflower, no kext.
+- **Five scenes** rendered in [Metal](https://developer.apple.com/metal/):
+  Bars (spectrum), Scope (oscilloscope), Alchemy (80 000-particle compute
+  shader), Tunnel (raymarched), Lissajous (XY parametric).
+- **Six color palettes** with live preview swatches, cycle (P), random (⇧P),
+  and per-scene randomization (Space or click anywhere on the canvas).
+- **Real-time DSP** using Apple's [Accelerate / vDSP](https://developer.apple.com/documentation/accelerate/vdsp)
+  for spectrum analysis and a small energy-based beat detector that drives
+  ambient flashes.
+- **Diagnostics HUD** (⌘D) showing live FPS, RMS, beat strength, scene, and
+  palette so you can see exactly what the renderer is doing.
+- **Snapshot to Desktop** (⌘S) — grabs the next-presented drawable as a sRGB
+  PNG.
+- **Configurable frame-rate cap** (30 / 60 / 90 / 120 / unlimited) so you can
+  trade smoothness for battery on the go.
+- **Bilingual UI** (English + Spanish) via [Xcode 15 String Catalogs](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog),
+  switchable live without restart.
+- **Clean Architecture + DDD** — pure-Swift Domain and Application layers
+  (zero Apple-framework imports), Infrastructure adapters isolated behind
+  ports. See [Architecture](#architecture).
 
 ## Requirements
 
-- macOS 14.2 or newer (Core Audio Taps API)
+- macOS **14.2** or newer ([`CATapDescription`](https://developer.apple.com/documentation/coreaudio/catapdescription)
+  was introduced in 14.2)
 - Apple Silicon or Intel
-- First launch will prompt for "Audio Capture" permission once
+- One TCC permission prompt on first launch ("Audio Capture")
 
 ## Install (pre-built)
 
-Download the latest `.dmg` from the [Releases page](https://github.com/SCHsebastian/audio-video-gen/releases), open it, and drag **AudioVisualizer.app** into your Applications folder. On first launch macOS will ask for permission to listen to other apps' audio — accept it once and you're done.
+Download the latest `.zip` from the [Releases page](https://github.com/SCHsebastian/audio-video-gen/releases),
+unzip, and drag **AudioVisualizer.app** to `/Applications`.
 
-> The binary is ad-hoc signed (not notarized). macOS Gatekeeper may show a warning on first run. Right-click → Open, or run `xattr -dr com.apple.quarantine /Applications/AudioVisualizer.app` once.
+> The binary is ad-hoc signed (not notarized). On first launch macOS Gatekeeper
+> may complain. Right-click → Open, or run
+> `xattr -dr com.apple.quarantine /Applications/AudioVisualizer.app` once.
 
 ## Use
 
-1. Launch the app — a window opens with a Metal canvas.
-2. Play audio in any other app (Spotify, Chrome, Music, …).
-3. Pick a scene from the toolbar (**Bars / Scope / Alchemy**).
-4. Pick an audio source from the dropdown, or leave it on **All system audio**.
-5. Open the ⚙️ settings sheet to switch language.
+1. Launch the app — a Metal canvas window opens.
+2. Play audio in any other app (Music, Spotify, Chrome, …).
+3. Grant **Audio Capture** access the first time (one prompt, ever).
+4. Drive it from the floating toolbar or these keyboard shortcuts:
+
+| Shortcut | Action |
+|----------|--------|
+| `1`–`5`  | Switch scene (Bars / Scope / Alchemy / Tunnel / Lissajous) |
+| `←` `→`  | Previous / next scene |
+| `Space` or click | Randomize the current scene |
+| `P` / `⇧P` | Cycle / randomize the color palette |
+| `⌘S`     | Save a PNG snapshot to the Desktop |
+| `⌘D`     | Toggle the diagnostics HUD |
+| `F` / `⌃⌘F` | Toggle fullscreen |
+| `?`      | Open the About / Help sheet |
+
+The **Settings** sheet (gear icon, four tabs):
+
+- **General** — language, reduce motion, diagnostics HUD, reset to defaults.
+- **Visuals** — palette swatch grid, default scene, animation speed, **FPS
+  cap** (30 / 60 / 90 / 120 / unlimited).
+- **Audio** — gain (boost visual response without changing playback volume)
+  and beat sensitivity.
+- **About** — author + Claude credits, full shortcut sheet, version.
 
 ## Build from source
 
 ```bash
 git clone https://github.com/SCHsebastian/audio-video-gen.git
 cd audio-video-gen
-brew install xcodegen           # one-time
-xcodegen generate               # rebuild AudioVisualizer.xcodeproj from project.yml
-xcodebuild -project AudioVisualizer.xcodeproj -scheme AudioVisualizer build
+
+# Domain + Application tests (pure Swift, <1 s, no Xcode required)
+swift test
+
+# Whole app (uses XcodeGen to regenerate the .xcodeproj from project.yml)
+brew install xcodegen
+xcodegen generate
+xcodebuild -project AudioVisualizer.xcodeproj -scheme AudioVisualizer \
+           -destination 'platform=macOS' build
+
 open ~/Library/Developer/Xcode/DerivedData/AudioVisualizer-*/Build/Products/Debug/AudioVisualizer.app
 ```
 
-Pure-Swift Domain + Application tests run without Xcode:
-
-```bash
-swift test
-```
+Regenerate the Xcode project (`xcodegen generate`) any time you add or move a
+source file under `AudioVisualizer/`, change `project.yml`, or modify
+`Package.swift`.
 
 ## Architecture
 
-This project is **Clean Architecture + DDD** for a small native app. Quick map:
+Clean Architecture, lightly DDD-flavored:
 
 ```
-Sources/Domain/       — pure Swift, only Foundation imports; value objects, errors, ports
-Sources/Application/  — use cases (Start/Stop/SelectSource/ChangeScene/ChangeLanguage)
+Sources/Domain/        — pure Swift, only Foundation imports
+                         value objects, errors, ports (protocols)
+Sources/Application/   — use cases (Start, Stop, SelectSource, ChangeScene,
+                         ChangeLanguage)
 AudioVisualizer/
-  Infrastructure/     — CoreAudio, Analysis (vDSP), Metal, Persistence, Localization, Logging
-  Presentation/       — SwiftUI views + @Observable view models
-  App/                — @main + CompositionRoot (the single wiring point)
+  Infrastructure/      — Apple framework adapters
+    CoreAudio/           Core Audio Taps capture + TCC permission
+    Analysis/            vDSP spectrum analyzer + energy beat detector
+    Metal/               renderer + 5 scenes + 6 palettes
+    Persistence/         UserDefaults-backed preferences
+    Localization/        Xcode String Catalog → @Observable localizer
+    Logging/             os.log subsystems
+  Presentation/        — SwiftUI views + @Observable view models
+  App/                 — @main entry point + CompositionRoot
+Vendor/TPCircularBuffer/ — BSD lock-free ring buffer (C)
 ```
 
-Architectural invariant: `grep -rE 'import (CoreAudio|Metal|SwiftUI|AppKit|…)' Sources/Domain Sources/Application` returns nothing. Domain and Application stay framework-pure so their tests run in <1 s without macOS frameworks.
+The **architectural invariant** is enforced by reading code, not tooling:
 
-See [`CLAUDE.md`](CLAUDE.md) for the developer-facing architecture notes (bounded contexts, port/adapter table, non-obvious wiring rules) and `docs/superpowers/specs/` for the original design documents.
+```bash
+grep -rE 'import (CoreAudio|AVFoundation|Metal|MetalKit|Accelerate|SwiftUI|AppKit)' \
+      Sources/Domain Sources/Application
+```
+
+…must return zero matches. Domain and Application stay framework-pure so the
+test suite for them runs in <1 second without macOS frameworks. The
+[CompositionRoot](AudioVisualizer/App/CompositionRoot.swift) is the only place
+that constructs concrete adapters and hands them to use cases.
+
+See [`CLAUDE.md`](CLAUDE.md) for the developer-facing architecture notes
+(bounded contexts, port/adapter table, the non-obvious wiring rules around
+the IOProc thread and per-app capture), and `docs/superpowers/specs/` for the
+original design specs.
+
+## How it works (90-second tour)
+
+1. **Capture.** [`CoreAudioTapCapture`](AudioVisualizer/Infrastructure/CoreAudio/CoreAudioTapCapture.swift)
+   creates a `CATapDescription` for the default output device, builds a
+   private aggregate device around it, and registers an `AudioDeviceIOProc`
+   that the OS calls on its dedicated IO thread (≈ every 5 ms).
+2. **RT-safe ring.** The IOProc downmixes the (interleaved or
+   non-interleaved) Float32 audio to mono and writes it into a
+   [TPCircularBuffer](https://github.com/michaeltyson/TPCircularBuffer)
+   — a lock-free single-producer/single-consumer ring buffer. The IOProc never
+   allocates, never touches the Swift runtime, never takes a lock.
+3. **Drain.** A user-interactive drain queue pulls 1024-sample mono frames
+   out of the ring buffer and yields them down an `AsyncStream`.
+4. **DSP.** Each frame is fed to [`VDSPSpectrumAnalyzer`](AudioVisualizer/Infrastructure/Analysis/VDSPSpectrumAnalyzer.swift)
+   (Hann window → real FFT → magnitudes → 64 log-spaced bands) and to
+   [`EnergyBeatDetector`](AudioVisualizer/Infrastructure/Analysis/EnergyBeatDetector.swift)
+   (short-window energy vs. running average).
+5. **Render.** Results are handed to
+   [`MetalVisualizationRenderer`](AudioVisualizer/Infrastructure/Metal/MetalVisualizationRenderer.swift),
+   which **lazily materializes** the active scene's pipelines on first
+   navigation and releases the previous scene on switch. Each frame, the
+   chosen scene encodes a [Metal](https://developer.apple.com/metal/) draw
+   pass against a 256-pixel 1-D LUT palette texture.
 
 ## Diagnostic logging
 
-The app emits structured `os.log` under subsystem `dev.audiovideogen.AudioVisualizer`. Stream it live while reproducing any issue:
+The app emits structured `os.log` under subsystem
+`dev.audiovideogen.AudioVisualizer`. Stream it live while reproducing any
+issue:
 
 ```bash
-/usr/bin/log stream --predicate 'subsystem == "dev.audiovideogen.AudioVisualizer"' --info --style compact
+# Note: zsh has a `log` builtin. Use the absolute path.
+/usr/bin/log stream --predicate 'subsystem == "dev.audiovideogen.AudioVisualizer"' \
+                    --info --style compact
 ```
 
-Categories: `capture`, `analysis`, `render`, `vm`. The capture category emits per-second IOProc stats (`callbacks/s`, `frames/s`, `peakAmp`) that tell you immediately whether the audio pipeline is alive.
+Categories: `capture`, `analysis`, `render`, `vm`.
+
+- The **capture** category emits per-second IOProc stats
+  (`callbacks/s`, `frames/s`, `peakAmp`). Non-zero `peakAmp` means
+  non-silent audio is reaching the ring buffer.
+- The **render** category logs scene materialization & release
+  (`scene materialized: tunnel`, `scene released: bars`) plus per-second
+  `consume` framerate.
+- The **vm** category logs state transitions and snapshot results.
+
+## Testing
+
+```bash
+swift test                                              # Domain + Application
+swift test --filter DomainTests.LanguageTests           # single class
+xcodebuild test -project AudioVisualizer.xcodeproj \
+                -scheme AudioVisualizer \
+                -destination 'platform=macOS'           # full Xcode suite
+```
+
+## Credits
+
+- **Built by [Sebastián Cardona Henao](https://github.com/SCHsebastian)**
+  with [Claude](https://www.anthropic.com/claude) (Anthropic), pair-programmed
+  end-to-end.
+- Inspired by the Windows XP Media Player visualizations of a bygone era.
+- Vendored [TPCircularBuffer](https://github.com/michaeltyson/TPCircularBuffer)
+  by Michael Tyson (BSD 2-Clause).
 
 ## License
 
-MIT. Includes [TPCircularBuffer](https://github.com/michaeltyson/TPCircularBuffer) by Michael Tyson (BSD).
+MIT — see [`LICENSE`](LICENSE). Free to use, fork, modify, ship in your own
+products, commercial or otherwise. A copyright notice in derivative work is
+appreciated.
