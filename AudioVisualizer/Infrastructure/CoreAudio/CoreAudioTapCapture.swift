@@ -11,7 +11,6 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
     private var ring: RingBuffer?
     private var sampleRate: Double = 48_000
     private var channelCount: Int = 2
-    private var isInterleaved: Bool = true
     private var deviceChangeListener: AudioObjectPropertyListenerBlock?
     private var currentSource: AudioSource?
 
@@ -95,34 +94,56 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         }
         self.sampleRate = asbd.mSampleRate
         self.channelCount = Int(asbd.mChannelsPerFrame)
-        self.isInterleaved = (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0
-        let bytesPerFrame = Int(asbd.mBytesPerFrame == 0 ? 4 * UInt32(channelCount) : asbd.mBytesPerFrame)
+        let nonInterleaved = (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) != 0
 
-        // Allocate ring: 0.5 sec at the discovered rate.
-        let capacityBytes = Int(self.sampleRate) * bytesPerFrame / 2
+        // Issue 3 fix: ring always sized for mono Float32 output (4 bytes/frame), regardless of input format.
+        // With mono mixdown in the IOProc, we write exactly 4 bytes per input frame.
+        let monoFrameBytes = 4  // always mix down to mono Float32
+        let capacityBytes = Int(self.sampleRate) * monoFrameBytes / 2
         let ring = RingBuffer(capacityBytes: capacityBytes)
         self.ring = ring
 
         let (stream, continuation) = AsyncStream<AudioFrame>.makeStream(bufferingPolicy: .bufferingNewest(8))
 
         // IOProc — DO NOT capture self strongly, DO NOT allocate, DO NOT touch Swift runtime.
+        // Issue 2 fix: downmix to mono Float32 in the IOProc so the ring always holds mono samples,
+        // eliminating the garbled-audio bug in the non-interleaved multi-callback drain path.
         let ringRef = Unmanaged.passUnretained(ring).toOpaque()
         let unsafeRing = OpaquePointer(ringRef)
+        let ch = channelCount
+        let chF = Float(ch)
         var newProc: AudioDeviceIOProcID?
         let ioStatus = AudioDeviceCreateIOProcIDWithBlock(&newProc, aggID, drainQueue) { _, inData, _, _, _ in
-            // Non-interleaved float buffers; walk them and copy raw bytes into the ring.
-            let abl = UnsafeBufferPointer(start: UnsafePointer(inData),
-                                          count: 1).baseAddress!.pointee
-            let bufferCount = Int(abl.mNumberBuffers)
-            withUnsafePointer(to: abl) { ptr in
-                ptr.withMemoryRebound(to: AudioBufferList.self, capacity: 1) { listPtr in
-                    let buffers = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: listPtr))
-                    for i in 0..<bufferCount {
-                        let b = buffers[i]
-                        guard let data = b.mData else { continue }
-                        let r = Unmanaged<RingBuffer>.fromOpaque(UnsafeRawPointer(unsafeRing)).takeUnretainedValue()
-                        _ = r.write(data, byteCount: Int(b.mDataByteSize))
+            let ablPtr = UnsafePointer<AudioBufferList>(OpaquePointer(inData))
+            let buffers = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: ablPtr))
+            let r = Unmanaged<RingBuffer>.fromOpaque(UnsafeRawPointer(unsafeRing)).takeUnretainedValue()
+
+            let bufferCount = buffers.count
+            if !nonInterleaved {
+                // Interleaved: single buffer with layout [L, R, L, R, ...]
+                let buf = buffers[0]
+                guard let data = buf.mData else { return }
+                let p = data.assumingMemoryBound(to: Float.self)
+                let totalFloats = Int(buf.mDataByteSize) / 4
+                let frames = totalFloats / ch
+                for i in 0..<frames {
+                    var sum: Float = 0
+                    for c in 0..<ch { sum += p[i * ch + c] }
+                    var mono = sum / chF
+                    _ = r.write(&mono, byteCount: 4)
+                }
+            } else {
+                // Non-interleaved: bufferCount == ch, each buffer is one channel of `frames` floats.
+                let frames = bufferCount > 0 ? Int(buffers[0].mDataByteSize) / 4 : 0
+                for i in 0..<frames {
+                    var sum: Float = 0
+                    for c in 0..<bufferCount {
+                        if let p = buffers[c].mData?.assumingMemoryBound(to: Float.self) {
+                            sum += p[i]
+                        }
                     }
+                    var mono = sum / chF
+                    _ = r.write(&mono, byteCount: 4)
                 }
             }
         }
@@ -139,11 +160,9 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
             throw CaptureError.ioProcStartFailed(startStatus)
         }
 
-        // Drainer: every ~21 ms, pull 1024 mono frames out of the ring and yield.
+        // Drainer: every ~5 ms, pull mono Float32 frames out of the ring and yield 1024-sample chunks.
+        // Issue 2 fix: no more interleaved/non-interleaved branching — ring always holds mono Float32.
         let sr = sampleRate
-        let ch = channelCount
-        let bpf = bytesPerFrame
-        let interleaved = isInterleaved
         drainQueue.async { [weak self] in
             guard let self else { return }
             let chunkFrames = 1024
@@ -151,45 +170,25 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
             accumulator.reserveCapacity(chunkFrames)
             var lastYield = CACurrentMediaTime()
             let silentTimeout = 0.5
+            // Issue 1 fix: procID is read only on drainQueue; stop() writes it on drainQueue too
+            // (via drainQueue.async in stop()), so this check is properly serialized.
             while self.procID != nil {
                 let (ptr, bytes) = ring.peek()
-                if let ptr, bytes >= bpf {
-                    let frames = bytes / bpf
+                if let ptr, bytes >= 4 {
+                    let frames = bytes / 4
                     let floats = ptr.assumingMemoryBound(to: Float.self)
-                    if interleaved {
-                        // Interleaved: sample layout is [L, R, L, R, ...]
-                        for i in 0..<frames {
-                            var sum: Float = 0
-                            for c in 0..<ch { sum += floats[i * ch + c] }
-                            accumulator.append(sum / Float(ch))
-                            if accumulator.count == chunkFrames {
-                                let frame = AudioFrame(samples: accumulator,
-                                                       sampleRate: SampleRate(hz: sr),
-                                                       timestamp: HostTime(machAbsolute: mach_absolute_time()))
-                                continuation.yield(frame)
-                                accumulator.removeAll(keepingCapacity: true)
-                                lastYield = CACurrentMediaTime()
-                            }
-                        }
-                    } else {
-                        // Non-interleaved: the ring received `ch` consecutive contiguous channel buffers per callback,
-                        // each `frames` floats long. Walk them in parallel.
-                        let perChannel = frames / ch     // assumes producer wrote N×ch frames
-                        for i in 0..<perChannel {
-                            var sum: Float = 0
-                            for c in 0..<ch { sum += floats[c * perChannel + i] }
-                            accumulator.append(sum / Float(ch))
-                            if accumulator.count == chunkFrames {
-                                let frame = AudioFrame(samples: accumulator,
-                                                       sampleRate: SampleRate(hz: sr),
-                                                       timestamp: HostTime(machAbsolute: mach_absolute_time()))
-                                continuation.yield(frame)
-                                accumulator.removeAll(keepingCapacity: true)
-                                lastYield = CACurrentMediaTime()
-                            }
+                    for i in 0..<frames {
+                        accumulator.append(floats[i])
+                        if accumulator.count == chunkFrames {
+                            let frame = AudioFrame(samples: accumulator,
+                                                   sampleRate: SampleRate(hz: sr),
+                                                   timestamp: HostTime(machAbsolute: mach_absolute_time()))
+                            continuation.yield(frame)
+                            accumulator.removeAll(keepingCapacity: true)
+                            lastYield = CACurrentMediaTime()
                         }
                     }
-                    ring.markRead(byteCount: frames * bpf)
+                    ring.markRead(byteCount: frames * 4)
                 } else {
                     // No data; sleep ~5 ms.
                     Thread.sleep(forTimeInterval: 0.005)
@@ -240,21 +239,34 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
     }
 
     func stop() async {
-        // Remove the default-output-device change listener before tearing down hardware.
-        if let listener = deviceChangeListener {
-            var deviceAddr = AudioObjectPropertyAddress(
-                mSelector: kAudioHardwarePropertyDefaultSystemOutputDevice,
-                mScope: kAudioObjectPropertyScopeGlobal,
-                mElement: kAudioObjectPropertyElementMain)
-            AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &deviceAddr, drainQueue, listener)
-            deviceChangeListener = nil
-        }
-        currentSource = nil
+        // Issue 1 fix: serialize all hardware teardown onto drainQueue so it cannot race
+        // with the drain loop's `while self.procID != nil` check. Both the read (drainer)
+        // and the write (here) now happen on the same serial queue.
+        await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
+            drainQueue.async {
+                // Remove the default-output-device change listener before tearing down hardware.
+                if let listener = self.deviceChangeListener {
+                    var deviceAddr = AudioObjectPropertyAddress(
+                        mSelector: kAudioHardwarePropertyDefaultSystemOutputDevice,
+                        mScope: kAudioObjectPropertyScopeGlobal,
+                        mElement: kAudioObjectPropertyElementMain)
+                    AudioObjectRemovePropertyListenerBlock(AudioObjectID(kAudioObjectSystemObject), &deviceAddr, self.drainQueue, listener)
+                    self.deviceChangeListener = nil
+                }
+                self.currentSource = nil
 
-        if let pid = procID, aggID != 0 { AudioDeviceStop(aggID, pid); AudioDeviceDestroyIOProcID(aggID, pid) }
-        procID = nil
-        if aggID != 0 { AudioHardwareDestroyAggregateDevice(aggID); aggID = 0 }
-        if tapID != 0 { AudioHardwareDestroyProcessTap(tapID); tapID = 0 }
-        ring = nil
+                if let pid = self.procID, self.aggID != 0 {
+                    AudioDeviceStop(self.aggID, pid)
+                    AudioDeviceDestroyIOProcID(self.aggID, pid)
+                }
+                // Writing procID = nil on drainQueue: this is what the drainer loop checks,
+                // so it will see nil on its next iteration and exit cleanly.
+                self.procID = nil
+                if self.aggID != 0 { AudioHardwareDestroyAggregateDevice(self.aggID); self.aggID = 0 }
+                if self.tapID != 0 { AudioHardwareDestroyProcessTap(self.tapID); self.tapID = 0 }
+                self.ring = nil
+                cont.resume()
+            }
+        }
     }
 }
