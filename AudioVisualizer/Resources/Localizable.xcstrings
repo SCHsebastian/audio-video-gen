@@ -1,108 +1,298 @@
 {
   "sourceLanguage" : "en",
-  "version" : "1.0",
   "strings" : {
-    "toolbar.source.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Source" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Fuente" } }
-      }
-    },
-    "toolbar.source.systemWide" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "All system audio" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Todo el audio del sistema" } }
-      }
-    },
-    "toolbar.scene.bars" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Bars" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Barras" } }
-      }
-    },
-    "toolbar.scene.scope" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scope" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Osciloscopio" } }
-      }
-    },
-    "toolbar.scene.alchemy" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Alchemy" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Alquimia" } }
-      }
-    },
-    "toolbar.settings.button" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes" } }
-      }
-    },
-    "permission.title" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio Visualizer needs permission to listen to system audio." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "El Visualizador de Audio necesita permiso para escuchar el audio del sistema." } }
-      }
-    },
-    "permission.grant" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Grant Audio Capture access" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Conceder acceso de captura de audio" } }
-      }
-    },
-    "permission.openSettings" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open System Settings → Privacy → Audio Capture" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrir Ajustes del Sistema → Privacidad → Captura de audio" } }
-      }
-    },
-    "overlay.waitingForAudio" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Waiting for audio…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Esperando audio…" } }
-      }
-    },
-    "overlay.errorPrefix" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Error: " } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Error: " } }
-      }
-    },
-    "settings.title" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Settings" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ajustes" } }
-      }
-    },
-    "settings.language.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Language" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Idioma" } }
-      }
-    },
-    "settings.close" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Listo" } }
-      }
-    },
-    "language.system" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "System default" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Predeterminado del sistema" } }
-      }
+    "Failed to start: %@" : {
+
     },
     "language.english" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "English" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Inglés" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inglés"
+          }
+        }
       }
     },
     "language.spanish" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Spanish" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Español" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spanish"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Español"
+          }
+        }
+      }
+    },
+    "language.system" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "System default"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Predeterminado del sistema"
+          }
+        }
+      }
+    },
+    "overlay.errorPrefix" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: "
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: "
+          }
+        }
+      }
+    },
+    "overlay.waitingForAudio" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waiting for audio…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esperando audio…"
+          }
+        }
+      }
+    },
+    "permission.grant" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant Audio Capture access"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conceder acceso de captura de audio"
+          }
+        }
+      }
+    },
+    "permission.openSettings" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open System Settings → Privacy → Audio Capture"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Ajustes del Sistema → Privacidad → Captura de audio"
+          }
+        }
+      }
+    },
+    "permission.title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Audio Visualizer needs permission to listen to system audio."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El Visualizador de Audio necesita permiso para escuchar el audio del sistema."
+          }
+        }
+      }
+    },
+    "settings.close" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listo"
+          }
+        }
+      }
+    },
+    "settings.language.label" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Idioma"
+          }
+        }
+      }
+    },
+    "settings.title" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        }
+      }
+    },
+    "toolbar.scene.alchemy" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alchemy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alquimia"
+          }
+        }
+      }
+    },
+    "toolbar.scene.bars" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bars"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Barras"
+          }
+        }
+      }
+    },
+    "toolbar.scene.scope" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scope"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Osciloscopio"
+          }
+        }
+      }
+    },
+    "toolbar.settings.button" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        }
+      }
+    },
+    "toolbar.source.label" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fuente"
+          }
+        }
+      }
+    },
+    "toolbar.source.systemWide" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All system audio"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todo el audio del sistema"
+          }
+        }
       }
     }
-  }
+  },
+  "version" : "1.0"
 }
