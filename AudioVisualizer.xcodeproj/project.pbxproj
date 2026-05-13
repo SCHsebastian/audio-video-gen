@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0FA043251EF2809F15167204 /* PingPongTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */; };
 		111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */; };
 		26884600E006F72B2D17E67C /* VDSPSpectrumAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */; };
 		2BF53352D03E7D477837AEEE /* VDSPSpectrumAnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47830BB5EB67565ECDB10B8A /* VDSPSpectrumAnalyzerTests.swift */; };
@@ -23,6 +24,7 @@
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
 		B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */; };
+		B4595ECA5F58A0603D1160D8 /* PaletteTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881865058AC789F7F65FA676 /* PaletteTexture.swift */; };
 		BC013271989B876F10199BA6 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 97B6E5018EBBCD6964AEEC50 /* Domain */; };
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
 		DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */; };
@@ -52,6 +54,7 @@
 		5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyBeatDetectorTests.swift; sourceTree = "<group>"; };
 		6BD4350024811F6CAF800549 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
+		881865058AC789F7F65FA676 /* PaletteTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteTexture.swift; sourceTree = "<group>"; };
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
 		BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioObjectID+Properties.swift"; sourceTree = "<group>"; };
 		C1A4B6B9B4B4C4C3B29B6E96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -59,6 +62,7 @@
 		CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCAudioCapturePermission.swift; sourceTree = "<group>"; };
 		D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAudioTapCapture.swift; sourceTree = "<group>"; };
 		D4CCF341189D337EEF681242 /* AudioVisualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioVisualizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingPongTextures.swift; sourceTree = "<group>"; };
 		EB42E07EF64ABEA50B4AF8B7 /* audio-video-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "audio-video-gen"; path = .; sourceTree = SOURCE_ROOT; };
 		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
 		F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -144,6 +148,8 @@
 			isa = PBXGroup;
 			children = (
 				EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */,
+				881865058AC789F7F65FA676 /* PaletteTexture.swift */,
+				D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */,
 			);
 			path = Renderer;
 			sourceTree = "<group>";
@@ -339,6 +345,8 @@
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
 				51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */,
 				2E41DE7CB65832525BAF1A4F /* MetalDevice.swift in Sources */,
+				B4595ECA5F58A0603D1160D8 /* PaletteTexture.swift in Sources */,
+				0FA043251EF2809F15167204 /* PingPongTextures.swift in Sources */,
 				4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */,
 				5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */,
 				B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */,
