@@ -118,7 +118,7 @@ final class VisualizerViewModel {
         refreshTask?.cancel()
         refreshTask = Task { @MainActor [weak self] in
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(3))
+                try? await Task.sleep(for: .seconds(1))
                 guard let self else { return }
                 await self.refreshSources()
             }

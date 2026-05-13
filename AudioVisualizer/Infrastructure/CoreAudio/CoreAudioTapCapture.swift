@@ -1,9 +1,11 @@
 import CoreAudio
 import AVFoundation
 import Foundation
+import os
 import Domain
 
 final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
+    private static let log = OSLog(subsystem: "dev.audiovideogen.AudioVisualizer", category: "capture")
     private var tapID: AudioObjectID = 0
     private var aggID: AudioObjectID = 0
     private var procID: AudioDeviceIOProcID?
@@ -40,10 +42,23 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
             // Global tap with no exclusions = tap every process on the default output.
             desc = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
         case .process(_, let bundleID):
-            // Resolve by bundle ID, not PID — helper processes (e.g. Chrome's audio service)
-            // get respawned with new PIDs but the bundle ID is stable.
-            let processObj = try AudioObjectID.translateBundleID(bundleID)
-            desc = CATapDescription(stereoMixdownOfProcesses: [processObj])
+            // Lenient matching: find every audio process whose parent bundle ID matches
+            // the parent of the requested bundle ID. Chrome can have multiple helpers
+            // (Audio, Plugin, GPU) — we want to tap them all, since any of them might
+            // be the one currently producing audio. This is also resilient to helper
+            // respawns where the specific helper that was visible at picker time has
+            // since restarted under a different sub-bundle-ID.
+            let matches = Self.findAudioProcessObjects(matchingParentOf: bundleID)
+            if matches.isEmpty {
+                // Nothing matched — fall back to system-wide capture so the visualizer
+                // still shows something. The user's picker selection is preserved; the
+                // next start() (after they re-select or refresh) may find it once the
+                // helper produces audio again. Logged for diagnostics.
+                os_log(.info, log: Self.log, "No audio processes match parent of %{public}@; falling back to system-wide", bundleID)
+                desc = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
+            } else {
+                desc = CATapDescription(stereoMixdownOfProcesses: matches)
+            }
         }
         desc.uuid = UUID()
         desc.muteBehavior = .unmuted
@@ -264,6 +279,32 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                 self.ring = nil
                 cont.resume()
             }
+        }
+    }
+
+    /// Find all audio process objects whose bundle ID shares a parent with `bundleID`.
+    /// Uses RunningApplicationsDiscovery.parentBundleID(of:) heuristic for matching.
+    private static func findAudioProcessObjects(matchingParentOf bundleID: String) -> [AudioObjectID] {
+        let targetParent = RunningApplicationsDiscovery.parentBundleID(of: bundleID)
+
+        var addr = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyProcessObjectList,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain)
+        var size: UInt32 = 0
+        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &addr, 0, nil, &size) == noErr else {
+            return []
+        }
+        let count = Int(size) / MemoryLayout<AudioObjectID>.size
+        var ids = [AudioObjectID](repeating: 0, count: count)
+        guard AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &addr, 0, nil, &size, &ids) == noErr else {
+            return []
+        }
+
+        return ids.compactMap { id -> AudioObjectID? in
+            guard let bid = try? id.readString(kAudioProcessPropertyBundleID), !bid.isEmpty else { return nil }
+            let candidateParent = RunningApplicationsDiscovery.parentBundleID(of: bid)
+            return candidateParent == targetParent ? id : nil
         }
     }
 }
