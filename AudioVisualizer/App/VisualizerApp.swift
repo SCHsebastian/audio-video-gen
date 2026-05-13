@@ -9,7 +9,9 @@ struct VisualizerApp: App {
         WindowGroup("Audio Visualizer") {
             Group {
                 if let root {
-                    RootView(vm: root.viewModel, renderer: root.renderer) {
+                    RootView(vm: root.viewModel,
+                             renderer: root.renderer,
+                             localizer: root.localizer) {
                         _ = await root.permission.request()
                     }
                 } else if let err = initError {

@@ -1,15 +1,17 @@
 import SwiftUI
+import Domain
 
 struct PermissionGate: View {
+    let localizer: Localizing
     let onGrant: () -> Void
     var body: some View {
         VStack(spacing: 24) {
-            Text("Audio Visualizer needs permission to listen to system audio.")
+            Text(localizer.string(.permissionTitle))
                 .multilineTextAlignment(.center)
                 .font(.title2)
-            Button("Grant Audio Capture access", action: onGrant)
+            Button(localizer.string(.permissionGrant), action: onGrant)
                 .keyboardShortcut(.defaultAction)
-            Link("Open System Settings → Privacy → Audio Capture",
+            Link(localizer.string(.permissionOpenSettings),
                  destination: URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AudioCapture")!)
                 .font(.footnote)
         }
