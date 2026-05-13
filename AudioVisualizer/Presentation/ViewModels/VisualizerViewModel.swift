@@ -60,6 +60,10 @@ final class VisualizerViewModel {
         renderer.randomizeLissajous()
     }
 
+    func randomizeCurrent() {
+        renderer.randomizeCurrent()
+    }
+
     func setSpeed(_ s: Float) {
         let clamped = max(0.1, min(3.0, s))
         speed = clamped

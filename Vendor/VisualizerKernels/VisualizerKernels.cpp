@@ -19,7 +19,9 @@ extern "C" void vk_lissajous(float *out_xy,
                              float delta,
                              float rms) {
     if (!out_xy || count == 0) return;
-    const float pulse = 0.85f + 0.15f * std::min(1.0f, rms * 6.0f);
+    // Hard ceiling at 0.90 so even with audio-reactive pulse the curve plus the
+    // line-thickness halo stays inside NDC [-1, 1].
+    const float pulse = 0.78f + 0.12f * std::min(1.0f, rms * 6.0f);
     const float phase = t * 0.35f;
     for (uint32_t i = 0; i < count; ++i) {
         const float u = static_cast<float>(i) / static_cast<float>(count - 1);
@@ -39,7 +41,8 @@ extern "C" void vk_rose(float *out_xy,
     if (!out_xy || count == 0) return;
     const float k = static_cast<float>(petals <= 0 ? 1 : petals);
     const float rot = t * 0.25f;
-    const float scale = 0.9f * (1.0f + std::min(0.8f, rms * 2.0f));
+    // Cap effective radius to 0.85 so the curve + glow halo stays inside the canvas.
+    const float scale = std::min(0.85f, 0.65f * (1.0f + std::min(0.5f, rms * 1.5f)));
     for (uint32_t i = 0; i < count; ++i) {
         const float u = static_cast<float>(i) / static_cast<float>(count - 1);
         const float theta = u * kTwoPi;

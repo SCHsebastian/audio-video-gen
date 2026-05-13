@@ -13,6 +13,15 @@ final class AlchemyScene: VisualizerScene {
     private var beatEnv: Float = 0
     private var simTime: Float = 0
 
+    // Randomizable behavior parameters — `randomize()` perturbs them.
+    private var attractorSpeedX: Float = 0.55
+    private var attractorSpeedY: Float = 0.71
+    private var attractorAmpX: Float = 0.60
+    private var attractorAmpY: Float = 0.50
+    private var curlScale: Float = 1.6
+    private var swirlBias: Float = 1.2
+    private var hueShift: Float = 0
+
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws {
         self.paletteTexture = paletteTexture
         guard let fn = library.makeFunction(name: "alchemy_update") else {
@@ -39,7 +48,7 @@ final class AlchemyScene: VisualizerScene {
         for i in 0..<particleCount {
             let seed = Float.random(in: 0..<1)
             let a = seed * 2 * .pi
-            let r = Float.random(in: 0..<0.6)
+            let r = Float.random(in: 0.2..<0.9)
             initial[i].seed = seed
             initial[i].life = Float.random(in: 0..<1)
             initial[i].pos = SIMD2(cos(a), sin(a)) * r
@@ -52,13 +61,11 @@ final class AlchemyScene: VisualizerScene {
 
     func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
         let bandCount = spectrum.bands.count
-        // Split the spectrum into low / mid / high thirds for richer modulation.
-        let lo = bandCount / 4                    // ~bass
+        let lo = bandCount / 4
         let hi = bandCount * 3 / 4
         let bassAvg = bandCount > 0 ? spectrum.bands.prefix(lo).reduce(0, +) / Float(max(1, lo)) : 0
         let midAvg = bandCount > 0 ? spectrum.bands[lo..<hi].reduce(0, +) / Float(max(1, hi - lo)) : 0
         let trebleAvg = bandCount > 0 ? spectrum.bands[hi..<bandCount].reduce(0, +) / Float(max(1, bandCount - hi)) : 0
-        // Smooth (attack fast, release slower) so particles don't jitter.
         bass = max(bassAvg, bass * 0.88)
         mid = max(midAvg, mid * 0.85)
         treble = max(trebleAvg, treble * 0.80)
@@ -67,11 +74,22 @@ final class AlchemyScene: VisualizerScene {
         simTime += dt
     }
 
+    func randomize() {
+        // Speeds are kept distinct so x and y don't lock in phase → visible motion.
+        attractorSpeedX = Float.random(in: 0.4...1.1)
+        attractorSpeedY = Float.random(in: 0.4...1.1)
+        if abs(attractorSpeedX - attractorSpeedY) < 0.1 { attractorSpeedY += 0.25 }
+        attractorAmpX = Float.random(in: 0.40...0.70)
+        attractorAmpY = Float.random(in: 0.35...0.60)
+        curlScale = Float.random(in: 1.0...3.5)
+        swirlBias = Float.random(in: 0.7...1.8)
+        hueShift = Float.random(in: 0..<1)
+    }
+
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {
         enc.setRenderPipelineState(renderPipeline)
         enc.setVertexBuffer(particles, offset: 0, index: 0)
-        var au = AUniforms(bass: bass, mid: mid, treble: treble, beat: beatEnv,
-                           dt: 0, aspect: uniforms.aspect, time: simTime, _pad: 0)
+        var au = uniformBuffer(dt: 0, aspect: uniforms.aspect)
         enc.setVertexBytes(&au, length: MemoryLayout.size(ofValue: au), index: 1)
         enc.setFragmentTexture(paletteTexture, index: 0)
         enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: particleCount)
@@ -81,8 +99,7 @@ final class AlchemyScene: VisualizerScene {
         guard let enc = cmd.makeComputeCommandEncoder() else { return }
         enc.setComputePipelineState(computePipeline)
         enc.setBuffer(particles, offset: 0, index: 0)
-        var au = AUniforms(bass: bass, mid: mid, treble: treble, beat: beatEnv,
-                           dt: dt, aspect: aspect, time: simTime, _pad: 0)
+        var au = uniformBuffer(dt: dt, aspect: aspect)
         enc.setBytes(&au, length: MemoryLayout.size(ofValue: au), index: 1)
         let tg = MTLSize(width: computePipeline.threadExecutionWidth, height: 1, depth: 1)
         let grid = MTLSize(width: particleCount, height: 1, depth: 1)
@@ -98,6 +115,22 @@ final class AlchemyScene: VisualizerScene {
         var dt: Float
         var aspect: Float
         var time: Float
-        var _pad: Float
+        var attractorSpeedX: Float
+        var attractorSpeedY: Float
+        var attractorAmpX: Float
+        var attractorAmpY: Float
+        var curlScale: Float
+        var swirlBias: Float
+        var hueShift: Float
+        var _pad0: Float = 0
+        var _pad1: Float = 0
+    }
+
+    private func uniformBuffer(dt: Float, aspect: Float) -> AUniforms {
+        AUniforms(bass: bass, mid: mid, treble: treble, beat: beatEnv,
+                  dt: dt, aspect: aspect, time: simTime,
+                  attractorSpeedX: attractorSpeedX, attractorSpeedY: attractorSpeedY,
+                  attractorAmpX: attractorAmpX, attractorAmpY: attractorAmpY,
+                  curlScale: curlScale, swirlBias: swirlBias, hueShift: hueShift)
     }
 }

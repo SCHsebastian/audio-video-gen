@@ -86,6 +86,21 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         Log.render.info("randomizeLissajous")
     }
 
+    func randomizeAlchemy() {
+        (scenes[.alchemy] as? AlchemyScene)?.randomize()
+        Log.render.info("randomizeAlchemy")
+    }
+
+    /// Randomize the current scene if it supports it. Used by the canvas tap
+    /// gesture so we don't have to teach the view layer about specific scenes.
+    func randomizeCurrent() {
+        switch currentKind {
+        case .lissajous: randomizeLissajous()
+        case .alchemy:   randomizeAlchemy()
+        default: break
+        }
+    }
+
     func peekRMS() -> Float {
         stateLock.withLock { $0.spectrum.rms }
     }

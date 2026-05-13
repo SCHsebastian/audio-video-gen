@@ -11,7 +11,15 @@ struct AlchemyUniforms {
     float dt;
     float aspect;
     float time;
-    float _pad;
+    float attractorSpeedX;
+    float attractorSpeedY;
+    float attractorAmpX;
+    float attractorAmpY;
+    float curlScale;
+    float swirlBias;
+    float hueShift;
+    float _pad0;
+    float _pad1;
 };
 
 // --- small noise helpers --------------------------------------------------
@@ -50,25 +58,27 @@ kernel void alchemy_update(device Particle *p [[buffer(0)]],
                            uint id [[thread_position_in_grid]]) {
     Particle x = p[id];
 
-    // Slow attractor wandering on a Lissajous figure, pulsing with bass+beat.
+    // Attractor wanders on a Lissajous — speed/amp randomized per click so the
+    // bright "centre" is visibly different every time and never camps in one spot.
     float t = u.time;
-    float2 attractor = float2(sin(t * 0.31 + 0.7) * 0.55,
-                              sin(t * 0.41) * 0.45);
-    float attractStrength = 0.6 + u.bass * 2.5 + u.beat * 1.8;
+    float2 attractor = float2(sin(t * u.attractorSpeedX + 0.7) * u.attractorAmpX,
+                              sin(t * u.attractorSpeedY + 1.3) * u.attractorAmpY);
+    // Weaker direct pull so particles don't pile up at the attractor.
+    float attractStrength = 0.35 + u.bass * 1.6 + u.beat * 1.0;
 
     float2 to = attractor - x.pos;
     float r = max(length(to), 0.05);
     float2 radial = to / r;
 
-    // Curl-noise flow field — driven by treble for higher-frequency swirl.
-    float2 q = x.pos * (1.6 + u.treble * 1.2) + x.seed * 7.3;
+    // Curl-noise flow field — randomised scale gives different swirl scales per click.
+    float2 q = x.pos * u.curlScale + x.seed * 7.3;
     float2 swirl = curl(q, t) * (0.9 + u.mid * 2.0);
 
     // Tangential bias around the attractor so particles orbit instead of crashing in.
     float2 tangent = float2(-radial.y, radial.x);
 
-    float2 accel = radial * attractStrength * (0.3 / (r + 0.2))
-                 + tangent * (1.2 + u.bass * 1.5)
+    float2 accel = radial * attractStrength * (0.22 / (r + 0.25))
+                 + tangent * (u.swirlBias + u.bass * 1.5)
                  + swirl * 1.4;
 
     x.vel += accel * u.dt;
@@ -82,12 +92,14 @@ kernel void alchemy_update(device Particle *p [[buffer(0)]],
     x.pos += x.vel * u.dt;
     x.life -= u.dt * (0.18 + u.treble * 0.4);
 
-    // Respawn near the attractor with a tangential kick so trails form.
+    // Respawn far from the attractor (wide ring) so the bright concentration
+    // is broken up — particles arrive at the attractor instead of being born there.
     if (x.life <= 0.0 || length(x.pos) > 1.6) {
         float a = x.seed * 6.2831853 + t * 0.7;
         float2 dir = float2(cos(a), sin(a));
-        x.pos = attractor + dir * (0.02 + 0.04 * hash21(float2(x.seed, t)));
-        x.vel = float2(-dir.y, dir.x) * (0.35 + u.bass * 1.2);
+        float spawnR = 0.55 + 0.40 * hash21(float2(x.seed, t));   // 0.55..0.95
+        x.pos = attractor + dir * spawnR;
+        x.vel = float2(-dir.y, dir.x) * (0.25 + u.bass * 1.0);
         x.life = 0.85 + 0.3 * hash21(float2(t, x.seed));
     }
     p[id] = x;
@@ -123,7 +135,7 @@ vertex AlchemyVertOut alchemy_vertex(uint vid [[vertex_id]],
     o.life = clamp(q.life, 0.0, 1.0);
     // Hue: mix angle around center, life, and a touch of audio energy.
     float angle = atan2(q.pos.y, q.pos.x) / 6.2831853 + 0.5;
-    o.hue = fract(angle * 1.3 + (1.0 - o.life) * 0.35 + u.bass * 0.25 + q.seed * 0.15);
+    o.hue = fract(angle * 1.3 + (1.0 - o.life) * 0.35 + u.bass * 0.25 + q.seed * 0.15 + u.hueShift);
     // Intensity envelope: brighter at mid-life, dim at spawn and death.
     // Toned down (was 0.65 + beat*0.9) so 120k additive sprites don't blow out.
     float env = sin(o.life * 3.14159265);

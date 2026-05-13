@@ -8,13 +8,21 @@ struct RootView: View {
     let requestPermission: () async -> Void
 
     @State private var showingSettings = false
+    @State private var toolbarVisible = true
+    @State private var hideTask: Task<Void, Never>? = nil
+
+    private let hideAfter: Duration = .milliseconds(2500)
 
     var body: some View {
         ZStack(alignment: .top) {
             MetalCanvas(renderer: renderer)
                 .ignoresSafeArea()
                 .onTapGesture {
-                    if vm.currentScene == .lissajous { vm.randomizeLissajous() }
+                    vm.randomizeCurrent()
+                    nudgeToolbar()
+                }
+                .onContinuousHover { phase in
+                    if case .active = phase { nudgeToolbar() }
                 }
             switch vm.state {
             case .waitingForPermission:
@@ -30,6 +38,7 @@ struct RootView: View {
                     HStack(spacing: 16) {
                         Button {
                             showingSettings = true
+                            nudgeToolbar()
                         } label: {
                             Image(systemName: "gearshape")
                                 .font(.title3)
@@ -39,15 +48,19 @@ struct RootView: View {
                         SceneToolbar(localizer: localizer,
                                      currentScene: Binding(
                                        get: { vm.currentScene },
-                                       set: { vm.selectScene($0) }))
+                                       set: { vm.selectScene($0); nudgeToolbar() }))
                         SpeedSlider(localizer: localizer,
                                     speed: Binding(
                                        get: { vm.speed },
-                                       set: { vm.setSpeed($0) }))
+                                       set: { vm.setSpeed($0); nudgeToolbar() }))
                     }
-                    .padding(.top, 16)
-                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 18)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .padding(.top, 14)
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .opacity(toolbarVisible ? 1 : 0)
+                    .animation(.easeInOut(duration: 0.45), value: toolbarVisible)
                     if vm.isSilent {
                         VStack {
                             Spacer()
@@ -64,10 +77,21 @@ struct RootView: View {
                     .foregroundStyle(.white)
             }
         }
-        .onAppear { vm.onAppear() }
+        .onAppear { vm.onAppear(); nudgeToolbar() }
         .sheet(isPresented: $showingSettings) {
             SettingsView(localizer: localizer,
                          onChange: { lang in vm.changeLanguage(lang) })
+        }
+    }
+
+    /// Show the toolbar and reset the idle timer; after `hideAfter` of no further
+    /// activity the toolbar fades out so the visualization is unobstructed.
+    private func nudgeToolbar() {
+        toolbarVisible = true
+        hideTask?.cancel()
+        hideTask = Task { @MainActor in
+            try? await Task.sleep(for: hideAfter)
+            if !Task.isCancelled { toolbarVisible = false }
         }
     }
 }
