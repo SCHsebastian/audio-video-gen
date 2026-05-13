@@ -152,7 +152,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         let unsafeStats = OpaquePointer(statsRef)
 
         var newProc: AudioDeviceIOProcID?
-        let ioStatus = AudioDeviceCreateIOProcIDWithBlock(&newProc, aggID, drainQueue) { _, inData, _, _, _ in
+        let ioStatus = AudioDeviceCreateIOProcIDWithBlock(&newProc, aggID, nil) { _, inData, _, _, _ in
             let ablPtr = UnsafePointer<AudioBufferList>(OpaquePointer(inData))
             let buffers = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: ablPtr))
             let r = Unmanaged<RingBuffer>.fromOpaque(UnsafeRawPointer(unsafeRing)).takeUnretainedValue()
