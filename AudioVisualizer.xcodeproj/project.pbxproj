@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		04339AE4B31849053AAAF052 /* VisualizerKernelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4FFF0EB58E7DC09C516FA1 /* VisualizerKernelsTests.swift */; };
 		0506A1BDA246E4925D46A6E8 /* BundleLocalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */; };
+		09AE66EAF2604821A8BF7FF7 /* AmbientVignette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE7987B00B0E970D32C03AF /* AmbientVignette.swift */; };
 		0FA043251EF2809F15167204 /* PingPongTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */; };
 		111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */; };
 		262A549375CA43A76CBAFFF3 /* Tunnel.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4D85905E101BA978B977F1AE /* Tunnel.metal */; };
@@ -96,6 +97,7 @@
 		8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlchemyScene.swift; sourceTree = "<group>"; };
 		8B97ECD5E8A02079964E76AD /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		925F2B6A9763EB6BF642AA83 /* PermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGate.swift; sourceTree = "<group>"; };
+		9CE7987B00B0E970D32C03AF /* AmbientVignette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientVignette.swift; sourceTree = "<group>"; };
 		A693DF52CB2769B94E01BD74 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = AlchemyParticles.metal; sourceTree = "<group>"; };
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
@@ -266,6 +268,7 @@
 		AA013CBEF4EDCE4B70D60822 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				9CE7987B00B0E970D32C03AF /* AmbientVignette.swift */,
 				C7EF2518C9DE9AAE618476A0 /* MetalCanvas.swift */,
 				925F2B6A9763EB6BF642AA83 /* PermissionGate.swift */,
 				B8D1929F0951B217438B6AB6 /* RootView.swift */,
@@ -474,6 +477,7 @@
 			files = (
 				8691A03CE3647051B86CAA42 /* AlchemyParticles.metal in Sources */,
 				474DED559F9653A8AC2B05D3 /* AlchemyScene.swift in Sources */,
+				09AE66EAF2604821A8BF7FF7 /* AmbientVignette.swift in Sources */,
 				347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */,
 				4556350D218716AD953145D4 /* Bars.metal in Sources */,
 				7F0EBC6E0AA4DDDB47984B8B /* BarsScene.swift in Sources */,

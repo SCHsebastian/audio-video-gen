@@ -25,6 +25,8 @@ struct RootView: View {
                 .onContinuousHover { phase in
                     if case .active = phase { nudgeToolbar() }
                 }
+            AmbientVignette(renderer: renderer)
+                .ignoresSafeArea()
             switch vm.state {
             case .waitingForPermission:
                 PermissionGate(localizer: localizer) {

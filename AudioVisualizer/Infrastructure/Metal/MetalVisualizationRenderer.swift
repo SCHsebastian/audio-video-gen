@@ -107,6 +107,15 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         stateLock.withLock { $0.spectrum.rms }
     }
 
+    /// Smoothed beat strength in [0, 1] for use by ambient UI effects (e.g. vignette).
+    private var smoothedBeat: Float = 0
+    func peekBeat() -> Float {
+        let target = stateLock.withLock { s -> Float in s.beat?.strength ?? 0 }
+        let coef: Float = target > smoothedBeat ? 0.45 : 0.06   // attack fast, release slow
+        smoothedBeat += (target - smoothedBeat) * coef
+        return smoothedBeat
+    }
+
     func consume(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?) {
         stateLock.withLock { s in
             s.spectrum = spectrum
