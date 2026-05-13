@@ -13,6 +13,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     private var currentKind: SceneKind = .bars
     private var paletteTexture: MTLTexture
     private var lastTimestamp: CFTimeInterval = 0
+    private var speed: Float = 1.0
 
     private let stateLock = OSAllocatedUnfairLock(initialState: State())
     private struct State {
@@ -53,6 +54,8 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         let bars = BarsScene(); try bars.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.bars] = bars
         let scope = ScopeScene(); try scope.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.scope] = scope
         let alch = AlchemyScene(); try alch.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.alchemy] = alch
+        let tun = TunnelScene(); try tun.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.tunnel] = tun
+        let liss = LissajousScene(); try liss.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.lissajous] = liss
         return renderer
     }
 
@@ -69,6 +72,13 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         if let bars = scenes[.bars] as? BarsScene { try? bars.build(device: device, library: library, paletteTexture: pal) }
         if let scope = scenes[.scope] as? ScopeScene { try? scope.build(device: device, library: library, paletteTexture: pal) }
         if let alch = scenes[.alchemy] as? AlchemyScene { try? alch.build(device: device, library: library, paletteTexture: pal) }
+        if let tun = scenes[.tunnel] as? TunnelScene { try? tun.build(device: device, library: library, paletteTexture: pal) }
+        if let liss = scenes[.lissajous] as? LissajousScene { try? liss.build(device: device, library: library, paletteTexture: pal) }
+    }
+
+    func setSpeed(_ s: Float) {
+        speed = max(0.1, min(3.0, s))
+        Log.render.info("setSpeed: \(self.speed, privacy: .public)")
     }
 
     func peekRMS() -> Float {
@@ -95,8 +105,9 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
 
     func draw(in view: MTKView) {
         let now = CACurrentMediaTime()
-        let dt = lastTimestamp == 0 ? Float(1.0/60.0) : Float(min(0.1, now - lastTimestamp))
+        let raw = lastTimestamp == 0 ? Float(1.0/60.0) : Float(min(0.1, now - lastTimestamp))
         lastTimestamp = now
+        let dt = raw * speed
 
         let snap = stateLock.withLock { s -> (SpectrumFrame, [Float], BeatEvent?) in
             let b = s.beatConsumed ? nil : s.beat

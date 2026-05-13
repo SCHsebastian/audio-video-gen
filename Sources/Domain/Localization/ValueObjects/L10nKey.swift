@@ -5,6 +5,9 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case sceneBars                = "toolbar.scene.bars"
     case sceneScope               = "toolbar.scene.scope"
     case sceneAlchemy             = "toolbar.scene.alchemy"
+    case sceneTunnel              = "toolbar.scene.tunnel"
+    case sceneLissajous           = "toolbar.scene.lissajous"
+    case speedLabel               = "toolbar.speed.label"
     case settingsButton           = "toolbar.settings.button"
 
     // Permission gate

@@ -7,7 +7,7 @@ final class SceneKindTests: XCTestCase {
             XCTAssertEqual(SceneKind(rawValue: k.rawValue), k)
         }
     }
-    func test_all_three_scenes_present() {
-        XCTAssertEqual(Set(SceneKind.allCases), [.bars, .scope, .alchemy])
+    func test_all_scenes_present() {
+        XCTAssertEqual(Set(SceneKind.allCases), [.bars, .scope, .alchemy, .tunnel, .lissajous])
     }
 }

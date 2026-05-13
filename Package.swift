@@ -8,6 +8,7 @@ let package = Package(
         .library(name: "Domain", targets: ["Domain"]),
         .library(name: "Application", targets: ["Application"]),
         .library(name: "TPCircularBuffer", targets: ["TPCircularBuffer"]),
+        .library(name: "VisualizerKernels", targets: ["VisualizerKernels"]),
     ],
     targets: [
         .target(name: "Domain", path: "Sources/Domain"),
@@ -18,7 +19,15 @@ let package = Package(
             sources: ["TPCircularBuffer.c"],
             publicHeadersPath: "include"
         ),
+        .target(
+            name: "VisualizerKernels",
+            path: "Vendor/VisualizerKernels",
+            sources: ["VisualizerKernels.cpp"],
+            publicHeadersPath: "include",
+            cxxSettings: [.headerSearchPath("include")]
+        ),
         .testTarget(name: "DomainTests", dependencies: ["Domain"], path: "Tests/DomainTests"),
         .testTarget(name: "ApplicationTests", dependencies: ["Domain", "Application"], path: "Tests/ApplicationTests"),
-    ]
+    ],
+    cxxLanguageStandard: .cxx17
 )

@@ -9,8 +9,10 @@ struct SceneToolbar: View {
             Text(localizer.string(.sceneBars)).tag(SceneKind.bars)
             Text(localizer.string(.sceneScope)).tag(SceneKind.scope)
             Text(localizer.string(.sceneAlchemy)).tag(SceneKind.alchemy)
+            Text(localizer.string(.sceneTunnel)).tag(SceneKind.tunnel)
+            Text(localizer.string(.sceneLissajous)).tag(SceneKind.lissajous)
         }
         .pickerStyle(.segmented)
-        .frame(width: 240)
+        .frame(width: 420)
     }
 }

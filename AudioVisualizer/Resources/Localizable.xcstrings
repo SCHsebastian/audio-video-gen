@@ -225,6 +225,54 @@
         }
       }
     },
+    "toolbar.scene.tunnel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tunnel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Túnel"
+          }
+        }
+      }
+    },
+    "toolbar.scene.lissajous" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lissajous"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lissajous"
+          }
+        }
+      }
+    },
+    "toolbar.speed.label" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visualization speed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velocidad de la visualización"
+          }
+        }
+      }
+    },
     "toolbar.scene.scope" : {
       "extractionState" : "stale",
       "localizations" : {

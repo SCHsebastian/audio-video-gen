@@ -7,42 +7,33 @@ import os.log
 @Observable
 final class VisualizerViewModel {
     private(set) var state: VisualizationState = .idle
-    var sources: [AudioSource] = [.systemWide]
-    var processInfos: [AudioProcessInfo] = []
-    var selectedSource: AudioSource = .systemWide
     var currentScene: SceneKind = .bars
+    var speed: Float = 1.0
 
     let localizer: Localizing                  // public so views can read
 
-    private let listSources: ListAudioSourcesUseCase
-    private let selectSourceUseCase: SelectAudioSourceUseCase
     private let changeScene: ChangeSceneUseCase
     private let start: StartVisualizationUseCase
     private let stop: StopVisualizationUseCase
-    private let discovery: ProcessDiscovering
     private let renderer: MetalVisualizationRenderer
+    private let preferences: PreferencesStoring
     private let changeLanguageUseCase: ChangeLanguageUseCase
     private var streamTask: Task<Void, Never>?
     private var silenceTask: Task<Void, Never>?
-    private var refreshTask: Task<Void, Never>?
     private(set) var isSilent: Bool = false
 
-    init(listSources: ListAudioSourcesUseCase,
-         selectSource: SelectAudioSourceUseCase,
-         changeScene: ChangeSceneUseCase,
+    init(changeScene: ChangeSceneUseCase,
          start: StartVisualizationUseCase,
          stop: StopVisualizationUseCase,
-         discovery: ProcessDiscovering,
          renderer: MetalVisualizationRenderer,
+         preferences: PreferencesStoring,
          localizer: Localizing,
          changeLanguage: ChangeLanguageUseCase) {
-        self.listSources = listSources
-        self.selectSourceUseCase = selectSource
         self.changeScene = changeScene
         self.start = start
         self.stop = stop
-        self.discovery = discovery
         self.renderer = renderer
+        self.preferences = preferences
         self.localizer = localizer
         self.changeLanguageUseCase = changeLanguage
     }
@@ -54,30 +45,8 @@ final class VisualizerViewModel {
     func onAppear() {
         Log.vm.info("onAppear")
         Task { @MainActor in
-            await refreshSources()
             beginStream()
             startSilenceWatch()
-            startRefreshLoop()
-        }
-    }
-
-    func refreshSources() async {
-        do {
-            sources = try await listSources.execute()
-            processInfos = (try? await discovery.listAudioProcesses()) ?? []
-            Log.vm.debug("refreshSources: \(self.sources.count) sources, \(self.processInfos.count) audio processes")
-        } catch {
-            Log.vm.error("refreshSources failed: \(String(describing: error), privacy: .public)")
-            state = .error(.permissionDenied)
-        }
-    }
-
-    func displayName(for source: AudioSource) -> String {
-        switch source {
-        case .systemWide:
-            return localizer.string(.sourceSystemWide)
-        case .process(_, let bundleID):
-            return processInfos.first(where: { $0.bundleID == bundleID })?.displayName ?? bundleID
         }
     }
 
@@ -87,21 +56,22 @@ final class VisualizerViewModel {
         changeScene.execute(k)
     }
 
-    func selectSource(_ s: AudioSource) {
-        Log.vm.info("selectSource: \(String(describing: s), privacy: .public)")
-        selectedSource = s
-        selectSourceUseCase.execute(s)
-        beginStream()
+    func setSpeed(_ s: Float) {
+        let clamped = max(0.1, min(3.0, s))
+        speed = clamped
+        renderer.setSpeed(clamped)
+        var prefs = preferences.load()
+        prefs.speed = clamped
+        preferences.save(prefs)
     }
 
     private func beginStream() {
-        Log.vm.info("beginStream: chosen=\(String(describing: self.selectedSource), privacy: .public)")
+        Log.vm.info("beginStream: systemWide")
         streamTask?.cancel()
         let useCase = start
-        let chosen = selectedSource
         streamTask = Task { @MainActor in
             await stop.execute()
-            for await s in await useCase.execute(source: chosen) {
+            for await s in await useCase.execute(source: .systemWide) {
                 Log.vm.info("state: \(String(describing: s), privacy: .public)")
                 self.state = s
             }
@@ -118,17 +88,6 @@ final class VisualizerViewModel {
                 let rms = self.renderer.peekRMS()
                 if rms < 0.005 { silentSinceMs += 250 } else { silentSinceMs = 0 }
                 self.isSilent = silentSinceMs >= 2000
-            }
-        }
-    }
-
-    private func startRefreshLoop() {
-        refreshTask?.cancel()
-        refreshTask = Task { @MainActor [weak self] in
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(1))
-                guard let self else { return }
-                await self.refreshSources()
             }
         }
     }

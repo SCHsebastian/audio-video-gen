@@ -24,7 +24,7 @@ struct RootView: View {
                 }
             case .running, .idle, .noAudioYet:
                 ZStack {
-                    HStack(spacing: 24) {
+                    HStack(spacing: 16) {
                         Button {
                             showingSettings = true
                         } label: {
@@ -33,11 +33,14 @@ struct RootView: View {
                         }
                         .buttonStyle(.plain)
                         .help(localizer.string(.settingsButton))
-                        SourcePicker(vm: vm)
                         SceneToolbar(localizer: localizer,
                                      currentScene: Binding(
                                        get: { vm.currentScene },
                                        set: { vm.selectScene($0) }))
+                        SpeedSlider(localizer: localizer,
+                                    speed: Binding(
+                                       get: { vm.speed },
+                                       set: { vm.setSpeed($0) }))
                     }
                     .padding(.top, 16)
                     .padding(.horizontal, 16)
