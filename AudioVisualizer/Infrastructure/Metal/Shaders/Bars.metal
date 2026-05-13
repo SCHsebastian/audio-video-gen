@@ -23,11 +23,14 @@ vertex BarsOut bars_vertex(uint vid [[vertex_id]],
     float x0 = -1.0 + w * float(iid) + w * (gap * 0.5);
     float x1 = x0 + w * (1.0 - gap);
     float h = max(heights[iid], 0.006);                // visible idle line
-    float y0 = -1.0;
-    float yTop = -1.0 + 2.0 * h;
-    // Pad the quad upward a bit so the soft halo fits without clipping.
+    // Centre the bars vertically so they grow up *and* down (mirror).
+    // Bar half-height in NDC; clamped so it never overruns the canvas.
+    float halfH = min(0.96, h);
+    float y0 = -halfH;
+    float yTop = halfH;
     float pad = 0.04;
     float y1 = min(1.0, yTop + pad);
+    y0 = max(-1.0, y0 - pad);
 
     float2 verts[6] = { float2(x0,y0), float2(x1,y0), float2(x0,y1),
                         float2(x1,y0), float2(x1,y1), float2(x0,y1) };
@@ -52,26 +55,26 @@ fragment float4 bars_fragment(BarsOut in [[stage_in]],
                               texture2d<float> palette [[texture(0)]]) {
     constexpr sampler s(filter::linear);
 
-    // Convert the padded quad's local coords to a "bar-tight" space where
-    // y=-1 is the bottom of the bar and y=+1 is the bar's top (excluding pad).
+    // Mirror layout: in.local.y is [-1, 1] across the padded full-height quad.
+    // The bar fills the centre; take |y| so colour symmetry mirrors top↔bottom.
+    float yAbs = abs(in.local.y);
     float pad_frac = 0.04 / max(0.001, in.size);
-    float yBar = (in.local.y + 1.0) / (1.0 + pad_frac) - 1.0; // [-1, 1] within bar, >1 in pad
-    float2 p = float2(in.local.x, yBar);
+    float yBar = yAbs / (1.0 + pad_frac);              // 0..1 from centre outwards
+    float2 p = float2(in.local.x, yBar * 2.0 - 1.0);   // SDF wants [-1, 1]
 
-    // Rounded-rect SDF. Slightly narrow horizontally so neighbouring bars don't kiss.
-    float d = sdRoundBox(p, float2(0.85, 1.0), 0.45);
+    float d = sdRoundBox(p, float2(0.85, 1.0), 0.35);
     float aa = fwidth(d) + 0.001;
     float fill = 1.0 - smoothstep(-aa, aa, d);
-    float glow = exp(-max(d, 0.0) * 6.0) * 0.55;        // outer halo
+    float glow = exp(-max(d, 0.0) * 6.0) * 0.55;
 
-    // Vertical gradient: brighter near top, hue from height envelope.
-    float topT = clamp((yBar + 1.0) * 0.5, 0.0, 1.0);
-    float palU = clamp(in.height * 0.55 + topT * 0.45, 0.0, 1.0);
+    // Gradient brightens toward the centre (axis of symmetry).
+    float centreT = 1.0 - yBar;                         // 1 at centre, 0 at tip
+    float palU = clamp(in.height * 0.55 + centreT * 0.45, 0.0, 1.0);
     float3 base = palette.sample(s, float2(palU, 0.5)).rgb;
 
-    // Highlight ridge near the very top edge.
-    float ridge = smoothstep(0.92, 0.99, topT) * (1.0 - smoothstep(1.0, 1.04, topT));
-    float3 col = base * (0.7 + 0.5 * topT) + float3(1.0) * ridge * 0.5;
+    // Highlight ridge at the very tip (top or bottom — symmetric).
+    float ridge = smoothstep(0.92, 0.99, yBar) * (1.0 - smoothstep(1.0, 1.04, yBar));
+    float3 col = base * (0.6 + 0.6 * centreT) + float3(1.0) * ridge * 0.5;
 
     float a = fill + glow * (1.0 - fill);
     return float4(col * a, a);

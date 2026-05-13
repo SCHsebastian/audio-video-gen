@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 import Domain
 
 struct RootView: View {
@@ -108,7 +109,9 @@ struct RootView: View {
                     .foregroundStyle(.white)
             }
         }
-        .onAppear { vm.onAppear(); nudgeToolbar(); keyboardFocused = true }
+        .onAppear { vm.onAppear(); nudgeToolbar(); keyboardFocused = true; updateWindowTitle() }
+        .onChange(of: vm.currentScene) { _, _ in updateWindowTitle() }
+        .onChange(of: vm.paletteName) { _, _ in updateWindowTitle() }
         .sheet(isPresented: $showingSettings) {
             SettingsView(localizer: localizer,
                          onChange: { lang in vm.changeLanguage(lang) })
@@ -148,6 +151,22 @@ struct RootView: View {
 
     /// Show the toolbar and reset the idle timer; after `hideAfter` of no further
     /// activity the toolbar fades out so the visualization is unobstructed.
+    private func sceneDisplayName(_ k: SceneKind) -> String {
+        switch k {
+        case .bars: return localizer.string(.sceneBars)
+        case .scope: return localizer.string(.sceneScope)
+        case .alchemy: return localizer.string(.sceneAlchemy)
+        case .tunnel: return localizer.string(.sceneTunnel)
+        case .lissajous: return localizer.string(.sceneLissajous)
+        }
+    }
+
+    private func updateWindowTitle() {
+        let scene = sceneDisplayName(vm.currentScene)
+        let title = "Audio Visualizer — \(scene) · \(vm.paletteName)"
+        for w in NSApp.windows { w.title = title }
+    }
+
     private func nudgeToolbar() {
         toolbarVisible = true
         hideTask?.cancel()
