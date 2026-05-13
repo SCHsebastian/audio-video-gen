@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */; };
 		26884600E006F72B2D17E67C /* VDSPSpectrumAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */; };
 		2BF53352D03E7D477837AEEE /* VDSPSpectrumAnalyzerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47830BB5EB67565ECDB10B8A /* VDSPSpectrumAnalyzerTests.swift */; };
 		368E756989688059F7A61697 /* VisualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832E146FD2B148356484937B /* VisualizerApp.swift */; };
@@ -17,6 +18,7 @@
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
 		BC013271989B876F10199BA6 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 97B6E5018EBBCD6964AEEC50 /* Domain */; };
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
+		DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */; };
 		FFEE78CA3D545FAF887B76C1 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0BA6759B8D541765628417 /* Application */; };
 /* End PBXBuildFile section */
 
@@ -35,8 +37,10 @@
 		079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferences.swift; sourceTree = "<group>"; };
 		2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferencesTests.swift; sourceTree = "<group>"; };
 		4272C3F4212C49A23281F643 /* AudioVisualizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AudioVisualizer.entitlements; sourceTree = "<group>"; };
+		4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyBeatDetector.swift; sourceTree = "<group>"; };
 		47830BB5EB67565ECDB10B8A /* VDSPSpectrumAnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDSPSpectrumAnalyzerTests.swift; sourceTree = "<group>"; };
 		4FB965E9116803E67E2A6371 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyBeatDetectorTests.swift; sourceTree = "<group>"; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
 		C1A4B6B9B4B4C4C3B29B6E96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D4CCF341189D337EEF681242 /* AudioVisualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioVisualizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +112,7 @@
 		7D4630AB1F70A58F44C09426 /* Analysis */ = {
 			isa = PBXGroup;
 			children = (
+				4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */,
 				035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */,
 			);
 			path = Analysis;
@@ -149,6 +154,7 @@
 		BF0C2C94C0910328D3CBCFE4 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */,
 				2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */,
 				47830BB5EB67565ECDB10B8A /* VDSPSpectrumAnalyzerTests.swift */,
 			);
@@ -264,6 +270,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
 				4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */,
 				26884600E006F72B2D17E67C /* VDSPSpectrumAnalyzer.swift in Sources */,
 				368E756989688059F7A61697 /* VisualizerApp.swift in Sources */,
@@ -274,6 +281,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */,
 				8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */,
 				9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */,
 				2BF53352D03E7D477837AEEE /* VDSPSpectrumAnalyzerTests.swift in Sources */,
