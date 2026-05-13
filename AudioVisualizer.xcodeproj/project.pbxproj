@@ -39,6 +39,7 @@
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
 		DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */; };
 		DE0608DA54486B883E1ABFF7 /* VisualizerScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */; };
+		E39B635E6943C0EC1ECE333A /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2640C1355B4C74F25C877A4D /* Localizable.xcstrings */; };
 		E891DF819BE4127C66ABE6AE /* MetalVisualizationRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27278EF1AECFD061183F26F5 /* MetalVisualizationRenderer.swift */; };
 		EC19A09F417ED07E8E10B7BE /* PermissionGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925F2B6A9763EB6BF642AA83 /* PermissionGate.swift */; };
 		FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */; };
@@ -58,6 +59,7 @@
 /* Begin PBXFileReference section */
 		035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDSPSpectrumAnalyzer.swift; sourceTree = "<group>"; };
 		079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferences.swift; sourceTree = "<group>"; };
+		2640C1355B4C74F25C877A4D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		27278EF1AECFD061183F26F5 /* MetalVisualizationRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalVisualizationRenderer.swift; sourceTree = "<group>"; };
 		281753387399B49B8FEFE387 /* SceneToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneToolbar.swift; sourceTree = "<group>"; };
 		2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Scope.metal; sourceTree = "<group>"; };
@@ -259,6 +261,7 @@
 			children = (
 				4272C3F4212C49A23281F643 /* AudioVisualizer.entitlements */,
 				C1A4B6B9B4B4C4C3B29B6E96 /* Info.plist */,
+				2640C1355B4C74F25C877A4D /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -319,6 +322,7 @@
 			buildConfigurationList = 6B55D7F287975E5EB35F310E /* Build configuration list for PBXNativeTarget "AudioVisualizer" */;
 			buildPhases = (
 				B2E4BA4929C9CED5F0B7A269 /* Sources */,
+				925BD761C102DDA00EE528A2 /* Resources */,
 				2D66273D481466605D08CF05 /* Frameworks */,
 			);
 			buildRules = (
@@ -381,6 +385,7 @@
 			knownRegions = (
 				Base,
 				en,
+				es,
 			);
 			mainGroup = 1577DC35DC0E9E70F6167076;
 			minimizedProjectReferenceProxies = 1;
@@ -397,6 +402,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		925BD761C102DDA00EE528A2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E39B635E6943C0EC1ECE333A /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B2E4BA4929C9CED5F0B7A269 /* Sources */ = {

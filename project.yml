@@ -5,6 +5,8 @@ options:
   bundleIdPrefix: dev.audiovideogen
   createIntermediateGroups: true
   generateEmptyDirectories: true
+  developmentLanguage: en
+knownRegions: [en, es, Base]
 settings:
   base:
     SWIFT_VERSION: "5.10"
