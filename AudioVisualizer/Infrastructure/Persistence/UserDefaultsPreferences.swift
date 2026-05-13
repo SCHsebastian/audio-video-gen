@@ -27,6 +27,7 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
         let bundleID: String?
         let scene: String
         let paletteName: String
+        let language: String?               // new — optional for backward compat with v0.1 stored prefs
 
         init(domain p: UserPreferences) {
             switch p.lastSource {
@@ -35,6 +36,7 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
             }
             scene = p.lastScene.rawValue
             paletteName = p.lastPaletteName
+            language = p.lastLanguage.rawValue
         }
 
         func toDomain() -> UserPreferences {
@@ -43,7 +45,8 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
                 return .systemWide
             }()
             let scene = SceneKind(rawValue: scene) ?? .bars
-            return UserPreferences(lastSource: source, lastScene: scene, lastPaletteName: paletteName)
+            let lang = Language(rawValue: language ?? "") ?? .system
+            return UserPreferences(lastSource: source, lastScene: scene, lastPaletteName: paletteName, lastLanguage: lang)
         }
     }
 }

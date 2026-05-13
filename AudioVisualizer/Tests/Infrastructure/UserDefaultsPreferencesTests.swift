@@ -26,4 +26,15 @@ final class UserDefaultsPreferencesTests: XCTestCase {
         let sut = UserDefaultsPreferences(defaults: defaults)
         XCTAssertEqual(sut.load(), .default)
     }
+
+    func test_round_trip_includes_language() {
+        let suite = "test.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suite)!
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let sut = UserDefaultsPreferences(defaults: defaults)
+        var p = sut.load()
+        p.lastLanguage = .es
+        sut.save(p)
+        XCTAssertEqual(sut.load().lastLanguage, .es)
+    }
 }
