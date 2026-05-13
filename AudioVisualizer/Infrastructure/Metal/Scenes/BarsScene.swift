@@ -4,9 +4,9 @@ import Domain
 import VisualizerKernels
 
 final class BarsScene: VisualizerScene {
-    private let barCount = 64
-    private var displayed = [Float](repeating: 0, count: 64)
-    private var state = [Float](repeating: 0, count: 64)        // C++ smoothing state
+    private var barCount = 64
+    private var displayed = [Float](repeating: 0, count: 128)
+    private var state = [Float](repeating: 0, count: 128)        // C++ smoothing state
     private var pipeline: MTLRenderPipelineState!
     private var heightsBuffer: MTLBuffer!
     private var paletteTexture: MTLTexture!
@@ -25,9 +25,20 @@ final class BarsScene: VisualizerScene {
         do { pipeline = try device.makeRenderPipelineState(descriptor: desc) }
         catch { throw RenderError.pipelineCreationFailed(name: "Bars") }
         heightsBuffer = device.makeBuffer(
-            length: barCount * MemoryLayout<Float>.size,
+            length: 128 * MemoryLayout<Float>.size,
             options: .storageModeShared
         )
+    }
+
+    func randomize() {
+        // Limited to the analyzer's band count (64) — higher would leave gaps.
+        let options = [24, 32, 48, 64]
+        let new = options.randomElement() ?? 64
+        if new != barCount {
+            barCount = new
+            // Reset smoothing/display state so the previous count's tail doesn't bleed in.
+            for i in 0..<state.count { state[i] = 0; displayed[i] = 0 }
+        }
     }
 
     func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {

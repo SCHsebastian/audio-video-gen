@@ -6,6 +6,10 @@ struct TunnelUniforms {
     float aspect;
     float rms;
     float beat;
+    float twist;       // ring twist frequency (per turn)
+    float depth;       // depth-curve coefficient
+    float tight;       // ring tightness (band width scaler)
+    float _pad;
 };
 
 struct TVertexOut {
@@ -31,15 +35,14 @@ fragment float4 tunnel_fragment(TVertexOut in [[stage_in]],
     float r = length(p);
     float a = atan2(p.y, p.x);
     // Tunnel coordinates: depth ~ 1/r, twist ~ a + time.
-    float depth = 0.6 / max(r, 0.001);
+    float depth = u.depth / max(r, 0.001);
     float twist = a / 3.14159265 + 0.5;
-    // Audio-reactive bands flowing inward.
     float band = fract(depth - u.time * (0.35 + u.rms * 2.5));
-    // Wider, smoother rings — three soft falloffs blended for a glow band.
-    float ring1 = smoothstep(0.38, 0.50, band) - smoothstep(0.50, 0.62, band);
-    float ring2 = exp(-pow((band - 0.5) * 3.0, 2.0)) * 0.6;     // gaussian halo
+    float w = 0.12 / max(0.4, u.tight);
+    float ring1 = smoothstep(0.5 - w, 0.5, band) - smoothstep(0.5, 0.5 + w, band);
+    float ring2 = exp(-pow((band - 0.5) * 3.0 * u.tight, 2.0)) * 0.6;
     float rings = ring1 * 0.75 + ring2 * 0.55;
-    float swirl = 0.5 + 0.5 * sin(twist * 6.0 + u.time * 0.9);
+    float swirl = 0.5 + 0.5 * sin(twist * u.twist + u.time * 0.9);
     // Soft vignette + beat lift.
     float vignette = smoothstep(1.8, 0.15, r);
     float pulse = 1.0 + 0.5 * u.beat;

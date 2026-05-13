@@ -95,11 +95,15 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
 
     /// Randomize the current scene if it supports it. Used by the canvas tap
     /// gesture so we don't have to teach the view layer about specific scenes.
-    func randomizeCurrent() {
+    /// Returns a short label naming what was randomized (or nil if no-op).
+    @discardableResult
+    func randomizeCurrent() -> String? {
         switch currentKind {
-        case .lissajous: randomizeLissajous()
-        case .alchemy:   randomizeAlchemy()
-        default: break
+        case .lissajous: randomizeLissajous(); return "Lissajous"
+        case .alchemy:   randomizeAlchemy();   return "Alchemy"
+        case .tunnel:    (scenes[.tunnel] as? TunnelScene)?.randomize(); return "Tunnel"
+        case .bars:      (scenes[.bars]   as? BarsScene)?.randomize();   return "Bars"
+        case .scope:     return nil
         }
     }
 

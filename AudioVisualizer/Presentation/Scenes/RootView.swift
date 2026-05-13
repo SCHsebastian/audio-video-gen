@@ -75,6 +75,23 @@ struct RootView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .opacity(toolbarVisible ? 1 : 0)
                     .animation(.easeInOut(duration: 0.45), value: toolbarVisible)
+                    if let label = vm.lastRandomizedLabel {
+                        VStack {
+                            Spacer().frame(height: 80)
+                            HStack(spacing: 8) {
+                                Image(systemName: "shuffle")
+                                Text("\(label) randomized")
+                            }
+                            .font(.callout.weight(.medium))
+                            .foregroundStyle(.white)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
+                            .background(.ultraThinMaterial, in: Capsule())
+                            .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                            Spacer()
+                        }
+                        .animation(.easeInOut(duration: 0.25), value: vm.lastRandomizedLabel)
+                    }
                     if vm.isSilent {
                         VStack {
                             Spacer()

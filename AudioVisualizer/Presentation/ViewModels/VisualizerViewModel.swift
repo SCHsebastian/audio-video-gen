@@ -60,8 +60,20 @@ final class VisualizerViewModel {
         renderer.randomizeLissajous()
     }
 
+    /// Last "Randomized X" toast surfaced after a randomize action. Cleared
+    /// after a short delay by the view layer.
+    var lastRandomizedLabel: String? = nil
+    private var clearLabelTask: Task<Void, Never>? = nil
+
     func randomizeCurrent() {
-        renderer.randomizeCurrent()
+        if let label = renderer.randomizeCurrent() {
+            lastRandomizedLabel = label
+            clearLabelTask?.cancel()
+            clearLabelTask = Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(1200))
+                if !Task.isCancelled { lastRandomizedLabel = nil }
+            }
+        }
     }
 
     /// Display name of the active palette, observed by the UI.
