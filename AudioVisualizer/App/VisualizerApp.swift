@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 @main
 struct VisualizerApp: App {
@@ -24,6 +25,29 @@ struct VisualizerApp: App {
                 }
             }
             .frame(minWidth: 1280, minHeight: 720)
+        }
+        .commands {
+            // File → Save Snapshot
+            CommandGroup(after: .saveItem) {
+                Button("Save Snapshot to Desktop") {
+                    root?.viewModel.saveSnapshot()
+                }
+                .keyboardShortcut("s", modifiers: [.command])
+                .disabled(root == nil)
+            }
+            // View → Toggle Diagnostics / Fullscreen
+            CommandGroup(after: .toolbar) {
+                Button("Toggle Diagnostics HUD") {
+                    root?.viewModel.toggleDiagnostics()
+                }
+                .keyboardShortcut("d", modifiers: [.command])
+                .disabled(root == nil)
+
+                Button("Toggle Fullscreen") {
+                    (NSApp.keyWindow ?? NSApp.windows.first)?.toggleFullScreen(nil)
+                }
+                .keyboardShortcut("f", modifiers: [.control, .command])
+            }
         }
     }
 }

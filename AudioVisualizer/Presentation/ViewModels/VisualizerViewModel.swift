@@ -3,12 +3,22 @@ import Domain
 import Application
 import Observation
 import os.log
+import AppKit
+import UniformTypeIdentifiers
+import ImageIO
 
 @Observable
 final class VisualizerViewModel {
     private(set) var state: VisualizationState = .idle
     var currentScene: SceneKind = .bars
     var speed: Float = 1.0
+    var audioGain: Float = 1.0
+    var beatSensitivity: Float = 1.0
+    var reduceMotion: Bool = false
+    var showDiagnostics: Bool = false
+    /// Toast surfaced after a snapshot was saved (or failed). Auto-clears.
+    var snapshotToast: String? = nil
+    private var clearSnapshotToastTask: Task<Void, Never>? = nil
 
     let localizer: Localizing                  // public so views can read
 
@@ -98,12 +108,127 @@ final class VisualizerViewModel {
         renderer.setPalette(palette)
     }
 
+    /// Select a palette by name and persist the choice.
+    func selectPalette(named name: String) {
+        applyInitialPalette(named: name)
+        persistPalette(named: name)
+    }
+
+    func persistPalette(named name: String) {
+        var prefs = preferences.load()
+        prefs.lastPaletteName = name
+        preferences.save(prefs)
+    }
+
     func setSpeed(_ s: Float) {
         let clamped = max(0.1, min(3.0, s))
         speed = clamped
         renderer.setSpeed(clamped)
         var prefs = preferences.load()
         prefs.speed = clamped
+        preferences.save(prefs)
+    }
+
+    func setAudioGain(_ g: Float) {
+        let clamped = max(0.25, min(4.0, g))
+        audioGain = clamped
+        renderer.setAudioGain(clamped)
+        var prefs = preferences.load()
+        prefs.audioGain = clamped
+        preferences.save(prefs)
+    }
+
+    func setBeatSensitivity(_ s: Float) {
+        let clamped = max(0.25, min(3.0, s))
+        beatSensitivity = clamped
+        renderer.setBeatSensitivity(clamped)
+        var prefs = preferences.load()
+        prefs.beatSensitivity = clamped
+        preferences.save(prefs)
+    }
+
+    func setReduceMotion(_ on: Bool) {
+        reduceMotion = on
+        var prefs = preferences.load()
+        prefs.reduceMotion = on
+        preferences.save(prefs)
+    }
+
+    func setShowDiagnostics(_ on: Bool) {
+        showDiagnostics = on
+        var prefs = preferences.load()
+        prefs.showDiagnostics = on
+        preferences.save(prefs)
+    }
+
+    func toggleDiagnostics() { setShowDiagnostics(!showDiagnostics) }
+
+    func applyInitial(prefs: UserPreferences) {
+        audioGain = prefs.audioGain
+        beatSensitivity = prefs.beatSensitivity
+        reduceMotion = prefs.reduceMotion
+        showDiagnostics = prefs.showDiagnostics
+        renderer.setAudioGain(prefs.audioGain)
+        renderer.setBeatSensitivity(prefs.beatSensitivity)
+    }
+
+    func resetToDefaults() {
+        let d = UserPreferences.default
+        setSpeed(d.speed)
+        setAudioGain(d.audioGain)
+        setBeatSensitivity(d.beatSensitivity)
+        setReduceMotion(d.reduceMotion)
+        setShowDiagnostics(d.showDiagnostics)
+        applyInitialPalette(named: d.lastPaletteName)
+        var prefs = preferences.load()
+        prefs.lastPaletteName = d.lastPaletteName
+        preferences.save(prefs)
+    }
+
+    /// Save the next-rendered Metal frame as a PNG on the user's Desktop. The
+    /// renderer is asked to capture the next drawable; once it returns we
+    /// write the file and surface a toast.
+    func saveSnapshot() {
+        renderer.requestSnapshot { [weak self] cgImage in
+            guard let self else { return }
+            if let cgImage, let url = Self.snapshotURL(),
+               let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) {
+                CGImageDestinationAddImage(dest, cgImage, nil)
+                if CGImageDestinationFinalize(dest) {
+                    self.surfaceSnapshotToast("saved")
+                    Log.vm.info("snapshot saved: \(url.path, privacy: .public)")
+                    return
+                }
+            }
+            self.surfaceSnapshotToast("failed")
+            Log.vm.error("snapshot failed")
+        }
+    }
+
+    private static func snapshotURL() -> URL? {
+        let fm = FileManager.default
+        guard let desktop = fm.urls(for: .desktopDirectory, in: .userDomainMask).first else { return nil }
+        let ts = ISO8601DateFormatter().string(from: Date()).replacingOccurrences(of: ":", with: "-")
+        return desktop.appendingPathComponent("AudioVisualizer-\(ts).png")
+    }
+
+    private func surfaceSnapshotToast(_ kind: String) {
+        snapshotToast = kind
+        clearSnapshotToastTask?.cancel()
+        clearSnapshotToastTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(1500))
+            if !Task.isCancelled { snapshotToast = nil }
+        }
+    }
+
+    func randomPalette() {
+        let all = PaletteFactory.all
+        let pool = all.filter { $0.name != currentPaletteName }
+        guard let pick = pool.randomElement() ?? all.first else { return }
+        currentPaletteName = pick.name
+        renderer.setPalette(pick)
+        var prefs = preferences.load()
+        prefs.lastPaletteName = pick.name
         preferences.save(prefs)
     }
 

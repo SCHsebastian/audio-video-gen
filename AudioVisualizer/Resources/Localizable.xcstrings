@@ -343,18 +343,260 @@
     "toolbar.source.systemWide" : {
       "extractionState" : "stale",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All system audio"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todo el audio del sistema"
-          }
-        }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "All system audio" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Todo el audio del sistema" } }
+      }
+    },
+    "toolbar.help.button" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Help & About (?)" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ayuda y acerca de (?)" } }
+      }
+    },
+    "overlay.randomized" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "randomized" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "aleatorizado" } }
+      }
+    },
+    "settings.tab.general" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "General" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "General" } }
+      }
+    },
+    "settings.tab.visuals" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Visuals" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visuales" } }
+      }
+    },
+    "settings.tab.audio" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Audio" } }
+      }
+    },
+    "settings.tab.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "About" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acerca de" } }
+      }
+    },
+    "settings.reduceMotion" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reduce motion" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Reducir movimiento" } }
+      }
+    },
+    "settings.reduceMotion.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Softens ambient glow and beat flashes." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Suaviza el resplandor ambiental y los destellos del ritmo." } }
+      }
+    },
+    "settings.showDiagnostics" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show diagnostics HUD" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar HUD de diagnóstico" } }
+      }
+    },
+    "settings.showDiagnostics.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Live FPS, RMS, beat strength and scene info. Toggle with ⌘D." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "FPS, RMS, intensidad de ritmo y escena en vivo. Alterna con ⌘D." } }
+      }
+    },
+    "settings.palette.section" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Color palette" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Paleta de colores" } }
+      }
+    },
+    "settings.defaultScene.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Default scene" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Escena predeterminada" } }
+      }
+    },
+    "settings.speed.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Animation speed" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Velocidad de animación" } }
+      }
+    },
+    "settings.audioGain.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio gain" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ganancia de audio" } }
+      }
+    },
+    "settings.audioGain.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Boost visual response without changing playback volume." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aumenta la respuesta visual sin cambiar el volumen." } }
+      }
+    },
+    "settings.beatSensitivity.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Beat sensitivity" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sensibilidad al ritmo" } }
+      }
+    },
+    "settings.beatSensitivity.hint" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "How strongly beats brighten the scene and trigger ambient flashes." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Qué tanto los ritmos iluminan la escena y disparan destellos." } }
+      }
+    },
+    "settings.reset" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset to defaults" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Restablecer valores" } }
+      }
+    },
+    "about.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio Visualizer" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visualizador de audio" } }
+      }
+    },
+    "about.tagline" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Windows XP–era visualizations, rebuilt for macOS with Core Audio Taps and Metal." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visualizaciones al estilo Windows XP, reconstruidas para macOS con Core Audio Taps y Metal." } }
+      }
+    },
+    "about.author.header" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Author" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Autor" } }
+      }
+    },
+    "about.author.body" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sebastián Cardona Henao — software engineer building generative audio/video tools on macOS. This app started as a study of Core Audio Taps (macOS 14.2+) and grew into a full clean-architecture Metal visualizer with five scenes, six palettes, and bilingual UI." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sebastián Cardona Henao — ingeniero de software que construye herramientas generativas de audio/video en macOS. Esta app empezó como un estudio de Core Audio Taps (macOS 14.2+) y creció hasta ser un visualizador Metal con cinco escenas, seis paletas e interfaz bilingüe." } }
+      }
+    },
+    "about.assistant.header" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Built with Claude" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Construido con Claude" } }
+      }
+    },
+    "about.assistant.body" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pair-programmed end-to-end with Claude (Anthropic). Highlights: real-time Core Audio Tap capture on the IO thread, lock-free TPCircularBuffer, vDSP spectrum analysis with energy-based beat detection, and a five-scene Metal renderer (Bars, Scope, Alchemy compute particles, Tunnel, Lissajous). Clean Architecture with strict Domain/Application purity, TDD-shaped plans under docs/superpowers/, and an @Observable bilingual localization layer." } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Programado en pareja de principio a fin con Claude (Anthropic). Lo destacado: captura Core Audio Tap en tiempo real en el hilo de IO, buffer circular sin bloqueos TPCircularBuffer, análisis de espectro vDSP con detección de ritmo basada en energía, y un renderizador Metal con cinco escenas (Barras, Osciloscopio, Alquimia con partículas de cómputo, Túnel, Lissajous). Clean Architecture con dominio puro, planes TDD en docs/superpowers/ y localización @Observable bilingüe." } }
+      }
+    },
+    "about.shortcuts.header" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keyboard shortcuts" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Atajos de teclado" } }
+      }
+    },
+    "about.shortcut.scenes" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "1–5  ·  Switch scene (Bars, Scope, Alchemy, Tunnel, Lissajous)" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "1–5  ·  Cambiar escena (Barras, Osciloscopio, Alquimia, Túnel, Lissajous)" } }
+      }
+    },
+    "about.shortcut.cycle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "← / →  ·  Previous / next scene" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "← / →  ·  Escena anterior / siguiente" } }
+      }
+    },
+    "about.shortcut.space" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Space (or click)  ·  Randomize current scene" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Espacio (o clic)  ·  Aleatorizar la escena actual" } }
+      }
+    },
+    "about.shortcut.palette" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "P  ·  Cycle color palette" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "P  ·  Cambiar paleta de colores" } }
+      }
+    },
+    "about.shortcut.paletteRandom" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "⇧P  ·  Random palette" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "⇧P  ·  Paleta aleatoria" } }
+      }
+    },
+    "about.shortcut.snapshot" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "⌘S  ·  Save snapshot to Desktop" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "⌘S  ·  Guardar captura en el Escritorio" } }
+      }
+    },
+    "about.shortcut.fullscreen" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "F (or ⌃⌘F)  ·  Toggle fullscreen" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "F (o ⌃⌘F)  ·  Alternar pantalla completa" } }
+      }
+    },
+    "about.shortcut.diagnostics" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "⌘D  ·  Toggle diagnostics HUD" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "⌘D  ·  Alternar HUD de diagnóstico" } }
+      }
+    },
+    "about.shortcut.help" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "?  ·  Show this help sheet" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "?  ·  Mostrar esta ayuda" } }
+      }
+    },
+    "about.version" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Version" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Versión" } }
+      }
+    },
+    "hud.fps" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "FPS" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "FPS" } }
+      }
+    },
+    "hud.rms" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "RMS" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "RMS" } }
+      }
+    },
+    "hud.beat" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Beat" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ritmo" } }
+      }
+    },
+    "hud.scene" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scene" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Escena" } }
+      }
+    },
+    "hud.palette" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Palette" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Paleta" } }
+      }
+    },
+    "snapshot.saved" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Snapshot saved to Desktop" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Captura guardada en el Escritorio" } }
+      }
+    },
+    "snapshot.failed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Snapshot failed" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Falló la captura" } }
       }
     }
   },

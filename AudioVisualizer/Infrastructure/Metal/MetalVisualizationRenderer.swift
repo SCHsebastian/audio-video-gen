@@ -15,6 +15,16 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     private(set) var currentPaletteName: String = PaletteFactory.xpNeon.name
     private var lastTimestamp: CFTimeInterval = 0
     private var speed: Float = 1.0
+    private var audioGain: Float = 1.0
+    private var beatSensitivity: Float = 1.0
+
+    // FPS sampled over a 0.5s sliding window.
+    private var fpsFrameCount: Int = 0
+    private var fpsLastSample: CFTimeInterval = 0
+    private(set) var measuredFPS: Double = 0
+
+    // Snapshot request: drained on the next draw.
+    private var snapshotHandler: ((CGImage?) -> Void)?
 
     private let stateLock = OSAllocatedUnfairLock(initialState: State())
     private struct State {
@@ -83,6 +93,27 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         Log.render.info("setSpeed: \(self.speed, privacy: .public)")
     }
 
+    func setAudioGain(_ g: Float) {
+        audioGain = max(0.25, min(4.0, g))
+    }
+
+    func setBeatSensitivity(_ s: Float) {
+        beatSensitivity = max(0.25, min(3.0, s))
+    }
+
+    /// Pick a palette by display name. Falls back silently when missing.
+    func setPalette(named name: String) {
+        if let pal = PaletteFactory.all.first(where: { $0.name == name }) {
+            setPalette(pal)
+        }
+    }
+
+    /// Capture the next presented drawable as a CGImage and hand it to `completion`
+    /// on the main actor. Completion is `nil` on failure.
+    func requestSnapshot(_ completion: @escaping (CGImage?) -> Void) {
+        snapshotHandler = completion
+    }
+
     func randomizeLissajous() {
         (scenes[.lissajous] as? LissajousScene)?.randomize()
         Log.render.info("randomizeLissajous")
@@ -108,7 +139,8 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     }
 
     func peekRMS() -> Float {
-        stateLock.withLock { $0.spectrum.rms }
+        let raw = stateLock.withLock { $0.spectrum.rms }
+        return min(1, raw * audioGain)
     }
 
     /// Smoothed beat strength in [0, 1] for use by ambient UI effects (e.g. vignette).
@@ -117,8 +149,10 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         let target = stateLock.withLock { s -> Float in s.beat?.strength ?? 0 }
         let coef: Float = target > smoothedBeat ? 0.45 : 0.06   // attack fast, release slow
         smoothedBeat += (target - smoothedBeat) * coef
-        return smoothedBeat
+        return min(1, smoothedBeat * beatSensitivity)
     }
+
+    var currentScene: SceneKind { currentKind }
 
     func consume(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?) {
         stateLock.withLock { s in
@@ -143,6 +177,16 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         let raw = lastTimestamp == 0 ? Float(1.0/60.0) : Float(min(0.1, now - lastTimestamp))
         lastTimestamp = now
         let dt = raw * speed
+
+        // FPS sliding window (~0.5s).
+        fpsFrameCount += 1
+        if fpsLastSample == 0 { fpsLastSample = now }
+        let dtFPS = now - fpsLastSample
+        if dtFPS >= 0.5 {
+            measuredFPS = Double(fpsFrameCount) / dtFPS
+            fpsFrameCount = 0
+            fpsLastSample = now
+        }
 
         let snap = stateLock.withLock { s -> (SpectrumFrame, [Float], BeatEvent?) in
             let b = s.beatConsumed ? nil : s.beat
@@ -172,7 +216,43 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
             beatStrength: beat?.strength ?? 0)
         scene.encode(into: enc, uniforms: &uniforms)
         enc.endEncoding()
+
+        // Snapshot the freshly-rendered drawable BEFORE present, so the texture
+        // is still valid. Hand the captured CGImage back on the main actor.
+        if let handler = snapshotHandler {
+            snapshotHandler = nil
+            let tex = drawable.texture
+            cmd.addCompletedHandler { _ in
+                let img = Self.makeCGImage(from: tex)
+                DispatchQueue.main.async { handler(img) }
+            }
+        }
+
         cmd.present(drawable)
         cmd.commit()
+    }
+
+    /// Convert a BGRA8/`bgra8Unorm_srgb` Metal texture to a sRGB CGImage. Returns
+    /// nil if the texture cannot be read (e.g. framebufferOnly).
+    private static func makeCGImage(from texture: MTLTexture) -> CGImage? {
+        let w = texture.width, h = texture.height
+        let bytesPerPixel = 4
+        let bytesPerRow = w * bytesPerPixel
+        var pixels = [UInt8](repeating: 0, count: bytesPerRow * h)
+        texture.getBytes(&pixels, bytesPerRow: bytesPerRow,
+                         from: MTLRegionMake2D(0, 0, w, h), mipmapLevel: 0)
+        // BGRA → RGBA in place.
+        for i in stride(from: 0, to: pixels.count, by: 4) {
+            let b = pixels[i]; pixels[i] = pixels[i + 2]; pixels[i + 2] = b
+        }
+        let cs = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
+        guard let provider = CGDataProvider(data: Data(pixels) as CFData) else { return nil }
+        return CGImage(width: w, height: h,
+                       bitsPerComponent: 8, bitsPerPixel: 32,
+                       bytesPerRow: bytesPerRow,
+                       space: cs,
+                       bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue),
+                       provider: provider, decode: nil, shouldInterpolate: false,
+                       intent: .defaultIntent)
     }
 }

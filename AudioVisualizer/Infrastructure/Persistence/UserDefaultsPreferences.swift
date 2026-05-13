@@ -27,8 +27,13 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
         let bundleID: String?
         let scene: String
         let paletteName: String
-        let language: String?               // new — optional for backward compat with v0.1 stored prefs
-        let speed: Float?                   // new — optional for backward compat
+        let language: String?
+        let speed: Float?
+        // New in v0.2 — all optional for backward compat.
+        let audioGain: Float?
+        let beatSensitivity: Float?
+        let reduceMotion: Bool?
+        let showDiagnostics: Bool?
 
         init(domain p: UserPreferences) {
             switch p.lastSource {
@@ -39,6 +44,10 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
             paletteName = p.lastPaletteName
             language = p.lastLanguage.rawValue
             speed = p.speed
+            audioGain = p.audioGain
+            beatSensitivity = p.beatSensitivity
+            reduceMotion = p.reduceMotion
+            showDiagnostics = p.showDiagnostics
         }
 
         func toDomain() -> UserPreferences {
@@ -48,7 +57,16 @@ final class UserDefaultsPreferences: PreferencesStoring, @unchecked Sendable {
             }()
             let scene = SceneKind(rawValue: scene) ?? .bars
             let lang = Language(rawValue: language ?? "") ?? .system
-            return UserPreferences(lastSource: source, lastScene: scene, lastPaletteName: paletteName, lastLanguage: lang, speed: speed ?? 1.0)
+            return UserPreferences(
+                lastSource: source,
+                lastScene: scene,
+                lastPaletteName: paletteName,
+                lastLanguage: lang,
+                speed: speed ?? 1.0,
+                audioGain: audioGain ?? 1.0,
+                beatSensitivity: beatSensitivity ?? 1.0,
+                reduceMotion: reduceMotion ?? false,
+                showDiagnostics: showDiagnostics ?? false)
         }
     }
 }
