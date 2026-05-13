@@ -20,9 +20,12 @@
 		347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */; };
 		368E756989688059F7A61697 /* VisualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832E146FD2B148356484937B /* VisualizerApp.swift */; };
 		36BD3D5BF0880E844220458B /* Scope.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */; };
+		42197E81FE4F5BB3FA8A505C /* SynthwaveScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BBBD60354247251BD907B01 /* SynthwaveScene.swift */; };
 		42E2C620A618EC40CF48A1DD /* RunningApplicationsDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */; };
 		4556350D218716AD953145D4 /* Bars.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4F1133FB55F1963379B01B11 /* Bars.metal */; };
+		46ED79196CCB3285FCFA66F4 /* MilkdropScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7180AC02064B64F9D2A8ADC8 /* MilkdropScene.swift */; };
 		474DED559F9653A8AC2B05D3 /* AlchemyScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */; };
+		48FB406BBDAC6B6830543BB7 /* Synthwave.metal in Sources */ = {isa = PBXBuildFile; fileRef = 05AD762503D91DE08292AA58 /* Synthwave.metal */; };
 		4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */; };
 		4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD4350024811F6CAF800549 /* RingBuffer.swift */; };
 		51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF2518C9DE9AAE618476A0 /* MetalCanvas.swift */; };
@@ -32,6 +35,7 @@
 		5E327CFA00D1972F5AF291B0 /* RenderBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78640E93FCEAA978C26DFEC6 /* RenderBus.swift */; };
 		6337BEF1615E0162D2C78C46 /* TunnelScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA55E3F0BB3DAC4C98ADE /* TunnelScene.swift */; };
 		6A837DC312AF9DA4FBF91DDC /* RingsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1A56682300E3400874BE4F /* RingsScene.swift */; };
+		75D1A0347E558FBC1D8EEC2F /* SpectrogramScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = C640AFEF4187FDC0FEB6FB46 /* SpectrogramScene.swift */; };
 		75F5939D9FBCCDE3BE7D330F /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B97ECD5E8A02079964E76AD /* Log.swift */; };
 		7ADB836CB11A1EB255048ED1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D1929F0951B217438B6AB6 /* RootView.swift */; };
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
@@ -40,6 +44,9 @@
 		81D3E428750CD2E6DFAEF06B /* CompositionRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7531C1C10C4294CC4EBFE9F /* CompositionRoot.swift */; };
 		8691A03CE3647051B86CAA42 /* AlchemyParticles.metal in Sources */ = {isa = PBXBuildFile; fileRef = AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
+		8EB8D004AECF9A936028CC8B /* Spectrogram.metal in Sources */ = {isa = PBXBuildFile; fileRef = F6EA0DBE9C60674B4F1F3FC3 /* Spectrogram.metal */; };
+		9BF0A749A42F5F345B5A5744 /* Kaleidoscope.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5C3A2EAD959F591A13EF43B3 /* Kaleidoscope.metal */; };
+		9C40F8461358CF856CA5238E /* KaleidoscopeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC1625348C2D5F027A335DF /* KaleidoscopeScene.swift */; };
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
 		A16BEF38A5AFA9341EFC2498 /* Rings.metal in Sources */ = {isa = PBXBuildFile; fileRef = BD9C0F83E129DC2B5A0C992A /* Rings.metal */; };
 		A261081D59B0242DB05C55B2 /* DiagnosticsHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D5FEEBEF9C6571C855B15 /* DiagnosticsHUD.swift */; };
@@ -61,6 +68,7 @@
 		E3DBD43A7314963896335142 /* Lissajous.metal in Sources */ = {isa = PBXBuildFile; fileRef = 06694B81B9BFB05EF0FC3248 /* Lissajous.metal */; };
 		E891DF819BE4127C66ABE6AE /* MetalVisualizationRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27278EF1AECFD061183F26F5 /* MetalVisualizationRenderer.swift */; };
 		EC19A09F417ED07E8E10B7BE /* PermissionGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 925F2B6A9763EB6BF642AA83 /* PermissionGate.swift */; };
+		F3A828B023E9036B941C9555 /* Milkdrop.metal in Sources */ = {isa = PBXBuildFile; fileRef = 964EFE3CF1CF12489A21124F /* Milkdrop.metal */; };
 		F4E423EA8C3A9BFC60E9FA6E /* SpeedSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CEDD1B1CF79BF8E73FB61 /* SpeedSlider.swift */; };
 		FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */; };
 		FFEE78CA3D545FAF887B76C1 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0BA6759B8D541765628417 /* Application */; };
@@ -80,6 +88,7 @@
 		029AC86646001C0332446F3A /* BundleLocalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocalizer.swift; sourceTree = "<group>"; };
 		035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDSPSpectrumAnalyzer.swift; sourceTree = "<group>"; };
 		054CEDD1B1CF79BF8E73FB61 /* SpeedSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedSlider.swift; sourceTree = "<group>"; };
+		05AD762503D91DE08292AA58 /* Synthwave.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Synthwave.metal; sourceTree = "<group>"; };
 		06694B81B9BFB05EF0FC3248 /* Lissajous.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Lissajous.metal; sourceTree = "<group>"; };
 		079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferences.swift; sourceTree = "<group>"; };
 		1CCCA55E3F0BB3DAC4C98ADE /* TunnelScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelScene.swift; sourceTree = "<group>"; };
@@ -97,8 +106,10 @@
 		4F1133FB55F1963379B01B11 /* Bars.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Bars.metal; sourceTree = "<group>"; };
 		4FB965E9116803E67E2A6371 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 		5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscovery.swift; sourceTree = "<group>"; };
+		5C3A2EAD959F591A13EF43B3 /* Kaleidoscope.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Kaleidoscope.metal; sourceTree = "<group>"; };
 		5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyBeatDetectorTests.swift; sourceTree = "<group>"; };
 		6BD4350024811F6CAF800549 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
+		7180AC02064B64F9D2A8ADC8 /* MilkdropScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilkdropScene.swift; sourceTree = "<group>"; };
 		78640E93FCEAA978C26DFEC6 /* RenderBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderBus.swift; sourceTree = "<group>"; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
 		881865058AC789F7F65FA676 /* PaletteTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteTexture.swift; sourceTree = "<group>"; };
@@ -106,6 +117,8 @@
 		8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlchemyScene.swift; sourceTree = "<group>"; };
 		8B97ECD5E8A02079964E76AD /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		925F2B6A9763EB6BF642AA83 /* PermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGate.swift; sourceTree = "<group>"; };
+		964EFE3CF1CF12489A21124F /* Milkdrop.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Milkdrop.metal; sourceTree = "<group>"; };
+		9BBBD60354247251BD907B01 /* SynthwaveScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthwaveScene.swift; sourceTree = "<group>"; };
 		9CE7987B00B0E970D32C03AF /* AmbientVignette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmbientVignette.swift; sourceTree = "<group>"; };
 		A693DF52CB2769B94E01BD74 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A8AB876AEE331330FE6E92E0 /* practical-black-5de856 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "practical-black-5de856"; path = .; sourceTree = SOURCE_ROOT; };
@@ -113,10 +126,12 @@
 		B03E0DD61CB8364D25CED809 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
 		B8D1929F0951B217438B6AB6 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		BBC1625348C2D5F027A335DF /* KaleidoscopeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaleidoscopeScene.swift; sourceTree = "<group>"; };
 		BD9C0F83E129DC2B5A0C992A /* Rings.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Rings.metal; sourceTree = "<group>"; };
 		BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioObjectID+Properties.swift"; sourceTree = "<group>"; };
 		BEDD2639B1779651F9867675 /* BarsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarsScene.swift; sourceTree = "<group>"; };
 		C1A4B6B9B4B4C4C3B29B6E96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C640AFEF4187FDC0FEB6FB46 /* SpectrogramScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpectrogramScene.swift; sourceTree = "<group>"; };
 		C7EF2518C9DE9AAE618476A0 /* MetalCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalCanvas.swift; sourceTree = "<group>"; };
 		CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCAudioCapturePermission.swift; sourceTree = "<group>"; };
 		CE4FFF0EB58E7DC09C516FA1 /* VisualizerKernelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerKernelsTests.swift; sourceTree = "<group>"; };
@@ -130,6 +145,7 @@
 		E7BCB1CCD72A80E75A623AEA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EA1A56682300E3400874BE4F /* RingsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingsScene.swift; sourceTree = "<group>"; };
 		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
+		F6EA0DBE9C60674B4F1F3FC3 /* Spectrogram.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Spectrogram.metal; sourceTree = "<group>"; };
 		F7531C1C10C4294CC4EBFE9F /* CompositionRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionRoot.swift; sourceTree = "<group>"; };
 		F75F8A3548BB5D0D36D382F4 /* LissajousScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LissajousScene.swift; sourceTree = "<group>"; };
 		F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -271,10 +287,14 @@
 			children = (
 				8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */,
 				BEDD2639B1779651F9867675 /* BarsScene.swift */,
+				BBC1625348C2D5F027A335DF /* KaleidoscopeScene.swift */,
 				F75F8A3548BB5D0D36D382F4 /* LissajousScene.swift */,
+				7180AC02064B64F9D2A8ADC8 /* MilkdropScene.swift */,
 				D3322505EE79B0E78A2B744E /* RadialScene.swift */,
 				EA1A56682300E3400874BE4F /* RingsScene.swift */,
 				E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */,
+				C640AFEF4187FDC0FEB6FB46 /* SpectrogramScene.swift */,
+				9BBBD60354247251BD907B01 /* SynthwaveScene.swift */,
 				1CCCA55E3F0BB3DAC4C98ADE /* TunnelScene.swift */,
 				3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */,
 			);
@@ -302,10 +322,14 @@
 			children = (
 				AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */,
 				4F1133FB55F1963379B01B11 /* Bars.metal */,
+				5C3A2EAD959F591A13EF43B3 /* Kaleidoscope.metal */,
 				06694B81B9BFB05EF0FC3248 /* Lissajous.metal */,
+				964EFE3CF1CF12489A21124F /* Milkdrop.metal */,
 				42D1036DBED480B1C1314B4B /* Radial.metal */,
 				BD9C0F83E129DC2B5A0C992A /* Rings.metal */,
 				2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */,
+				F6EA0DBE9C60674B4F1F3FC3 /* Spectrogram.metal */,
+				05AD762503D91DE08292AA58 /* Synthwave.metal */,
 				4D85905E101BA978B977F1AE /* Tunnel.metal */,
 			);
 			path = Shaders;
@@ -508,12 +532,16 @@
 				FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */,
 				A261081D59B0242DB05C55B2 /* DiagnosticsHUD.swift in Sources */,
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
+				9BF0A749A42F5F345B5A5744 /* Kaleidoscope.metal in Sources */,
+				9C40F8461358CF856CA5238E /* KaleidoscopeScene.swift in Sources */,
 				E3DBD43A7314963896335142 /* Lissajous.metal in Sources */,
 				DEA5B90B7A0668946B973A8C /* LissajousScene.swift in Sources */,
 				75F5939D9FBCCDE3BE7D330F /* Log.swift in Sources */,
 				51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */,
 				2E41DE7CB65832525BAF1A4F /* MetalDevice.swift in Sources */,
 				E891DF819BE4127C66ABE6AE /* MetalVisualizationRenderer.swift in Sources */,
+				F3A828B023E9036B941C9555 /* Milkdrop.metal in Sources */,
+				46ED79196CCB3285FCFA66F4 /* MilkdropScene.swift in Sources */,
 				B4595ECA5F58A0603D1160D8 /* PaletteTexture.swift in Sources */,
 				EC19A09F417ED07E8E10B7BE /* PermissionGate.swift in Sources */,
 				0FA043251EF2809F15167204 /* PingPongTextures.swift in Sources */,
@@ -529,7 +557,11 @@
 				36BD3D5BF0880E844220458B /* Scope.metal in Sources */,
 				AD2C439D80BEE74097C589D0 /* ScopeScene.swift in Sources */,
 				546A8B74AFB831F013BDBFE9 /* SettingsView.swift in Sources */,
+				8EB8D004AECF9A936028CC8B /* Spectrogram.metal in Sources */,
+				75D1A0347E558FBC1D8EEC2F /* SpectrogramScene.swift in Sources */,
 				F4E423EA8C3A9BFC60E9FA6E /* SpeedSlider.swift in Sources */,
+				48FB406BBDAC6B6830543BB7 /* Synthwave.metal in Sources */,
+				42197E81FE4F5BB3FA8A505C /* SynthwaveScene.swift in Sources */,
 				B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */,
 				262A549375CA43A76CBAFFF3 /* Tunnel.metal in Sources */,
 				6337BEF1615E0162D2C78C46 /* TunnelScene.swift in Sources */,

@@ -127,13 +127,9 @@ struct RootView: View {
                                 get: { secondaryScene },
                                 set: { secondaryScene = $0; secondary.setScene($0); nudgeToolbar() })
                             ) {
-                                Text(localizer.string(.sceneBars)).tag(SceneKind.bars)
-                                Text(localizer.string(.sceneScope)).tag(SceneKind.scope)
-                                Text(localizer.string(.sceneAlchemy)).tag(SceneKind.alchemy)
-                                Text(localizer.string(.sceneTunnel)).tag(SceneKind.tunnel)
-                                Text(localizer.string(.sceneLissajous)).tag(SceneKind.lissajous)
-                                Text(localizer.string(.sceneRadial)).tag(SceneKind.radial)
-                                Text(localizer.string(.sceneRings)).tag(SceneKind.rings)
+                                ForEach(vm.sceneOrder, id: \.self) { k in
+                                    Text(sceneDisplayName(k)).tag(k)
+                                }
                             }
                             .pickerStyle(.menu)
                             .labelsHidden()
@@ -220,6 +216,7 @@ struct RootView: View {
             .help(localizer.string(.settingsButton))
 
             SceneToolbar(localizer: localizer,
+                         order: vm.sceneOrder,
                          currentScene: Binding(
                            get: { vm.currentScene },
                            set: { vm.selectScene($0); nudgeToolbar() }))
@@ -269,7 +266,8 @@ struct RootView: View {
     private func handleKey(_ press: KeyPress) -> KeyPress.Result {
         let sceneByKey: [Character: SceneKind] = [
             "1": .bars, "2": .scope, "3": .alchemy, "4": .tunnel,
-            "5": .lissajous, "6": .radial, "7": .rings
+            "5": .lissajous, "6": .radial, "7": .rings,
+            "8": .synthwave, "9": .spectrogram, "0": .milkdrop, "-": .kaleidoscope
         ]
         if let ch = press.characters.first, let s = sceneByKey[ch] {
             vm.selectScene(s); nudgeToolbar(); return .handled
@@ -301,7 +299,8 @@ struct RootView: View {
         case .space:
             vm.randomizeCurrent(); nudgeToolbar(); return .handled
         case .leftArrow, .rightArrow:
-            let order: [SceneKind] = [.bars, .scope, .alchemy, .tunnel, .lissajous, .radial, .rings]
+            // Use the user's saved order; falls back to allCases if empty.
+            let order = vm.sceneOrder.isEmpty ? SceneKind.allCases : vm.sceneOrder
             if let idx = order.firstIndex(of: vm.currentScene) {
                 let next = press.key == .rightArrow ? (idx + 1) % order.count
                                                     : (idx - 1 + order.count) % order.count
@@ -340,6 +339,10 @@ struct RootView: View {
         case .lissajous: return localizer.string(.sceneLissajous)
         case .radial: return localizer.string(.sceneRadial)
         case .rings: return localizer.string(.sceneRings)
+        case .synthwave: return localizer.string(.sceneSynthwave)
+        case .spectrogram: return localizer.string(.sceneSpectrogram)
+        case .milkdrop: return localizer.string(.sceneMilkdrop)
+        case .kaleidoscope: return localizer.string(.sceneKaleidoscope)
         }
     }
 

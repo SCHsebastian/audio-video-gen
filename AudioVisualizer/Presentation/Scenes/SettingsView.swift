@@ -82,8 +82,41 @@ struct SettingsView: View {
                     Text(localizer.string(.sceneLissajous)).tag(SceneKind.lissajous)
                     Text(localizer.string(.sceneRadial)).tag(SceneKind.radial)
                     Text(localizer.string(.sceneRings)).tag(SceneKind.rings)
+                    Text(localizer.string(.sceneSynthwave)).tag(SceneKind.synthwave)
+                    Text(localizer.string(.sceneSpectrogram)).tag(SceneKind.spectrogram)
+                    Text(localizer.string(.sceneMilkdrop)).tag(SceneKind.milkdrop)
+                    Text(localizer.string(.sceneKaleidoscope)).tag(SceneKind.kaleidoscope)
                 }
                 .pickerStyle(.menu)
+            }
+            Section(localizer.string(.settingsSceneOrderSection)) {
+                sceneOrderList
+                Text(localizer.string(.settingsSceneOrderHint))
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+            Section {
+                Toggle(localizer.string(.settingsShuffleEnabled), isOn: Binding(
+                    get: { vm.shuffleEnabled },
+                    set: { vm.setShuffleEnabled($0) }))
+                Text(localizer.string(.settingsShuffleHint))
+                    .font(.footnote).foregroundStyle(.secondary)
+                LabeledContent(localizer.string(.settingsShuffleInterval)) {
+                    HStack {
+                        Picker("", selection: Binding(
+                            get: { vm.shuffleIntervalSec },
+                            set: { vm.setShuffleIntervalSec($0) })) {
+                            Text("1 \(localizer.string(.settingsShuffleMinutes))").tag(60)
+                            Text("3 \(localizer.string(.settingsShuffleMinutes))").tag(180)
+                            Text("5 \(localizer.string(.settingsShuffleMinutes))").tag(300)
+                            Text("10 \(localizer.string(.settingsShuffleMinutes))").tag(600)
+                            Text("30 \(localizer.string(.settingsShuffleMinutes))").tag(1800)
+                        }
+                        .pickerStyle(.menu)
+                        .labelsHidden()
+                        .frame(width: 130)
+                    }
+                }
+                .disabled(!vm.shuffleEnabled)
             }
             Section {
                 Picker(localizer.string(.settingsFPSLabel), selection: Binding(
@@ -149,6 +182,63 @@ struct SettingsView: View {
                     Image(systemName: "checkmark.circle.fill").foregroundStyle(.tint)
                 }
             }
+        }
+    }
+
+    private var sceneOrderList: some View {
+        // SwiftUI's `List(.onMove)` on macOS gives a native drag-to-reorder
+        // affordance with the standard grab handle on the right.
+        List {
+            ForEach(vm.sceneOrder, id: \.self) { kind in
+                HStack {
+                    Image(systemName: icon(for: kind))
+                        .frame(width: 22).foregroundStyle(.secondary)
+                    Text(name(for: kind))
+                    Spacer()
+                    if kind == vm.currentScene {
+                        Image(systemName: "play.circle.fill").foregroundStyle(.tint)
+                    }
+                }
+            }
+            .onMove { from, to in
+                var order = vm.sceneOrder
+                order.move(fromOffsets: from, toOffset: to)
+                vm.setSceneOrder(order)
+            }
+        }
+        .frame(minHeight: 260)
+        .listStyle(.bordered(alternatesRowBackgrounds: true))
+    }
+
+    private func name(for k: SceneKind) -> String {
+        switch k {
+        case .bars: return localizer.string(.sceneBars)
+        case .scope: return localizer.string(.sceneScope)
+        case .alchemy: return localizer.string(.sceneAlchemy)
+        case .tunnel: return localizer.string(.sceneTunnel)
+        case .lissajous: return localizer.string(.sceneLissajous)
+        case .radial: return localizer.string(.sceneRadial)
+        case .rings: return localizer.string(.sceneRings)
+        case .synthwave: return localizer.string(.sceneSynthwave)
+        case .spectrogram: return localizer.string(.sceneSpectrogram)
+        case .milkdrop: return localizer.string(.sceneMilkdrop)
+        case .kaleidoscope: return localizer.string(.sceneKaleidoscope)
+        }
+    }
+
+    private func icon(for k: SceneKind) -> String {
+        switch k {
+        case .bars: return "chart.bar.fill"
+        case .scope: return "waveform"
+        case .alchemy: return "sparkles"
+        case .tunnel: return "circle.hexagongrid.fill"
+        case .lissajous: return "infinity"
+        case .radial: return "circle.dotted"
+        case .rings: return "circle.circle.fill"
+        case .synthwave: return "sun.horizon.fill"
+        case .spectrogram: return "rectangle.split.3x3"
+        case .milkdrop: return "cloud.fill"
+        case .kaleidoscope: return "snowflake"
         }
     }
 

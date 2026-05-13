@@ -77,8 +77,12 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         r.sceneBuilders[.alchemy]   = { [weak r] in try Self.build(AlchemyScene(),   with: r, d: d, lib: lib) }
         r.sceneBuilders[.tunnel]    = { [weak r] in try Self.build(TunnelScene(),    with: r, d: d, lib: lib) }
         r.sceneBuilders[.lissajous] = { [weak r] in try Self.build(LissajousScene(), with: r, d: d, lib: lib) }
-        r.sceneBuilders[.radial]    = { [weak r] in try Self.build(RadialScene(),    with: r, d: d, lib: lib) }
-        r.sceneBuilders[.rings]     = { [weak r] in try Self.build(RingsScene(),     with: r, d: d, lib: lib) }
+        r.sceneBuilders[.radial]       = { [weak r] in try Self.build(RadialScene(),       with: r, d: d, lib: lib) }
+        r.sceneBuilders[.rings]        = { [weak r] in try Self.build(RingsScene(),        with: r, d: d, lib: lib) }
+        r.sceneBuilders[.synthwave]    = { [weak r] in try Self.build(SynthwaveScene(),    with: r, d: d, lib: lib) }
+        r.sceneBuilders[.spectrogram]  = { [weak r] in try Self.build(SpectrogramScene(),  with: r, d: d, lib: lib) }
+        r.sceneBuilders[.milkdrop]     = { [weak r] in try Self.build(MilkdropScene(),     with: r, d: d, lib: lib) }
+        r.sceneBuilders[.kaleidoscope] = { [weak r] in try Self.build(KaleidoscopeScene(), with: r, d: d, lib: lib) }
         return r
     }
 
@@ -99,8 +103,12 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         renderer.sceneBuilders[.alchemy]   = { [weak renderer] in try Self.build(AlchemyScene(),   with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.tunnel]    = { [weak renderer] in try Self.build(TunnelScene(),    with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.lissajous] = { [weak renderer] in try Self.build(LissajousScene(), with: renderer, d: d, lib: lib) }
-        renderer.sceneBuilders[.radial]    = { [weak renderer] in try Self.build(RadialScene(),    with: renderer, d: d, lib: lib) }
-        renderer.sceneBuilders[.rings]     = { [weak renderer] in try Self.build(RingsScene(),     with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.radial]       = { [weak renderer] in try Self.build(RadialScene(),       with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.rings]        = { [weak renderer] in try Self.build(RingsScene(),        with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.synthwave]    = { [weak renderer] in try Self.build(SynthwaveScene(),    with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.spectrogram]  = { [weak renderer] in try Self.build(SpectrogramScene(),  with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.milkdrop]     = { [weak renderer] in try Self.build(MilkdropScene(),     with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.kaleidoscope] = { [weak renderer] in try Self.build(KaleidoscopeScene(), with: renderer, d: d, lib: lib) }
         return renderer
     }
 
@@ -199,7 +207,9 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         case .bars:      (materialize(.bars)   as? BarsScene)?.randomize();   return "Bars"
         case .radial:    (materialize(.radial) as? RadialScene)?.randomize(); return "Radial"
         case .rings:     (materialize(.rings)  as? RingsScene)?.randomize();  return "Rings"
-        case .scope:     return nil
+        case .milkdrop:  (materialize(.milkdrop) as? MilkdropScene)?.randomize(); return "Milkdrop"
+        case .kaleidoscope: (materialize(.kaleidoscope) as? KaleidoscopeScene)?.randomize(); return "Kaleidoscope"
+        case .scope, .synthwave, .spectrogram: return nil
         }
     }
 
