@@ -243,18 +243,26 @@
     },
     "toolbar.scene.lissajous" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lissajous"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lissajous"
-          }
-        }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Lissajous" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Lissajous" } }
+      }
+    },
+    "toolbar.scene.radial" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Radial" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Radial" } }
+      }
+    },
+    "toolbar.scene.rings" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rings" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Anillos" } }
+      }
+    },
+    "toolbar.splitView.toggle" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Toggle split view (V)" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Alternar vista dividida (V)" } }
       }
     },
     "toolbar.palette.cycle" : {

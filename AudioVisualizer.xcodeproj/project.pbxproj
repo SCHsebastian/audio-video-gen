@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		03A0BDC2BE3D081571E3AF07 /* RadialScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3322505EE79B0E78A2B744E /* RadialScene.swift */; };
 		04339AE4B31849053AAAF052 /* VisualizerKernelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE4FFF0EB58E7DC09C516FA1 /* VisualizerKernelsTests.swift */; };
 		0506A1BDA246E4925D46A6E8 /* BundleLocalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */; };
 		09AE66EAF2604821A8BF7FF7 /* AmbientVignette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE7987B00B0E970D32C03AF /* AmbientVignette.swift */; };
@@ -28,7 +29,9 @@
 		546A8B74AFB831F013BDBFE9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A693DF52CB2769B94E01BD74 /* SettingsView.swift */; };
 		54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */; };
 		5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */; };
+		5E327CFA00D1972F5AF291B0 /* RenderBus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78640E93FCEAA978C26DFEC6 /* RenderBus.swift */; };
 		6337BEF1615E0162D2C78C46 /* TunnelScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCCA55E3F0BB3DAC4C98ADE /* TunnelScene.swift */; };
+		6A837DC312AF9DA4FBF91DDC /* RingsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA1A56682300E3400874BE4F /* RingsScene.swift */; };
 		75F5939D9FBCCDE3BE7D330F /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B97ECD5E8A02079964E76AD /* Log.swift */; };
 		7ADB836CB11A1EB255048ED1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D1929F0951B217438B6AB6 /* RootView.swift */; };
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
@@ -38,6 +41,7 @@
 		8691A03CE3647051B86CAA42 /* AlchemyParticles.metal in Sources */ = {isa = PBXBuildFile; fileRef = AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
+		A16BEF38A5AFA9341EFC2498 /* Rings.metal in Sources */ = {isa = PBXBuildFile; fileRef = BD9C0F83E129DC2B5A0C992A /* Rings.metal */; };
 		A261081D59B0242DB05C55B2 /* DiagnosticsHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D5FEEBEF9C6571C855B15 /* DiagnosticsHUD.swift */; };
 		A2A9187AF93D659A01C1D538 /* BundleLocalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029AC86646001C0332446F3A /* BundleLocalizer.swift */; };
 		AD2C439D80BEE74097C589D0 /* ScopeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */; };
@@ -48,6 +52,7 @@
 		BD50347561CCE064BA909211 /* VisualizerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A79CD1C85F3DFE42E4766D2 /* VisualizerViewModel.swift */; };
 		BF0D59E270EB9FAEA26C9EDE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7BCB1CCD72A80E75A623AEA /* Assets.xcassets */; };
 		CF89B31678B4FDA335617C56 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03E0DD61CB8364D25CED809 /* AboutView.swift */; };
+		D677B1ECAE09C8AEFECF2AC2 /* Radial.metal in Sources */ = {isa = PBXBuildFile; fileRef = 42D1036DBED480B1C1314B4B /* Radial.metal */; };
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
 		DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */; };
 		DE0608DA54486B883E1ABFF7 /* VisualizerScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */; };
@@ -85,6 +90,7 @@
 		2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferencesTests.swift; sourceTree = "<group>"; };
 		3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerScene.swift; sourceTree = "<group>"; };
 		4272C3F4212C49A23281F643 /* AudioVisualizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AudioVisualizer.entitlements; sourceTree = "<group>"; };
+		42D1036DBED480B1C1314B4B /* Radial.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Radial.metal; sourceTree = "<group>"; };
 		4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyBeatDetector.swift; sourceTree = "<group>"; };
 		47830BB5EB67565ECDB10B8A /* VDSPSpectrumAnalyzerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDSPSpectrumAnalyzerTests.swift; sourceTree = "<group>"; };
 		4D85905E101BA978B977F1AE /* Tunnel.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Tunnel.metal; sourceTree = "<group>"; };
@@ -93,6 +99,7 @@
 		5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscovery.swift; sourceTree = "<group>"; };
 		5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyBeatDetectorTests.swift; sourceTree = "<group>"; };
 		6BD4350024811F6CAF800549 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
+		78640E93FCEAA978C26DFEC6 /* RenderBus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RenderBus.swift; sourceTree = "<group>"; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
 		881865058AC789F7F65FA676 /* PaletteTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteTexture.swift; sourceTree = "<group>"; };
 		8A79CD1C85F3DFE42E4766D2 /* VisualizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerViewModel.swift; sourceTree = "<group>"; };
@@ -106,6 +113,7 @@
 		B03E0DD61CB8364D25CED809 /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
 		B8D1929F0951B217438B6AB6 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		BD9C0F83E129DC2B5A0C992A /* Rings.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Rings.metal; sourceTree = "<group>"; };
 		BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioObjectID+Properties.swift"; sourceTree = "<group>"; };
 		BEDD2639B1779651F9867675 /* BarsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarsScene.swift; sourceTree = "<group>"; };
 		C1A4B6B9B4B4C4C3B29B6E96 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -113,12 +121,14 @@
 		CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TCCAudioCapturePermission.swift; sourceTree = "<group>"; };
 		CE4FFF0EB58E7DC09C516FA1 /* VisualizerKernelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerKernelsTests.swift; sourceTree = "<group>"; };
 		D22D5FEEBEF9C6571C855B15 /* DiagnosticsHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticsHUD.swift; sourceTree = "<group>"; };
+		D3322505EE79B0E78A2B744E /* RadialScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadialScene.swift; sourceTree = "<group>"; };
 		D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAudioTapCapture.swift; sourceTree = "<group>"; };
 		D4CCF341189D337EEF681242 /* AudioVisualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioVisualizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingPongTextures.swift; sourceTree = "<group>"; };
 		DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocalizerTests.swift; sourceTree = "<group>"; };
 		E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeScene.swift; sourceTree = "<group>"; };
 		E7BCB1CCD72A80E75A623AEA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		EA1A56682300E3400874BE4F /* RingsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingsScene.swift; sourceTree = "<group>"; };
 		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
 		F7531C1C10C4294CC4EBFE9F /* CompositionRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompositionRoot.swift; sourceTree = "<group>"; };
 		F75F8A3548BB5D0D36D382F4 /* LissajousScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LissajousScene.swift; sourceTree = "<group>"; };
@@ -262,6 +272,8 @@
 				8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */,
 				BEDD2639B1779651F9867675 /* BarsScene.swift */,
 				F75F8A3548BB5D0D36D382F4 /* LissajousScene.swift */,
+				D3322505EE79B0E78A2B744E /* RadialScene.swift */,
+				EA1A56682300E3400874BE4F /* RingsScene.swift */,
 				E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */,
 				1CCCA55E3F0BB3DAC4C98ADE /* TunnelScene.swift */,
 				3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */,
@@ -291,6 +303,8 @@
 				AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */,
 				4F1133FB55F1963379B01B11 /* Bars.metal */,
 				06694B81B9BFB05EF0FC3248 /* Lissajous.metal */,
+				42D1036DBED480B1C1314B4B /* Radial.metal */,
+				BD9C0F83E129DC2B5A0C992A /* Rings.metal */,
 				2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */,
 				4D85905E101BA978B977F1AE /* Tunnel.metal */,
 			);
@@ -350,6 +364,7 @@
 			isa = PBXGroup;
 			children = (
 				27278EF1AECFD061183F26F5 /* MetalVisualizationRenderer.swift */,
+				78640E93FCEAA978C26DFEC6 /* RenderBus.swift */,
 				5DEA2238F516AEA89A4F14C7 /* Renderer */,
 				A6E633D6CCFADDF55DAF262D /* Scenes */,
 				B5E5B459C34F6154D19F6090 /* Shaders */,
@@ -502,7 +517,12 @@
 				B4595ECA5F58A0603D1160D8 /* PaletteTexture.swift in Sources */,
 				EC19A09F417ED07E8E10B7BE /* PermissionGate.swift in Sources */,
 				0FA043251EF2809F15167204 /* PingPongTextures.swift in Sources */,
+				D677B1ECAE09C8AEFECF2AC2 /* Radial.metal in Sources */,
+				03A0BDC2BE3D081571E3AF07 /* RadialScene.swift in Sources */,
+				5E327CFA00D1972F5AF291B0 /* RenderBus.swift in Sources */,
 				4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */,
+				A16BEF38A5AFA9341EFC2498 /* Rings.metal in Sources */,
+				6A837DC312AF9DA4FBF91DDC /* RingsScene.swift in Sources */,
 				7ADB836CB11A1EB255048ED1 /* RootView.swift in Sources */,
 				5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */,
 				7F376ACBAD0CC19FCF94701C /* SceneToolbar.swift in Sources */,

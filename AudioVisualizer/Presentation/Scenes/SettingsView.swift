@@ -80,6 +80,8 @@ struct SettingsView: View {
                     Text(localizer.string(.sceneAlchemy)).tag(SceneKind.alchemy)
                     Text(localizer.string(.sceneTunnel)).tag(SceneKind.tunnel)
                     Text(localizer.string(.sceneLissajous)).tag(SceneKind.lissajous)
+                    Text(localizer.string(.sceneRadial)).tag(SceneKind.radial)
+                    Text(localizer.string(.sceneRings)).tag(SceneKind.rings)
                 }
                 .pickerStyle(.menu)
             }
