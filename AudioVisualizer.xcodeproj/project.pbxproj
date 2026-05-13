@@ -32,6 +32,7 @@
 		B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */; };
 		B4595ECA5F58A0603D1160D8 /* PaletteTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881865058AC789F7F65FA676 /* PaletteTexture.swift */; };
 		BC013271989B876F10199BA6 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 97B6E5018EBBCD6964AEEC50 /* Domain */; };
+		BD50347561CCE064BA909211 /* VisualizerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A79CD1C85F3DFE42E4766D2 /* VisualizerViewModel.swift */; };
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
 		DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */; };
 		DE0608DA54486B883E1ABFF7 /* VisualizerScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */; };
@@ -67,6 +68,7 @@
 		6BD4350024811F6CAF800549 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
 		881865058AC789F7F65FA676 /* PaletteTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteTexture.swift; sourceTree = "<group>"; };
+		8A79CD1C85F3DFE42E4766D2 /* VisualizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerViewModel.swift; sourceTree = "<group>"; };
 		8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlchemyScene.swift; sourceTree = "<group>"; };
 		AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = AlchemyParticles.metal; sourceTree = "<group>"; };
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
@@ -168,6 +170,14 @@
 				D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */,
 			);
 			path = Renderer;
+			sourceTree = "<group>";
+		};
+		5FE6CB1F7C98EE385C8D9032 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				8A79CD1C85F3DFE42E4766D2 /* VisualizerViewModel.swift */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		7D4630AB1F70A58F44C09426 /* Analysis */ = {
@@ -276,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				AA013CBEF4EDCE4B70D60822 /* Scenes */,
+				5FE6CB1F7C98EE385C8D9032 /* ViewModels */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -401,6 +412,7 @@
 				26884600E006F72B2D17E67C /* VDSPSpectrumAnalyzer.swift in Sources */,
 				368E756989688059F7A61697 /* VisualizerApp.swift in Sources */,
 				DE0608DA54486B883E1ABFF7 /* VisualizerScene.swift in Sources */,
+				BD50347561CCE064BA909211 /* VisualizerViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
