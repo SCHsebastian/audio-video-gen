@@ -36,6 +36,7 @@ final class CompositionRoot {
         self.viewModel.currentScene = saved.lastScene
         self.viewModel.speed = saved.speed
         self.viewModel.applyInitialPalette(named: saved.lastPaletteName)
+        self.viewModel.applyInitial(prefs: saved)
         self.renderer = renderer
         self.permission = permission
         self.localizer = localizer
