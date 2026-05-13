@@ -59,6 +59,29 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         super.init()
     }
 
+    var deviceForSecondary: MTLDevice  { device }
+    var queueForSecondary:  MTLCommandQueue { queue }
+    var libraryForSecondary: MTLLibrary { library }
+
+    /// Build a secondary renderer that shares the primary's device/queue/library
+    /// but owns its own scene cache and palette texture. Used by split view.
+    static func makeSecondary(device d: MTLDevice, queue q: MTLCommandQueue, library lib: MTLLibrary,
+                              palette: ColorPalette) -> MetalVisualizationRenderer {
+        let pal = PaletteFactory.texture(from: palette, device: d)
+                  ?? PaletteFactory.texture(from: PaletteFactory.xpNeon, device: d)!
+        let r = MetalVisualizationRenderer(device: d, queue: q, library: lib, paletteTexture: pal)
+        r.currentPaletteName = palette.name
+        // Register the same lazy builders the primary uses.
+        r.sceneBuilders[.bars]      = { [weak r] in try Self.build(BarsScene(),      with: r, d: d, lib: lib) }
+        r.sceneBuilders[.scope]     = { [weak r] in try Self.build(ScopeScene(),     with: r, d: d, lib: lib) }
+        r.sceneBuilders[.alchemy]   = { [weak r] in try Self.build(AlchemyScene(),   with: r, d: d, lib: lib) }
+        r.sceneBuilders[.tunnel]    = { [weak r] in try Self.build(TunnelScene(),    with: r, d: d, lib: lib) }
+        r.sceneBuilders[.lissajous] = { [weak r] in try Self.build(LissajousScene(), with: r, d: d, lib: lib) }
+        r.sceneBuilders[.radial]    = { [weak r] in try Self.build(RadialScene(),    with: r, d: d, lib: lib) }
+        r.sceneBuilders[.rings]     = { [weak r] in try Self.build(RingsScene(),     with: r, d: d, lib: lib) }
+        return r
+    }
+
     static func make() throws -> MetalVisualizationRenderer {
         guard let d = MTLCreateSystemDefaultDevice() else { throw RenderError.metalDeviceUnavailable }
         guard let q = d.makeCommandQueue() else { throw RenderError.metalDeviceUnavailable }
@@ -76,6 +99,8 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         renderer.sceneBuilders[.alchemy]   = { [weak renderer] in try Self.build(AlchemyScene(),   with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.tunnel]    = { [weak renderer] in try Self.build(TunnelScene(),    with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.lissajous] = { [weak renderer] in try Self.build(LissajousScene(), with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.radial]    = { [weak renderer] in try Self.build(RadialScene(),    with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.rings]     = { [weak renderer] in try Self.build(RingsScene(),     with: renderer, d: d, lib: lib) }
         return renderer
     }
 
@@ -172,6 +197,8 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         case .alchemy:   randomizeAlchemy();   return "Alchemy"
         case .tunnel:    (materialize(.tunnel) as? TunnelScene)?.randomize(); return "Tunnel"
         case .bars:      (materialize(.bars)   as? BarsScene)?.randomize();   return "Bars"
+        case .radial:    (materialize(.radial) as? RadialScene)?.randomize(); return "Radial"
+        case .rings:     (materialize(.rings)  as? RingsScene)?.randomize();  return "Rings"
         case .scope:     return nil
         }
     }

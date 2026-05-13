@@ -21,9 +21,16 @@ struct VisualizerApp: App {
                 if let root {
                     RootView(vm: root.viewModel,
                              renderer: root.renderer,
-                             localizer: root.localizer) {
-                        _ = await root.permission.request()
-                    }
+                             localizer: root.localizer,
+                             requestPermission: {
+                                 _ = await root.permission.request()
+                             },
+                             makeSecondary: { scene in
+                                 root.makeSecondaryRenderer(scene: scene)
+                             },
+                             releaseSecondary: { r in
+                                 root.releaseSecondary(r)
+                             })
                 } else if let err = initError {
                     Text("Failed to start: \(err)").padding()
                 } else {

@@ -1,4 +1,5 @@
 import Foundation
+import Metal
 import Domain
 import Application
 
@@ -7,7 +8,14 @@ final class CompositionRoot {
     let viewModel: VisualizerViewModel
     let renderer: MetalVisualizationRenderer
     let permission: TCCAudioCapturePermission
-    let localizer: BundleLocalizer    // NEW — exposed for the view layer
+    let localizer: BundleLocalizer
+    /// Fan-out adapter. The capture pipeline writes audio frames into this
+    /// bus, which broadcasts them to every registered renderer (primary +
+    /// any secondary renderer the user spawns for split view).
+    let bus: RenderBus
+    private let device: MTLDevice
+    private let queue: MTLCommandQueue
+    private let library: MTLLibrary
 
     init() throws {
         let capture = CoreAudioTapCapture()
@@ -19,9 +27,14 @@ final class CompositionRoot {
         let saved = prefs.load()
         let localizer = BundleLocalizer(initialLanguage: saved.lastLanguage)
 
+        let bus = RenderBus()
+        bus.register(renderer)
+
         let change = ChangeSceneUseCase(renderer: renderer, preferences: prefs)
+        // Capture pipeline pushes into the bus so every renderer (including
+        // any spawned for split view) sees the same audio frames.
         let start = StartVisualizationUseCase(capture: capture, analyzer: analyzer, beats: beats,
-                                              renderer: renderer, permissions: permission)
+                                              renderer: bus, permissions: permission)
         let stop = StopVisualizationUseCase(capture: capture)
         let changeLanguage = ChangeLanguageUseCase(localizer: localizer, preferences: prefs)
 
@@ -40,5 +53,25 @@ final class CompositionRoot {
         self.renderer = renderer
         self.permission = permission
         self.localizer = localizer
+        self.bus = bus
+        self.device = renderer.deviceForSecondary
+        self.queue = renderer.queueForSecondary
+        self.library = renderer.libraryForSecondary
+    }
+
+    /// Build a secondary renderer (for split view), pre-loaded with the
+    /// user's saved palette, and register it with the bus. Caller owns the
+    /// returned renderer's lifetime and must call `releaseSecondary` when
+    /// the split view goes away.
+    func makeSecondaryRenderer(scene: SceneKind = .scope, palette: ColorPalette? = nil) -> MetalVisualizationRenderer {
+        let r = MetalVisualizationRenderer.makeSecondary(device: device, queue: queue, library: library,
+                                                         palette: palette ?? PaletteFactory.xpNeon)
+        r.setScene(scene)
+        bus.register(r)
+        return r
+    }
+
+    func releaseSecondary(_ r: MetalVisualizationRenderer) {
+        bus.unregister(r)
     }
 }

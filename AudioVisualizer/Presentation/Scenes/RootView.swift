@@ -7,6 +7,10 @@ struct RootView: View {
     let renderer: MetalVisualizationRenderer
     @Bindable var localizer: BundleLocalizer
     let requestPermission: () async -> Void
+    /// Provided by the App layer — used to spawn an independent secondary
+    /// renderer (registered with the audio bus) when split view is on.
+    let makeSecondary: (SceneKind) -> MetalVisualizationRenderer
+    let releaseSecondary: (MetalVisualizationRenderer) -> Void
 
     @State private var showingSettings = false
     @State private var showingAbout = false
@@ -17,19 +21,42 @@ struct RootView: View {
     @State private var hideTask: Task<Void, Never>? = nil
     @FocusState private var keyboardFocused: Bool
 
+    // Split-view state — when `secondaryRenderer` is non-nil the canvas
+    // splits horizontally and the second pane uses this renderer + scene.
+    @State private var secondaryRenderer: MetalVisualizationRenderer? = nil
+    @State private var secondaryScene: SceneKind = .scope
+
     private let hideAfter: Duration = .milliseconds(2500)
 
     var body: some View {
         ZStack(alignment: .top) {
-            MetalCanvas(renderer: renderer, preferredFPS: vm.maxFPS)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    vm.randomizeCurrent()
-                    nudgeToolbar()
+            if let secondaryRenderer {
+                // Split view: primary on the left, secondary on the right,
+                // separated by a thin divider. Both panes share the audio bus.
+                HStack(spacing: 0) {
+                    MetalCanvas(renderer: renderer, preferredFPS: vm.maxFPS)
+                        .onTapGesture {
+                            vm.randomizeCurrent()
+                            nudgeToolbar()
+                        }
+                    Divider().background(.black.opacity(0.4))
+                    MetalCanvas(renderer: secondaryRenderer, preferredFPS: vm.maxFPS)
                 }
+                .ignoresSafeArea()
                 .onContinuousHover { phase in
                     if case .active = phase { nudgeToolbar() }
                 }
+            } else {
+                MetalCanvas(renderer: renderer, preferredFPS: vm.maxFPS)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        vm.randomizeCurrent()
+                        nudgeToolbar()
+                    }
+                    .onContinuousHover { phase in
+                        if case .active = phase { nudgeToolbar() }
+                    }
+            }
             if !vm.reduceMotion {
                 AmbientVignette(renderer: renderer)
                     .ignoresSafeArea()
@@ -86,6 +113,39 @@ struct RootView: View {
                     .opacity(toolbarVisible ? 1 : 0)
                     .animation(.easeInOut(duration: 0.45), value: toolbarVisible)
                 Spacer()
+            }
+            // Right-pane scene picker (only visible during split view).
+            if let secondary = secondaryRenderer {
+                VStack {
+                    Spacer().frame(height: 14)
+                    HStack {
+                        Spacer()
+                        HStack(spacing: 6) {
+                            Image(systemName: "rectangle.split.2x1.fill")
+                                .foregroundStyle(.white.opacity(0.7))
+                            Picker("", selection: Binding(
+                                get: { secondaryScene },
+                                set: { secondaryScene = $0; secondary.setScene($0); nudgeToolbar() })
+                            ) {
+                                Text(localizer.string(.sceneBars)).tag(SceneKind.bars)
+                                Text(localizer.string(.sceneScope)).tag(SceneKind.scope)
+                                Text(localizer.string(.sceneAlchemy)).tag(SceneKind.alchemy)
+                                Text(localizer.string(.sceneTunnel)).tag(SceneKind.tunnel)
+                                Text(localizer.string(.sceneLissajous)).tag(SceneKind.lissajous)
+                                Text(localizer.string(.sceneRadial)).tag(SceneKind.radial)
+                                Text(localizer.string(.sceneRings)).tag(SceneKind.rings)
+                            }
+                            .pickerStyle(.menu)
+                            .labelsHidden()
+                        }
+                        .padding(.horizontal, 10).padding(.vertical, 6)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .padding(.trailing, 18)
+                        .opacity(toolbarVisible ? 1 : 0)
+                        .animation(.easeInOut(duration: 0.35), value: toolbarVisible)
+                    }
+                    Spacer()
+                }
             }
             // Top-right: diagnostics HUD
             if vm.showDiagnostics {
@@ -180,6 +240,17 @@ struct RootView: View {
             .help(localizer.string(.paletteCycle))
 
             Button {
+                toggleSplitView()
+                nudgeToolbar()
+            } label: {
+                Image(systemName: secondaryRenderer == nil ? "rectangle.split.2x1" : "rectangle")
+                    .font(.title3)
+                    .foregroundStyle(secondaryRenderer == nil ? .white : .accentColor)
+            }
+            .buttonStyle(.plain)
+            .help(localizer.string(.splitViewToggle))
+
+            Button {
                 showingAbout = true
                 nudgeToolbar()
             } label: {
@@ -197,10 +268,14 @@ struct RootView: View {
 
     private func handleKey(_ press: KeyPress) -> KeyPress.Result {
         let sceneByKey: [Character: SceneKind] = [
-            "1": .bars, "2": .scope, "3": .alchemy, "4": .tunnel, "5": .lissajous
+            "1": .bars, "2": .scope, "3": .alchemy, "4": .tunnel,
+            "5": .lissajous, "6": .radial, "7": .rings
         ]
         if let ch = press.characters.first, let s = sceneByKey[ch] {
             vm.selectScene(s); nudgeToolbar(); return .handled
+        }
+        if press.characters == "v" || press.characters == "V" {
+            toggleSplitView(); nudgeToolbar(); return .handled
         }
         if press.characters == "P" {
             vm.randomPalette(); nudgeToolbar(); return .handled
@@ -226,7 +301,7 @@ struct RootView: View {
         case .space:
             vm.randomizeCurrent(); nudgeToolbar(); return .handled
         case .leftArrow, .rightArrow:
-            let order: [SceneKind] = [.bars, .scope, .alchemy, .tunnel, .lissajous]
+            let order: [SceneKind] = [.bars, .scope, .alchemy, .tunnel, .lissajous, .radial, .rings]
             if let idx = order.firstIndex(of: vm.currentScene) {
                 let next = press.key == .rightArrow ? (idx + 1) % order.count
                                                     : (idx - 1 + order.count) % order.count
@@ -235,6 +310,19 @@ struct RootView: View {
             return .handled
         default:
             return .ignored
+        }
+    }
+
+    private func toggleSplitView() {
+        if let r = secondaryRenderer {
+            releaseSecondary(r)
+            secondaryRenderer = nil
+        } else {
+            // Default the second pane to a complementary scene so the user
+            // sees an immediate visual contrast.
+            let other: SceneKind = (vm.currentScene == .scope) ? .radial : .scope
+            secondaryScene = other
+            secondaryRenderer = makeSecondary(other)
         }
     }
 
@@ -250,6 +338,8 @@ struct RootView: View {
         case .alchemy: return localizer.string(.sceneAlchemy)
         case .tunnel: return localizer.string(.sceneTunnel)
         case .lissajous: return localizer.string(.sceneLissajous)
+        case .radial: return localizer.string(.sceneRadial)
+        case .rings: return localizer.string(.sceneRings)
         }
     }
 
