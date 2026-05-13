@@ -103,7 +103,15 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
 
     func setScene(_ kind: SceneKind) {
         Log.render.info("setScene: \(String(describing: kind), privacy: .public)")
+        let previous = currentKind
         currentKind = kind
+        // Free the scene we just left so its pipelines / compute buffers go
+        // away. The next visit will pay the build cost again — that's the
+        // explicit trade chosen here in favour of lower steady-state memory.
+        if previous != kind, scenes[previous] != nil {
+            scenes.removeValue(forKey: previous)
+            Log.render.info("scene released: \(String(describing: previous), privacy: .public)")
+        }
     }
 
     func setPalette(_ palette: ColorPalette) {
