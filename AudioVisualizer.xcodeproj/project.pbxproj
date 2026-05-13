@@ -14,6 +14,7 @@
 		368E756989688059F7A61697 /* VisualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832E146FD2B148356484937B /* VisualizerApp.swift */; };
 		42E2C620A618EC40CF48A1DD /* RunningApplicationsDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */; };
 		4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */; };
+		4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD4350024811F6CAF800549 /* RingBuffer.swift */; };
 		54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */; };
 		5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */; };
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
@@ -46,6 +47,7 @@
 		4FB965E9116803E67E2A6371 /* SmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 		5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscovery.swift; sourceTree = "<group>"; };
 		5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnergyBeatDetectorTests.swift; sourceTree = "<group>"; };
+		6BD4350024811F6CAF800549 /* RingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingBuffer.swift; sourceTree = "<group>"; };
 		832E146FD2B148356484937B /* VisualizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerApp.swift; sourceTree = "<group>"; };
 		B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningApplicationsDiscoveryTests.swift; sourceTree = "<group>"; };
 		BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioObjectID+Properties.swift"; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 			isa = PBXGroup;
 			children = (
 				BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */,
+				6BD4350024811F6CAF800549 /* RingBuffer.swift */,
 				5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */,
 				CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */,
 			);
@@ -292,6 +295,7 @@
 			files = (
 				347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */,
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
+				4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */,
 				5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */,
 				B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */,
 				4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */,
