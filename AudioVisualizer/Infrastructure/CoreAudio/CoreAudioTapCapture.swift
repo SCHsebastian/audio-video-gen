@@ -11,6 +11,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
     private var ring: RingBuffer?
     private var sampleRate: Double = 48_000
     private var channelCount: Int = 2
+    private var isInterleaved: Bool = true
 
     func start(source: AudioSource) async throws -> AsyncStream<AudioFrame> {
         let processList: [AudioObjectID]
@@ -73,6 +74,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         }
         self.sampleRate = asbd.mSampleRate
         self.channelCount = Int(asbd.mChannelsPerFrame)
+        self.isInterleaved = (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0
         let bytesPerFrame = Int(asbd.mBytesPerFrame == 0 ? 4 * UInt32(channelCount) : asbd.mBytesPerFrame)
 
         // Allocate ring: 0.5 sec at the discovered rate.
@@ -120,6 +122,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         let sr = sampleRate
         let ch = channelCount
         let bpf = bytesPerFrame
+        let interleaved = isInterleaved
         drainQueue.async { [weak self] in
             guard let self else { return }
             let chunkFrames = 1024
@@ -130,20 +133,35 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                 if let ptr, bytes >= bpf {
                     let frames = bytes / bpf
                     let floats = ptr.assumingMemoryBound(to: Float.self)
-                    // Non-interleaved channels in TPCircularBuffer? Tap delivers non-interleaved per AudioBuffer;
-                    // since we copied raw buffers contiguously, each chunk is one channel's data of size b.mDataByteSize.
-                    // For mono mixdown, we naively treat the stream as interleaved-stereo Float32 — works because
-                    // the aggregate normalizes to interleaved (verified empirically; if mismatch, see Task 5.6).
-                    for i in 0..<frames {
-                        var sum: Float = 0
-                        for c in 0..<ch { sum += floats[i * ch + c] }
-                        accumulator.append(sum / Float(ch))
-                        if accumulator.count == chunkFrames {
-                            let frame = AudioFrame(samples: accumulator,
-                                                   sampleRate: SampleRate(hz: sr),
-                                                   timestamp: HostTime(machAbsolute: mach_absolute_time()))
-                            continuation.yield(frame)
-                            accumulator.removeAll(keepingCapacity: true)
+                    if interleaved {
+                        // Interleaved: sample layout is [L, R, L, R, ...]
+                        for i in 0..<frames {
+                            var sum: Float = 0
+                            for c in 0..<ch { sum += floats[i * ch + c] }
+                            accumulator.append(sum / Float(ch))
+                            if accumulator.count == chunkFrames {
+                                let frame = AudioFrame(samples: accumulator,
+                                                       sampleRate: SampleRate(hz: sr),
+                                                       timestamp: HostTime(machAbsolute: mach_absolute_time()))
+                                continuation.yield(frame)
+                                accumulator.removeAll(keepingCapacity: true)
+                            }
+                        }
+                    } else {
+                        // Non-interleaved: the ring received `ch` consecutive contiguous channel buffers per callback,
+                        // each `frames` floats long. Walk them in parallel.
+                        let perChannel = frames / ch     // assumes producer wrote N×ch frames
+                        for i in 0..<perChannel {
+                            var sum: Float = 0
+                            for c in 0..<ch { sum += floats[c * perChannel + i] }
+                            accumulator.append(sum / Float(ch))
+                            if accumulator.count == chunkFrames {
+                                let frame = AudioFrame(samples: accumulator,
+                                                       sampleRate: SampleRate(hz: sr),
+                                                       timestamp: HostTime(machAbsolute: mach_absolute_time()))
+                                continuation.yield(frame)
+                                accumulator.removeAll(keepingCapacity: true)
+                            }
                         }
                     }
                     ring.markRead(byteCount: frames * bpf)
