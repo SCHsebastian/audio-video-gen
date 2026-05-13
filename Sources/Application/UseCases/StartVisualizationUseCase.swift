@@ -34,8 +34,14 @@ public struct StartVisualizationUseCase: Sendable {
                     for await frame in frames {
                         let spectrum = analyzer.analyze(frame)
                         let beat = beats.feed(spectrum)
-                        let tail = Array(frame.samples.suffix(waveformSampleCount))
-                        renderer.consume(spectrum: spectrum, waveform: tail, beat: beat)
+                        let mono = Array(frame.samples.suffix(waveformSampleCount))
+                        // Pass real stereo tails when the capture source supplied them.
+                        // Mono sources leave `left`/`right` empty, in which case
+                        // WaveformBuffer mirrors the mono mixdown.
+                        let leftTail  = frame.left.isEmpty  ? nil : Array(frame.left.suffix(waveformSampleCount))
+                        let rightTail = frame.right.isEmpty ? nil : Array(frame.right.suffix(waveformSampleCount))
+                        let wave = WaveformBuffer(mono: mono, left: leftTail, right: rightTail)
+                        renderer.consume(spectrum: spectrum, waveform: wave, beat: beat)
                     }
                     continuation.finish()
                 } catch let e as CaptureError {

@@ -35,24 +35,13 @@ final class TunnelScene: VisualizerScene {
         catch { throw RenderError.pipelineCreationFailed(name: "Tunnel") }
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         rms = spectrum.rms
         time += dt
 
-        // Per-band averages with τ-stable one-pole smoothing.
-        let bandCount = max(1, spectrum.bands.count)
-        let loEnd = min(8, bandCount)
-        let bassTgt = spectrum.bands.prefix(loEnd).reduce(0, +) / Float(loEnd)
-        let midStart = min(8, bandCount - 1)
-        let midEnd   = min(32, bandCount)
-        let midSlice = (midStart..<midEnd).reduce(Float(0)) { $0 + spectrum.bands[$1] }
-        let _ = midSlice / Float(max(1, midEnd - midStart))  // available if we add a mid coupling later
-        let hiStart  = min(40, bandCount - 1)
-        let hiEnd    = bandCount
-        let hiCount  = max(1, hiEnd - hiStart)
-        let trebleTgt = (hiStart..<hiEnd).reduce(Float(0)) { $0 + spectrum.bands[$1] } / Float(hiCount)
-        bass   += (bassTgt   - bass)   * (1.0 - expf(-dt / 0.10))
-        treble += (trebleTgt - treble) * (1.0 - expf(-dt / 0.04))
+        // τ-stable one-pole smoothing of the analyzer's centralised sub-bands.
+        bass   += (spectrum.bass   - bass)   * (1.0 - expf(-dt / 0.10))
+        treble += (spectrum.treble - treble) * (1.0 - expf(-dt / 0.04))
 
         if let b = beat {
             beatEnv = max(beatEnv, b.strength)

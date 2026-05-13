@@ -11,6 +11,7 @@ final class KaleidoscopeScene: VisualizerScene {
     private var bass: Float = 0
     private var mid: Float = 0
     private var treble: Float = 0
+    private var centroid: Float = 0
     private var beatEnv: Float = 0
     private var rotate: Float = 0
     private var sectors: Int32 = 8
@@ -31,33 +32,26 @@ final class KaleidoscopeScene: VisualizerScene {
         rotate = Float.random(in: 0..<(.pi * 2))
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         time += dt
         rms = spectrum.rms
 
-        let bands = spectrum.bands
-        let n = max(1, bands.count)
-        let bassEnd = min(6, n)
-        let midStart = min(6, n - 1)
-        let midEnd   = min(24, n)
-        let trebStart = min(24, n - 1)
-        let trebEnd  = min(56, n)
-
-        let bassTgt = bands.prefix(bassEnd).reduce(0, +) / Float(bassEnd)
-        let midTgt  = (midStart..<midEnd).reduce(Float(0)) { $0 + bands[$1] }
-                    / Float(max(1, midEnd - midStart))
-        let trebTgt = (trebStart..<trebEnd).reduce(Float(0)) { $0 + bands[$1] }
-                    / Float(max(1, trebEnd - trebStart))
-
-        bass   += (bassTgt - bass)   * (1.0 - expf(-dt / 0.120))
-        mid    += (midTgt  - mid)    * (1.0 - expf(-dt / 0.200))
-        treble += (trebTgt - treble) * (1.0 - expf(-dt / 0.060))
+        // τ-stable smoothing of the analyzer's centralised sub-bands and the
+        // spectral centroid (used to bias rotation direction by tonal centre).
+        bass     += (spectrum.bass     - bass)     * (1.0 - expf(-dt / 0.120))
+        mid      += (spectrum.mid      - mid)      * (1.0 - expf(-dt / 0.200))
+        treble   += (spectrum.treble   - treble)   * (1.0 - expf(-dt / 0.060))
+        centroid += (spectrum.centroid - centroid) * (1.0 - expf(-dt / 0.250))
 
         if let b = beat { beatEnv = max(beatEnv, b.strength) }
         beatEnv *= expf(-dt / 0.080)
 
-        // Continuous rotation. Mid widens the rate. Wrap to avoid float blowup.
-        rotate += dt * (0.10 + mid * 1.2)
+        // Continuous rotation. Mid widens the rate; centroid biases the
+        // direction (bright/dark material spins opposite ways) so the mandala
+        // feels timbre-aware rather than just amplitude-aware. Wrap to avoid
+        // float blowup.
+        let dir: Float = centroid > 0.5 ? 1 : -1
+        rotate += dt * dir * (0.10 + mid * 1.2)
         if rotate >  6.28318530718 { rotate -= 6.28318530718 }
         if rotate < -6.28318530718 { rotate += 6.28318530718 }
     }

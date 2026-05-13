@@ -11,11 +11,19 @@ final class ScopeScene: VisualizerScene {
     private let displayCount = 512
 
     private var samplesBuffer: MTLBuffer!
+    // Secondary trace buffer — used as the R channel when the source is stereo.
+    private var samplesBufferR: MTLBuffer!
     private var pipeline: MTLRenderPipelineState!
     private var paletteTexture: MTLTexture!
 
     private var scratchIn  = [Float](repeating: 0, count: 1024)
     private var scratchOut = [Float](repeating: 0, count: 512)
+    // Stereo scratch — used only when the WaveformBuffer carries true L/R data.
+    private var scratchInL  = [Float](repeating: 0, count: 1024)
+    private var scratchInR  = [Float](repeating: 0, count: 1024)
+    private var scratchOutL = [Float](repeating: 0, count: 512)
+    private var scratchOutR = [Float](repeating: 0, count: 512)
+    private var lastStereo: Bool = false
 
     // Auto-gain envelope follower — fast attack, slow release. Keeps quiet
     // signals readable without amplifying silence-floor self-noise.
@@ -35,29 +43,79 @@ final class ScopeScene: VisualizerScene {
         desc.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
         do { pipeline = try device.makeRenderPipelineState(descriptor: desc) }
         catch { throw RenderError.pipelineCreationFailed(name: "Scope") }
-        samplesBuffer = device.makeBuffer(length: displayCount * MemoryLayout<Float>.size,
-                                          options: .storageModeShared)
+        samplesBuffer  = device.makeBuffer(length: displayCount * MemoryLayout<Float>.size,
+                                           options: .storageModeShared)
+        samplesBufferR = device.makeBuffer(length: displayCount * MemoryLayout<Float>.size,
+                                           options: .storageModeShared)
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         rms = spectrum.rms
 
         // Beat envelope — `1 - exp(-dt/τ)` decay so 30/60/120 Hz refreshes look the same.
         if let b = beat { beatBoost = max(beatBoost, b.strength) }
         beatBoost *= expf(-dt / 0.250)
 
-        // Copy the tail of the live waveform into the fixed-size scratch input,
-        // zero-padding the front if the producer hasn't fed us a full frame yet.
         let n = inputCount
-        let tail = waveform.suffix(n)
-        let pad = n - tail.count
-        for i in 0..<pad { scratchIn[i] = 0 }
-        var idx = pad
-        for v in tail { scratchIn[idx] = v; idx += 1 }
+        let stereo = waveform.isStereo
+        lastStereo = stereo
+        if stereo {
+            copyTail(of: waveform.left,  into: &scratchInL, length: n)
+            copyTail(of: waveform.right, into: &scratchInR, length: n)
+            let peakNow = max(peakAbs(of: scratchInL), peakAbs(of: scratchInR))
+            let gain = updateGain(peakNow: peakNow, dt: dt)
 
-        // Track peak amplitude with a fast-attack / slow-release follower.
-        var peakNow: Float = 0
-        for v in scratchIn { let a = abs(v); if a > peakNow { peakNow = a } }
+            scratchInL.withUnsafeBufferPointer { inPtr in
+                scratchOutL.withUnsafeMutableBufferPointer { outPtr in
+                    vk_scope_prepare(inPtr.baseAddress, UInt32(n),
+                                     outPtr.baseAddress, UInt32(displayCount), gain)
+                }
+            }
+            scratchInR.withUnsafeBufferPointer { inPtr in
+                scratchOutR.withUnsafeMutableBufferPointer { outPtr in
+                    vk_scope_prepare(inPtr.baseAddress, UInt32(n),
+                                     outPtr.baseAddress, UInt32(displayCount), gain)
+                }
+            }
+            // Compress each trace into a half-height band and offset vertically.
+            // L sits centred at y=+0.4 with ±0.4 amplitude, R at y=-0.4 ± 0.4.
+            for i in 0..<displayCount {
+                scratchOutL[i] = scratchOutL[i] * 0.4 + 0.4
+                scratchOutR[i] = scratchOutR[i] * 0.4 - 0.4
+            }
+            memcpy(samplesBuffer.contents(),  scratchOutL, displayCount * MemoryLayout<Float>.size)
+            memcpy(samplesBufferR.contents(), scratchOutR, displayCount * MemoryLayout<Float>.size)
+        } else {
+            copyTail(of: waveform.mono, into: &scratchIn, length: n)
+            let gain = updateGain(peakNow: peakAbs(of: scratchIn), dt: dt)
+            scratchIn.withUnsafeBufferPointer { inPtr in
+                scratchOut.withUnsafeMutableBufferPointer { outPtr in
+                    vk_scope_prepare(inPtr.baseAddress, UInt32(n),
+                                     outPtr.baseAddress, UInt32(displayCount), gain)
+                }
+            }
+            memcpy(samplesBuffer.contents(), scratchOut, displayCount * MemoryLayout<Float>.size)
+        }
+    }
+
+    /// Copy the most recent `length` samples from `src` into `dst`, zero-padding
+    /// the front when the producer hasn't yet fed a full frame.
+    private func copyTail(of src: [Float], into dst: inout [Float], length n: Int) {
+        let tail = src.suffix(n)
+        let pad = n - tail.count
+        for i in 0..<pad { dst[i] = 0 }
+        var idx = pad
+        for v in tail { dst[idx] = v; idx += 1 }
+    }
+
+    private func peakAbs(of buffer: [Float]) -> Float {
+        var p: Float = 0
+        for v in buffer { let a = abs(v); if a > p { p = a } }
+        return p
+    }
+
+    /// Shared fast-attack / slow-release peak follower → target-peak gain.
+    private func updateGain(peakNow: Float, dt: Float) -> Float {
         let attackTau: Float = 0.020
         let releaseTau: Float = 1.200
         if peakNow > peakEnv {
@@ -66,37 +124,35 @@ final class ScopeScene: VisualizerScene {
             peakEnv += (peakNow - peakEnv) * (1.0 - expf(-dt / releaseTau))
         }
         let targetPeak: Float = 0.70
-        let gain: Float = max(1.0, min(8.0, targetPeak / max(peakEnv, 0.05)))
-
-        scratchIn.withUnsafeBufferPointer { inPtr in
-            scratchOut.withUnsafeMutableBufferPointer { outPtr in
-                vk_scope_prepare(inPtr.baseAddress,
-                                 UInt32(n),
-                                 outPtr.baseAddress,
-                                 UInt32(displayCount),
-                                 gain)
-            }
-        }
-        memcpy(samplesBuffer.contents(), scratchOut, displayCount * MemoryLayout<Float>.size)
+        return max(1.0, min(8.0, targetPeak / max(peakEnv, 0.05)))
     }
 
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {
         enc.setRenderPipelineState(pipeline)
-        enc.setVertexBuffer(samplesBuffer, offset: 0, index: 0)
         var count = UInt32(displayCount)
-        enc.setVertexBytes(&count, length: 4, index: 1)
         // Halo widens with RMS so loud passages bloom; core stays constant.
         var su = ScopeU(aspect: uniforms.aspect,
                         time: uniforms.time,
                         coreRadius: 0.004,
                         haloSigma: 0.018 + min(0.040, rms * 0.10),
                         beatBoost: beatBoost)
-        enc.setVertexBytes(&su, length: MemoryLayout.size(ofValue: su), index: 2)
         enc.setFragmentBytes(&su, length: MemoryLayout.size(ofValue: su), index: 0)
         enc.setFragmentTexture(paletteTexture, index: 0)
-        // One quad per segment between consecutive samples.
+
+        // L trace (or mono trace when the source isn't stereo).
+        enc.setVertexBuffer(samplesBuffer, offset: 0, index: 0)
+        enc.setVertexBytes(&count, length: 4, index: 1)
+        enc.setVertexBytes(&su, length: MemoryLayout.size(ofValue: su), index: 2)
         enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6,
                            instanceCount: displayCount - 1)
+        // R trace — only drawn when the most recent update saw stereo data.
+        if lastStereo {
+            enc.setVertexBuffer(samplesBufferR, offset: 0, index: 0)
+            enc.setVertexBytes(&count, length: 4, index: 1)
+            enc.setVertexBytes(&su, length: MemoryLayout.size(ofValue: su), index: 2)
+            enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6,
+                               instanceCount: displayCount - 1)
+        }
     }
 
     private struct ScopeU {

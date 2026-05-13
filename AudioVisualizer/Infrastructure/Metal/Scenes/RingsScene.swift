@@ -23,6 +23,8 @@ final class RingsScene: VisualizerScene {
     private var rms: Float = 0
     private var bass: Float = 0
     private var treble: Float = 0
+    private var flux: Float = 0
+    private var fluxArmed: Bool = true   // re-armed when flux drops below threshold
 
     private var pipeline: MTLRenderPipelineState!
     private var paletteTexture: MTLTexture!
@@ -55,32 +57,44 @@ final class RingsScene: VisualizerScene {
         bassWarpAmp  = Float.random(in: 0.012...0.030)
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         time += dt
         rms = spectrum.rms
 
-        let bands = spectrum.bands
-        let n = max(1, bands.count)
-        let bassEnd = min(5, n)
-        let trebStart = min(48, n - 1)
-        let trebEnd  = n
-        let bassTgt = bands.prefix(bassEnd).reduce(0, +) / Float(bassEnd)
-        let trebTgt = (trebStart..<trebEnd).reduce(Float(0)) { $0 + bands[$1] }
-                    / Float(max(1, trebEnd - trebStart))
-        bass   += (bassTgt - bass)   * (1.0 - expf(-dt / 0.10))
-        treble += (trebTgt - treble) * (1.0 - expf(-dt / 0.04))
+        // τ-stable smoothing of the analyzer's centralised sub-bands.
+        bass   += (spectrum.bass   - bass)   * (1.0 - expf(-dt / 0.10))
+        treble += (spectrum.treble - treble) * (1.0 - expf(-dt / 0.04))
+        flux    = spectrum.flux
 
         // Beat-driven spawn.
         if let b = beat {
             spawn(strength: 0.35 + 0.65 * b.strength)
             lastBeatTime = time
             idleAccum = 0
+            fluxArmed = false
         }
 
-        // Idle continuous spawn — only after a quiet stretch with no beats.
+        // Flux-driven spawn: a sharp onset that the energy-only beat detector
+        // missed (e.g. a hi-hat or a percussive non-bass transient) still
+        // shows up as a positive spectral-flux spike. Gate with a high
+        // threshold and re-arm only after flux drops below 0.18 to avoid
+        // back-to-back firing on the same onset.
+        let fluxFire: Float = 0.45
+        let fluxReset: Float = 0.18
+        if fluxArmed, flux > fluxFire, time - lastBeatTime > 0.12 {
+            spawn(strength: 0.25 + 0.45 * min(1, flux))
+            fluxArmed = false
+        } else if flux < fluxReset {
+            fluxArmed = true
+        }
+
+        // Idle continuous spawn — only after a quiet stretch with no beats AND
+        // no recent spectral onsets. Gating on `flux` in addition to RMS catches
+        // the case where the signal is "loud but spectrally flat" (e.g. a
+        // pad/drone with no transients) and lets the screen breathe.
         let idleGap: Float = 1.5
         let idleHz: Float = 0.5
-        if time - lastBeatTime > idleGap && rms < 0.02 {
+        if time - lastBeatTime > idleGap && rms < 0.02 && flux < 0.05 {
             idleAccum += dt
             if idleAccum >= 1.0 / idleHz {
                 idleAccum = 0

@@ -10,6 +10,6 @@ struct SceneUniforms {
 
 protocol VisualizerScene: AnyObject {
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float)
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float)
     func encode(into encoder: MTLRenderCommandEncoder, uniforms: inout SceneUniforms)
 }

@@ -23,7 +23,7 @@ final class SynthwaveScene: VisualizerScene {
         catch { throw RenderError.pipelineCreationFailed(name: "Synthwave") }
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         time += dt
         // Smooth rms (and bass) so percussive transients don't strobe the sun.
         let targetBass = spectrum.bands.prefix(6).reduce(0, +) / 6

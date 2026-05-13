@@ -8,4 +8,24 @@ final class SpectrumFrameTests: XCTestCase {
         XCTAssertEqual(f.rms, 0.25)
         XCTAssertEqual(f.timestamp.machAbsolute, 99)
     }
+
+    func test_derived_fields_default_to_zero_for_back_compat() {
+        let f = SpectrumFrame(bands: [0.1, 0.2], rms: 0.3, timestamp: .zero)
+        XCTAssertEqual(f.bass, 0)
+        XCTAssertEqual(f.mid, 0)
+        XCTAssertEqual(f.treble, 0)
+        XCTAssertEqual(f.centroid, 0)
+        XCTAssertEqual(f.flux, 0)
+    }
+
+    func test_holds_derived_fields_when_provided() {
+        let f = SpectrumFrame(bands: [0.1], rms: 0.2, timestamp: .zero,
+                              bass: 0.4, mid: 0.5, treble: 0.6,
+                              centroid: 0.7, flux: 0.8)
+        XCTAssertEqual(f.bass, 0.4)
+        XCTAssertEqual(f.mid, 0.5)
+        XCTAssertEqual(f.treble, 0.6)
+        XCTAssertEqual(f.centroid, 0.7)
+        XCTAssertEqual(f.flux, 0.8)
+    }
 }

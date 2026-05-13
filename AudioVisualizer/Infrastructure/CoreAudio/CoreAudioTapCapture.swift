@@ -127,22 +127,24 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         let nonInterleaved = (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) != 0
         Log.capture.info("tap format: sampleRate=\(asbd.mSampleRate, privacy: .public) channels=\(asbd.mChannelsPerFrame, privacy: .public) formatFlags=\(asbd.mFormatFlags, privacy: .public) nonInterleaved=\(nonInterleaved, privacy: .public)")
 
-        // Issue 3 fix: ring always sized for mono Float32 output (4 bytes/frame), regardless of input format.
-        // With mono mixdown in the IOProc, we write exactly 4 bytes per input frame.
-        let monoFrameBytes = 4  // always mix down to mono Float32
-        let capacityBytes = Int(self.sampleRate) * monoFrameBytes / 2
+        // Ring stores stereo Float32 pairs — 8 bytes/frame regardless of source format.
+        // Mono sources duplicate the single channel onto both L and R inside the IOProc
+        // so the drainer's stride is uniform. The mono mixdown is recomputed on the
+        // drain side (the IOProc must stay allocation-free and runtime-free).
+        let stereoFrameBytes = 8
+        let capacityBytes = Int(self.sampleRate) * stereoFrameBytes / 2
         let ring = RingBuffer(capacityBytes: capacityBytes)
         self.ring = ring
 
         let (stream, continuation) = AsyncStream<AudioFrame>.makeStream(bufferingPolicy: .bufferingNewest(8))
 
         // IOProc — DO NOT capture self strongly, DO NOT allocate, DO NOT touch Swift runtime.
-        // Issue 2 fix: downmix to mono Float32 in the IOProc so the ring always holds mono samples,
-        // eliminating the garbled-audio bug in the non-interleaved multi-callback drain path.
+        // Writes lockstep (L, R) Float32 pairs to the ring for every input frame:
+        // interleaved sources are sampled position-by-position; non-interleaved ones
+        // walk the per-channel buffers in lockstep so the L/R pair never desynchronises.
         let ringRef = Unmanaged.passUnretained(ring).toOpaque()
         let unsafeRing = OpaquePointer(ringRef)
         let ch = channelCount
-        let chF = Float(ch)
 
         // Allocate stats on the heap; hand an opaque pointer to the IOProc so it can
         // update counters without touching the Swift runtime (same pattern as unsafeRing above).
@@ -161,34 +163,35 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
             s.callbacks &+= 1
             let bufferCount = buffers.count
             if !nonInterleaved {
-                // Interleaved: single buffer with layout [L, R, L, R, ...]
+                // Interleaved: single buffer with layout [c0, c1, ..., c0, c1, ...]
                 let buf = buffers[0]
                 guard let data = buf.mData else { return }
                 let p = data.assumingMemoryBound(to: Float.self)
                 let totalFloats = Int(buf.mDataByteSize) / 4
                 let frames = totalFloats / ch
                 for i in 0..<frames {
-                    var sum: Float = 0
-                    for c in 0..<ch { sum += p[i * ch + c] }
-                    var mono = sum / chF
-                    s.peakAmp = s.peakAmp > abs(mono) ? s.peakAmp : abs(mono)
+                    let l: Float = p[i * ch + 0]
+                    let r2: Float = ch >= 2 ? p[i * ch + 1] : l
+                    var pair: (Float, Float) = (l, r2)
+                    let m = (l + r2) * 0.5
+                    s.peakAmp = s.peakAmp > abs(m) ? s.peakAmp : abs(m)
                     s.frames &+= 1
-                    _ = r.write(&mono, byteCount: 4)
+                    _ = r.write(&pair, byteCount: 8)
                 }
             } else {
                 // Non-interleaved: bufferCount == ch, each buffer is one channel of `frames` floats.
                 let frames = bufferCount > 0 ? Int(buffers[0].mDataByteSize) / 4 : 0
+                let pL = buffers[0].mData?.assumingMemoryBound(to: Float.self)
+                let pR = (bufferCount >= 2) ? buffers[1].mData?.assumingMemoryBound(to: Float.self) : pL
+                guard let pL else { return }
                 for i in 0..<frames {
-                    var sum: Float = 0
-                    for c in 0..<bufferCount {
-                        if let p = buffers[c].mData?.assumingMemoryBound(to: Float.self) {
-                            sum += p[i]
-                        }
-                    }
-                    var mono = sum / chF
-                    s.peakAmp = s.peakAmp > abs(mono) ? s.peakAmp : abs(mono)
+                    let l: Float = pL[i]
+                    let r2: Float = pR?[i] ?? l
+                    var pair: (Float, Float) = (l, r2)
+                    let m = (l + r2) * 0.5
+                    s.peakAmp = s.peakAmp > abs(m) ? s.peakAmp : abs(m)
                     s.frames &+= 1
-                    _ = r.write(&mono, byteCount: 4)
+                    _ = r.write(&pair, byteCount: 8)
                 }
             }
         }
@@ -209,15 +212,16 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         }
         Log.capture.info("AudioDeviceStart succeeded; capture is live")
 
-        // Drainer: every ~5 ms, pull mono Float32 frames out of the ring and yield 1024-sample chunks.
-        // Issue 2 fix: no more interleaved/non-interleaved branching — ring always holds mono Float32.
+        // Drainer: every ~5 ms, pull stereo Float32 pairs out of the ring and yield
+        // 1024-frame chunks with mono mixdown + L/R channels in the AudioFrame.
         let sr = sampleRate
         drainQueue.async { [weak self] in
             guard let self else { return }
             Log.capture.info("drainer started")
             let chunkFrames = 1024
-            var accumulator = [Float]()
-            accumulator.reserveCapacity(chunkFrames)
+            var monoAccum  = [Float](); monoAccum.reserveCapacity(chunkFrames)
+            var leftAccum  = [Float](); leftAccum.reserveCapacity(chunkFrames)
+            var rightAccum = [Float](); rightAccum.reserveCapacity(chunkFrames)
             var lastYield = CACurrentMediaTime()
             var lastStatLog = CACurrentMediaTime()
             let silentTimeout = 0.5
@@ -225,29 +229,40 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
             // (via drainQueue.async in stop()), so this check is properly serialized.
             while self.procID != nil {
                 let (ptr, bytes) = ring.peek()
-                if let ptr, bytes >= 4 {
-                    let frames = bytes / 4
+                if let ptr, bytes >= 8 {
+                    let frames = bytes / 8
                     let floats = ptr.assumingMemoryBound(to: Float.self)
                     for i in 0..<frames {
-                        accumulator.append(floats[i])
-                        if accumulator.count == chunkFrames {
-                            let frame = AudioFrame(samples: accumulator,
+                        let l = floats[i * 2 + 0]
+                        let r2 = floats[i * 2 + 1]
+                        leftAccum.append(l)
+                        rightAccum.append(r2)
+                        monoAccum.append((l + r2) * 0.5)
+                        if monoAccum.count == chunkFrames {
+                            let frame = AudioFrame(samples: monoAccum,
                                                    sampleRate: SampleRate(hz: sr),
-                                                   timestamp: HostTime(machAbsolute: mach_absolute_time()))
+                                                   timestamp: HostTime(machAbsolute: mach_absolute_time()),
+                                                   left: leftAccum,
+                                                   right: rightAccum)
                             continuation.yield(frame)
-                            accumulator.removeAll(keepingCapacity: true)
+                            monoAccum.removeAll(keepingCapacity: true)
+                            leftAccum.removeAll(keepingCapacity: true)
+                            rightAccum.removeAll(keepingCapacity: true)
                             lastYield = CACurrentMediaTime()
                         }
                     }
-                    ring.markRead(byteCount: frames * 4)
+                    ring.markRead(byteCount: frames * 8)
                 } else {
                     // No data; sleep ~5 ms.
                     Thread.sleep(forTimeInterval: 0.005)
                     let now = CACurrentMediaTime()
                     if now - lastYield > silentTimeout {
-                        let silent = AudioFrame(samples: Array(repeating: 0, count: 1024),
+                        let silentBuf = Array<Float>(repeating: 0, count: 1024)
+                        let silent = AudioFrame(samples: silentBuf,
                                                 sampleRate: SampleRate(hz: sr),
-                                                timestamp: HostTime(machAbsolute: mach_absolute_time()))
+                                                timestamp: HostTime(machAbsolute: mach_absolute_time()),
+                                                left: silentBuf,
+                                                right: silentBuf)
                         continuation.yield(silent)
                         lastYield = now
                     }

@@ -37,7 +37,23 @@ enum PaletteFactory {
         RGB(r: 0.45, g: 0.48, b: 0.55),
         RGB(r: 0.92, g: 0.94, b: 0.98)
     ])
-    static let all = [xpNeon, aurora, sunset, inferno, ocean, mono]
+    /// Synthwave / Outrun palette. Stops chosen so the Synthwave shader's
+    /// sample positions land on the iconic 80s roles: near-black ground at
+    /// u=0, deep navy sky at u≈0.12, dark purple mid-sky / cool mountain rim
+    /// near u≈0.22-0.35, magenta mountain fill at u≈0.50, hot pink grid neon
+    /// at u≈0.65, warm pink-orange horizon at u≈0.78, orange sun upper at
+    /// u≈0.90, laser-lemon sun core at u≈0.97. Hex sources: #FF2975 hot
+    /// pink, #FF901F orange, #FEF65B laser lemon — the retrowave canon.
+    static let synthwave = ColorPalette(name: "Synthwave", stops: [
+        RGB(r: 0.008, g: 0.005, b: 0.030),   // 0: near-black ground
+        RGB(r: 0.040, g: 0.045, b: 0.180),   // 1: deep navy sky
+        RGB(r: 0.200, g: 0.060, b: 0.380),   // 2: deep purple
+        RGB(r: 0.560, g: 0.060, b: 0.700),   // 3: magenta
+        RGB(r: 1.000, g: 0.161, b: 0.459),   // 4: hot pink
+        RGB(r: 1.000, g: 0.565, b: 0.122),   // 5: orange
+        RGB(r: 1.000, g: 0.940, b: 0.340)    // 6: laser lemon
+    ])
+    static let all = [synthwave, xpNeon, aurora, sunset, inferno, ocean, mono]
 
     static func texture(from palette: ColorPalette, device: MTLDevice) -> MTLTexture? {
         let n = 256

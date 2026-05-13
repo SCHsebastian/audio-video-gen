@@ -26,6 +26,9 @@ final class SpectrogramScene: VisualizerScene {
 
     // Per-row "max-with-decay" memory so sustained tones look stable.
     private var previousColumn = [Float](repeating: 0, count: H)
+    // Separate persistence buffers for the stereo split (each half is H/2 rows).
+    private var previousColumnL = [Float](repeating: 0, count: H / 2)
+    private var previousColumnR = [Float](repeating: 0, count: H / 2)
     // Precomputed log-Hz → linear-bin lookup table (one entry per H row).
     private var binTable: [Float] = []   // length H — fractional bin index per row
 
@@ -68,36 +71,34 @@ final class SpectrogramScene: VisualizerScene {
         }
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         // Build one log-Hz, dB-scaled, normalized column [0..1] over H rows.
-        let bands = spectrum.bands
-        let n = bands.count
-        guard n > 0 else { return }
+        // Stereo path: bottom half = R, top half = L — both span the full
+        // log-Hz range. Mono path: one column over the full H rows.
+        let stereo = !spectrum.leftBands.isEmpty && !spectrum.rightBands.isEmpty
         var column = [Float](repeating: 0, count: Self.H)
-        let lastBin = n - 1
-        let dbRange = Self.dbCeil - Self.dbFloor
-
-        for k in 0..<Self.H {
-            let frac = binTable[k]
-            let b0 = max(0, min(lastBin, Int(frac.rounded(.down))))
-            let b1 = min(lastBin, b0 + 1)
-            let t = frac - Float(b0)
-            let mag = bands[b0] * (1 - t) + bands[b1] * t
-            // dB scale → normalize over [floor, ceil] → clamp to [0, 1].
-            let db = 20.0 * log10f(max(mag, 1e-6))
-            var v = (db - Self.dbFloor) / dbRange
-            if v < 0 { v = 0 }
-            if v > 1 { v = 1 }
-            // Per-row "peak hold with decay" — same idea as RX/Spek.
-            let prev = previousColumn[k] * 0.85
-            column[k] = max(v, prev)
-            previousColumn[k] = column[k]
+        if stereo {
+            let half = Self.H / 2
+            // Build R into rows [0, half), L into rows [half, H).
+            buildHalfColumn(into: &column, offset: 0,         rows: half,
+                            bands: spectrum.rightBands,
+                            previous: &previousColumnR)
+            buildHalfColumn(into: &column, offset: half,      rows: half,
+                            bands: spectrum.leftBands,
+                            previous: &previousColumnL)
+            // 1-pixel dim divider between the two halves so the eye separates them.
+            column[half] = 0
+        } else {
+            buildHalfColumn(into: &column, offset: 0, rows: Self.H,
+                            bands: spectrum.bands,
+                            previous: &previousColumn)
         }
 
         // Bottom of the screen should be bass — but ndc.y maps top→1, so when
         // the shader does `v_tex = uv.y` row 0 ends up at the bottom of the
         // screen. We want row 0 = bass = bottom, so this matches naturally —
-        // ndc.y=-1 (bottom) → uv.y=0 → row 0. Good.
+        // ndc.y=-1 (bottom) → uv.y=0 → row 0. Good. In the stereo case row 0
+        // is R-bass at the bottom and row H/2 is L-bass just above the divider.
 
         column.withUnsafeBytes { raw in
             historyTexture.replace(region: MTLRegionMake2D(writeCol, 0, 1, Self.H),
@@ -106,6 +107,39 @@ final class SpectrogramScene: VisualizerScene {
                                    bytesPerRow: MemoryLayout<Float>.size)
         }
         writeCol = (writeCol + 1) % Self.W
+    }
+
+    /// Build a log-Hz, dB-normalised, peak-held column slice into `column`
+    /// starting at `offset` and spanning `rows` rows. `previous` is updated in
+    /// place so the per-row exponential peak hold survives across frames.
+    private func buildHalfColumn(into column: inout [Float],
+                                 offset: Int,
+                                 rows: Int,
+                                 bands: [Float],
+                                 previous: inout [Float]) {
+        let n = bands.count
+        guard n > 0, rows > 0 else { return }
+        let lastBin = n - 1
+        let dbRange = Self.dbCeil - Self.dbFloor
+        // Stretch the precomputed binTable (which spans the full H rows) over
+        // this half so both halves still cover the full log-Hz range.
+        let scale = Float(Self.H - 1) / Float(max(1, rows - 1))
+        for k in 0..<rows {
+            let srcK = min(Self.H - 1, Int((Float(k) * scale).rounded()))
+            let frac = binTable[srcK]
+            let b0 = max(0, min(lastBin, Int(frac.rounded(.down))))
+            let b1 = min(lastBin, b0 + 1)
+            let t = frac - Float(b0)
+            let mag = bands[b0] * (1 - t) + bands[b1] * t
+            let db = 20.0 * log10f(max(mag, 1e-6))
+            var v = (db - Self.dbFloor) / dbRange
+            if v < 0 { v = 0 }
+            if v > 1 { v = 1 }
+            let prev = previous[k] * 0.85
+            let held = max(v, prev)
+            column[offset + k] = held
+            previous[k] = held
+        }
     }
 
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {

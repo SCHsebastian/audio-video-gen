@@ -3,17 +3,15 @@ import simd
 import Domain
 import VisualizerKernels
 
-/// Phosphor-persistence Lissajous / parametric trace. The CPU generates a
-/// dense parametric curve, runs Catmull-Rom subdivision for a continuous
-/// "phosphor beam" feel, then a 3-pass GPU pipeline accumulates the trace
-/// into a ping-pong texture with exponential decay (~80 ms half-life)
-/// before compositing to the drawable.
-///
-/// NOTE: A true mastering-grade goniometer needs the original stereo PCM
-/// (L/R interleaved) — see `docs/superpowers/specs/.../lissajous.md`.
-/// Until the capture pipeline exposes a stereo buffer the trace is the
-/// parametric figure (which is still musically interesting and visually
-/// rich), updated to RMS/bass.
+/// Phosphor-persistence Lissajous / goniometer trace. When the capture
+/// source supplies a real stereo waveform, the trace plots (L, R) directly
+/// in mid/side space so the figure reads as a mastering-grade goniometer.
+/// When the source is mono (or `randomize()` has been used to force the
+/// look) it falls back to the parametric Lissajous / Rosé curve. Either
+/// trace runs through Catmull-Rom subdivision for a continuous "phosphor
+/// beam" feel, then a 3-pass GPU pipeline accumulates it into a ping-pong
+/// texture with exponential decay (~80 ms half-life) before compositing
+/// to the drawable.
 final class LissajousScene: VisualizerScene {
     private static let controlCount = 256          // parametric "control" points
     private static let subdivs: UInt32 = 8         // Catmull-Rom subdivisions per span
@@ -49,7 +47,9 @@ final class LissajousScene: VisualizerScene {
     private var petalsBase: Int32 = 5
     private var rotation: Float = 0
     private var modeIsRose: Bool = false
+    private var forceParametric: Bool = true       // start with the classic parametric look; randomize() may roll the stereo goniometer
     private var tauSec: Float = 0.080              // phosphor decay τ
+    private var stereoPeak: Float = 0.20           // auto-gain peak follower for stereo PCM
 
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws {
         self.device = device
@@ -90,6 +90,10 @@ final class LissajousScene: VisualizerScene {
 
     func randomize() {
         modeIsRose = Bool.random()
+        // Heavily favour the parametric look (the "iconic" Lissajous /
+        // Rose curves) — the stereo goniometer is the special-case roll that
+        // shows up roughly 1 in 4 randomize taps when the source is stereo.
+        forceParametric = Int.random(in: 0..<4) != 0
         aBase = Float(Int.random(in: 2...7))
         bBase = Float(Int.random(in: 2...7))
         aJitter = Float.random(in: 0.5...1.8)
@@ -100,16 +104,70 @@ final class LissajousScene: VisualizerScene {
         tauSec = Float.random(in: 0.060...0.140)
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         time += dt
         rms = spectrum.rms
-        let bassTgt = spectrum.bands.prefix(8).reduce(0, +) / 8
-        bass += (bassTgt - bass) * (1.0 - expf(-dt / 0.10))
+        bass += (spectrum.bass - bass) * (1.0 - expf(-dt / 0.10))
         if let b = beat { beatEnv = max(beatEnv, b.strength) }
         beatEnv *= expf(-dt / 0.200)
 
-        // Build control points via the existing parametric kernels.
         let ctrlPtr = controlScratch.withUnsafeMutableBufferPointer { $0.baseAddress! }
+        let useStereo = !forceParametric && waveform.isStereo
+        if useStereo {
+            // Goniometer mode: control points are the live (L, R) PCM pairs
+            // rotated 45° into mid/side space — anti-phase forms a vertical
+            // line, mono content a horizontal one (classic mastering view).
+            let left = waveform.left, right = waveform.right
+            let n = min(left.count, right.count)
+            guard n > 0 else {
+                fillParametric(into: ctrlPtr)
+                return
+            }
+            // Track the peak of |L| and |R| with a fast-attack / slow-release
+            // follower so the figure always fills the canvas regardless of how
+            // loud the music actually is. Without this, low-level material
+            // (most listening volumes) collapses the trace into a dot.
+            var peakNow: Float = 0
+            for i in 0..<n {
+                let a = max(abs(left[i]), abs(right[i]))
+                if a > peakNow { peakNow = a }
+            }
+            let attackTau: Float  = 0.030
+            let releaseTau: Float = 1.500
+            if peakNow > stereoPeak {
+                stereoPeak += (peakNow - stereoPeak) * (1.0 - expf(-dt / attackTau))
+            } else {
+                stereoPeak += (peakNow - stereoPeak) * (1.0 - expf(-dt / releaseTau))
+            }
+            // Target ~0.85 of unit canvas for a healthy figure. Clamp the gain
+            // so silent passages don't blow up into noise.
+            let targetPeak: Float = 0.85
+            let autoGain: Float = max(1.0, min(12.0, targetPeak / max(stereoPeak, 0.05)))
+            let inv2 = 0.70710677 as Float    // 1/√2 for the M/S rotation
+            let beatBoost: Float = 1.0 + 0.25 * beatEnv
+            let drive = autoGain * beatBoost
+            for i in 0..<Self.controlCount {
+                let sIdx = (i * (n - 1)) / max(1, Self.controlCount - 1)
+                let l = left[sIdx]
+                let r = right[sIdx]
+                let m = (l + r) * inv2          // mid (45° rotation)
+                let s = (l - r) * inv2          // side
+                ctrlPtr[i * 2 + 0] = m * drive
+                ctrlPtr[i * 2 + 1] = s * drive
+            }
+        } else {
+            fillParametric(into: ctrlPtr)
+        }
+
+        // Catmull-Rom subdivision into the GPU buffer.
+        let outPtr = traceBuffer.contents().bindMemory(to: Float.self, capacity: Self.tracePoints * 2)
+        vk_catmull_rom(ctrlPtr, UInt32(Self.controlCount), outPtr, Self.subdivs)
+    }
+
+    /// Build a parametric Lissajous or Rose curve into `ctrlPtr` (length
+    /// `controlCount` × 2 floats). Used as the visual fallback when no stereo
+    /// PCM is available or the user has rolled forceParametric.
+    private func fillParametric(into ctrlPtr: UnsafeMutablePointer<Float>) {
         if modeIsRose {
             let petals = petalsBase + Int32(min(3.0, bass * 30))
             vk_rose(ctrlPtr, UInt32(Self.controlCount), time + rotation, petals, rms)
@@ -119,10 +177,6 @@ final class LissajousScene: VisualizerScene {
             let delta = sin(time * 0.4) * .pi + phaseOffset
             vk_lissajous(ctrlPtr, UInt32(Self.controlCount), time + rotation, a, b, delta, rms)
         }
-
-        // Catmull-Rom subdivision into the GPU buffer.
-        let outPtr = traceBuffer.contents().bindMemory(to: Float.self, capacity: Self.tracePoints * 2)
-        vk_catmull_rom(ctrlPtr, UInt32(Self.controlCount), outPtr, Self.subdivs)
     }
 
     /// Pre-pass: decay the accumulator, then additively draw the trace into it.

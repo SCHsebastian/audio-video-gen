@@ -64,20 +64,12 @@ final class AlchemyScene: VisualizerScene {
                                       options: .storageModeShared)
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
-        let bandCount = spectrum.bands.count
-        // Explicit bass/mid/treble ranges — match the spec, not bandCount/4.
-        let bassEnd = min(8, bandCount)
-        let midStart = min(8, bandCount - 1)
-        let midEnd   = min(32, bandCount)
-        let hiStart  = min(32, bandCount - 1)
-        let hiEnd    = bandCount
-        let bassAvg = bandCount > 0 ? spectrum.bands.prefix(bassEnd).reduce(0, +) / Float(bassEnd) : 0
-        let midAvg = (midStart..<midEnd).reduce(Float(0)) { $0 + spectrum.bands[$1] } / Float(max(1, midEnd - midStart))
-        let trebAvg = (hiStart..<hiEnd).reduce(Float(0)) { $0 + spectrum.bands[$1] } / Float(max(1, hiEnd - hiStart))
-        bass   = max(bassAvg, bass * 0.88)
-        mid    = max(midAvg,  mid  * 0.85)
-        treble = max(trebAvg, treble * 0.80)
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
+        // Use the analyzer's centralised sub-band averages and apply peak-hold
+        // decays per the canonical spec (bass 0.88, mid 0.85, treble 0.80).
+        bass   = max(spectrum.bass,   bass   * 0.88)
+        mid    = max(spectrum.mid,    mid    * 0.85)
+        treble = max(spectrum.treble, treble * 0.80)
 
         // Beat: triggered only on the frame the event arrives; envelope decays.
         beatTriggered = false

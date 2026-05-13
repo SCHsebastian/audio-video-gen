@@ -34,7 +34,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     private let stateLock = OSAllocatedUnfairLock(initialState: State())
     private struct State {
         var spectrum: SpectrumFrame = SpectrumFrame(bands: Array(repeating: 0, count: 64), rms: 0, timestamp: .zero)
-        var waveform: [Float] = Array(repeating: 0, count: 1024)
+        var waveform: WaveformBuffer = WaveformBuffer(mono: Array(repeating: 0, count: 1024))
         var beat: BeatEvent?
         var beatConsumed = true
     }
@@ -279,7 +279,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
 
     var currentScene: SceneKind { currentKind }
 
-    func consume(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?) {
+    func consume(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?) {
         stateLock.withLock { s in
             s.spectrum = spectrum
             s.waveform = waveform
@@ -313,7 +313,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
             fpsLastSample = now
         }
 
-        let snap = stateLock.withLock { s -> (SpectrumFrame, [Float], BeatEvent?) in
+        let snap = stateLock.withLock { s -> (SpectrumFrame, WaveformBuffer, BeatEvent?) in
             let b = s.beatConsumed ? nil : s.beat
             s.beatConsumed = true
             return (s.spectrum, s.waveform, b)

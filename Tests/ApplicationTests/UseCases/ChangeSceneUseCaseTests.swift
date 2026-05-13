@@ -8,7 +8,7 @@ final class FakeRenderer: VisualizationRendering, @unchecked Sendable {
     var lastSpectrum: SpectrumFrame?
     func setScene(_ kind: SceneKind) { scene = kind }
     func setPalette(_ palette: ColorPalette) { self.palette = palette }
-    func consume(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?) { lastSpectrum = spectrum }
+    func consume(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?) { lastSpectrum = spectrum }
 }
 
 final class ChangeSceneUseCaseTests: XCTestCase {

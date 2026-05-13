@@ -25,7 +25,7 @@ final class RenderBus: VisualizationRendering, @unchecked Sendable {
         }
     }
 
-    func consume(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?) {
+    func consume(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?) {
         let snapshot = lock.withLock { $0 }
         for r in snapshot { r.consume(spectrum: spectrum, waveform: waveform, beat: beat) }
     }

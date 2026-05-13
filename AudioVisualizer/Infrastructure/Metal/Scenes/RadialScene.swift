@@ -72,7 +72,7 @@ final class RadialScene: VisualizerScene {
 
     private var rotateDir: Float = 1.0
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         time += dt
         rms = spectrum.rms
         if let b = beat {

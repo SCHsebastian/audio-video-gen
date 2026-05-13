@@ -77,20 +77,12 @@ final class MilkdropScene: VisualizerScene {
         decay = Float.random(in: 0.960...0.985)
     }
 
-    func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
+    func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
         time += dt
         rms = spectrum.rms
 
-        let bands = spectrum.bands
-        let n = max(1, bands.count)
-        let bassEnd = min(5, n)
-        let midStart = min(8, n - 1)
-        let midEnd   = min(24, n)
-        let bassTgt = bands.prefix(bassEnd).reduce(0, +) / Float(bassEnd)
-        let midTgt  = (midStart..<midEnd).reduce(Float(0)) { $0 + bands[$1] }
-                    / Float(max(1, midEnd - midStart))
-        bass += (bassTgt - bass) * (1.0 - expf(-dt / 0.12))
-        mid  += (midTgt  - mid)  * (1.0 - expf(-dt / 0.12))
+        bass += (spectrum.bass - bass) * (1.0 - expf(-dt / 0.12))
+        mid  += (spectrum.mid  - mid)  * (1.0 - expf(-dt / 0.12))
 
         if let b = beat { beatEnv = max(beatEnv, b.strength) }
         beatEnv *= expf(-dt / 0.150)
@@ -101,11 +93,12 @@ final class MilkdropScene: VisualizerScene {
         let ptr = waveBuffer.contents().bindMemory(to: SIMD2<Float>.self, capacity: count)
         let baseR: Float = 0.45
         let amp:   Float = 0.18 + 0.25 * rms
-        let waveCount = max(1, waveform.count)
+        let mono = waveform.mono
+        let waveCount = max(1, mono.count)
         for i in 0..<count {
             // Sample evenly from the PCM buffer.
             let t = Float(i) / Float(count - 1)
-            let pcm = waveform[min(waveCount - 1, i * (waveCount / count))]
+            let pcm = mono[min(waveCount - 1, i * (waveCount / count))]
             let theta = t * 2.0 * .pi
             var x: Float = 0
             var y: Float = 0
