@@ -15,7 +15,26 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
     private var deviceChangeListener: AudioObjectPropertyListenerBlock?
     private var currentSource: AudioSource?
 
+    private static func sweepStaleAggregates() {
+        var addr = AudioObjectPropertyAddress(
+            mSelector: kAudioHardwarePropertyDevices,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain)
+        var size: UInt32 = 0
+        guard AudioObjectGetPropertyDataSize(AudioObjectID(kAudioObjectSystemObject), &addr, 0, nil, &size) == noErr else { return }
+        var ids = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
+        AudioObjectGetPropertyData(AudioObjectID(kAudioObjectSystemObject), &addr, 0, nil, &size, &ids)
+        let uuidRegex = try! NSRegularExpression(pattern: "^[0-9A-Fa-f-]{36}$")
+        for id in ids {
+            if let uid = try? id.readString(kAudioDevicePropertyDeviceUID),
+               uuidRegex.firstMatch(in: uid, options: [], range: NSRange(uid.startIndex..., in: uid)) != nil {
+                AudioHardwareDestroyAggregateDevice(id)
+            }
+        }
+    }
+
     func start(source: AudioSource) async throws -> AsyncStream<AudioFrame> {
+        CoreAudioTapCapture.sweepStaleAggregates()
         let processList: [AudioObjectID]
         switch source {
         case .systemWide:
