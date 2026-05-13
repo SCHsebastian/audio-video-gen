@@ -34,13 +34,16 @@ fragment float4 tunnel_fragment(TVertexOut in [[stage_in]],
     float depth = 0.6 / max(r, 0.001);
     float twist = a / 3.14159265 + 0.5;
     // Audio-reactive bands flowing inward.
-    float band = fract(depth - u.time * (0.5 + u.rms * 4.0));
-    float rings = smoothstep(0.45, 0.5, band) - smoothstep(0.5, 0.55, band);
-    float swirl = 0.5 + 0.5 * sin(twist * 12.0 + u.time * 1.5);
-    // Vignette + beat flash.
-    float vignette = smoothstep(1.6, 0.2, r);
-    float pulse = 1.0 + 0.6 * u.beat;
-    float intensity = (rings * 0.9 + swirl * 0.15) * vignette * pulse;
+    float band = fract(depth - u.time * (0.35 + u.rms * 2.5));
+    // Wider, smoother rings — three soft falloffs blended for a glow band.
+    float ring1 = smoothstep(0.38, 0.50, band) - smoothstep(0.50, 0.62, band);
+    float ring2 = exp(-pow((band - 0.5) * 3.0, 2.0)) * 0.6;     // gaussian halo
+    float rings = ring1 * 0.75 + ring2 * 0.55;
+    float swirl = 0.5 + 0.5 * sin(twist * 6.0 + u.time * 0.9);
+    // Soft vignette + beat lift.
+    float vignette = smoothstep(1.8, 0.15, r);
+    float pulse = 1.0 + 0.5 * u.beat;
+    float intensity = (rings * 0.95 + swirl * 0.10) * vignette * pulse;
     float4 col = palette.sample(s, float2(saturate(intensity + u.rms * 0.4), 0.5));
     col.rgb *= intensity * 1.4;
     col.a = 1.0;

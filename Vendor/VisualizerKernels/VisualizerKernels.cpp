@@ -59,8 +59,8 @@ extern "C" void vk_bars_process(const float *in,
     // Attack: react fast to rising bands. Release: decay slowly so peaks linger.
     // Time constants chosen for ~60 fps; behavior is dt-aware so the scene still
     // looks right under the speed slider.
-    const float attack_tau  = 0.040f;  // 40 ms
-    const float release_tau = 0.260f;  // 260 ms
+    const float attack_tau  = 0.060f;  // 60 ms — slightly softer rise
+    const float release_tau = 0.380f;  // 380 ms — bars linger, easier to read
     const float a_atk = 1.0f - std::exp(-dt / std::max(1e-4f, attack_tau));
     const float a_rel = 1.0f - std::exp(-dt / std::max(1e-4f, release_tau));
 

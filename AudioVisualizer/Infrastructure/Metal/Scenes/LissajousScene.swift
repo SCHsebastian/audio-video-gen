@@ -55,13 +55,22 @@ final class LissajousScene: VisualizerScene {
         enc.setVertexBuffer(pointsBuffer, offset: 0, index: 0)
         var count = UInt32(pointCount)
         enc.setVertexBytes(&count, length: 4, index: 1)
-        var lu = (thickness: Float(0.004 + rms * 0.012),
-                  aspect: uniforms.aspect,
-                  time: time,
-                  intensity: Float(0.6 + min(0.8, rms * 4)))
-        enc.setVertexBytes(&lu, length: MemoryLayout.size(ofValue: lu), index: 2)
-        enc.setFragmentBytes(&lu, length: MemoryLayout.size(ofValue: lu), index: 0)
+        // Outer glow pass — thick, dim.
+        var glow = (thickness: Float(0.018 + rms * 0.030),
+                    aspect: uniforms.aspect,
+                    time: time,
+                    intensity: Float(0.18 + min(0.30, rms * 1.6)))
+        enc.setVertexBytes(&glow, length: MemoryLayout.size(ofValue: glow), index: 2)
+        enc.setFragmentBytes(&glow, length: MemoryLayout.size(ofValue: glow), index: 0)
         enc.setFragmentTexture(paletteTexture, index: 0)
+        enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: pointCount - 1)
+        // Crisp core pass.
+        var core = (thickness: Float(0.005 + rms * 0.010),
+                    aspect: uniforms.aspect,
+                    time: time,
+                    intensity: Float(0.85 + min(0.6, rms * 3)))
+        enc.setVertexBytes(&core, length: MemoryLayout.size(ofValue: core), index: 2)
+        enc.setFragmentBytes(&core, length: MemoryLayout.size(ofValue: core), index: 0)
         enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: pointCount - 1)
     }
 }
