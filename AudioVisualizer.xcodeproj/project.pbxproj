@@ -14,6 +14,7 @@
 		2E41DE7CB65832525BAF1A4F /* MetalDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */; };
 		347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEAD60A8CF041F92DE39F9CD /* AudioObjectID+Properties.swift */; };
 		368E756989688059F7A61697 /* VisualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832E146FD2B148356484937B /* VisualizerApp.swift */; };
+		36BD3D5BF0880E844220458B /* Scope.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */; };
 		42E2C620A618EC40CF48A1DD /* RunningApplicationsDiscoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */; };
 		4556350D218716AD953145D4 /* Bars.metal in Sources */ = {isa = PBXBuildFile; fileRef = 4F1133FB55F1963379B01B11 /* Bars.metal */; };
 		4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */; };
@@ -25,6 +26,7 @@
 		7F0EBC6E0AA4DDDB47984B8B /* BarsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEDD2639B1779651F9867675 /* BarsScene.swift */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
+		AD2C439D80BEE74097C589D0 /* ScopeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */; };
 		B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */; };
 		B4595ECA5F58A0603D1160D8 /* PaletteTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881865058AC789F7F65FA676 /* PaletteTexture.swift */; };
 		BC013271989B876F10199BA6 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 97B6E5018EBBCD6964AEEC50 /* Domain */; };
@@ -48,6 +50,7 @@
 /* Begin PBXFileReference section */
 		035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDSPSpectrumAnalyzer.swift; sourceTree = "<group>"; };
 		079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferences.swift; sourceTree = "<group>"; };
+		2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Scope.metal; sourceTree = "<group>"; };
 		2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferencesTests.swift; sourceTree = "<group>"; };
 		3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerScene.swift; sourceTree = "<group>"; };
 		4272C3F4212C49A23281F643 /* AudioVisualizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AudioVisualizer.entitlements; sourceTree = "<group>"; };
@@ -69,6 +72,7 @@
 		D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAudioTapCapture.swift; sourceTree = "<group>"; };
 		D4CCF341189D337EEF681242 /* AudioVisualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioVisualizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingPongTextures.swift; sourceTree = "<group>"; };
+		E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeScene.swift; sourceTree = "<group>"; };
 		EB42E07EF64ABEA50B4AF8B7 /* audio-video-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "audio-video-gen"; path = .; sourceTree = SOURCE_ROOT; };
 		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
 		F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -181,6 +185,7 @@
 			isa = PBXGroup;
 			children = (
 				BEDD2639B1779651F9867675 /* BarsScene.swift */,
+				E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */,
 				3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */,
 			);
 			path = Scenes;
@@ -198,6 +203,7 @@
 			isa = PBXGroup;
 			children = (
 				4F1133FB55F1963379B01B11 /* Bars.metal */,
+				2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -376,6 +382,8 @@
 				0FA043251EF2809F15167204 /* PingPongTextures.swift in Sources */,
 				4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */,
 				5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */,
+				36BD3D5BF0880E844220458B /* Scope.metal in Sources */,
+				AD2C439D80BEE74097C589D0 /* ScopeScene.swift in Sources */,
 				B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */,
 				4C204CB20017E4C9AF74742A /* UserDefaultsPreferences.swift in Sources */,
 				26884600E006F72B2D17E67C /* VDSPSpectrumAnalyzer.swift in Sources */,
