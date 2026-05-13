@@ -26,12 +26,14 @@ final class CompositionRoot {
         let start = StartVisualizationUseCase(capture: capture, analyzer: analyzer, beats: beats,
                                               renderer: renderer, permissions: permission)
         let stop = StopVisualizationUseCase(capture: capture)
+        let changeLanguage = ChangeLanguageUseCase(localizer: localizer, preferences: prefs)
 
         renderer.setScene(saved.lastScene)
         self.viewModel = VisualizerViewModel(
             listSources: list, selectSource: select, changeScene: change,
             start: start, stop: stop,
-            discovery: discovery, renderer: renderer, localizer: localizer)
+            discovery: discovery, renderer: renderer,
+            localizer: localizer, changeLanguage: changeLanguage)
         self.viewModel.currentScene = saved.lastScene
         self.viewModel.selectedSource = saved.lastSource
         self.renderer = renderer

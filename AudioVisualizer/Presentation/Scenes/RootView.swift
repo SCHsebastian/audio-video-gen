@@ -7,6 +7,8 @@ struct RootView: View {
     @Bindable var localizer: BundleLocalizer
     let requestPermission: () async -> Void
 
+    @State private var showingSettings = false
+
     var body: some View {
         ZStack(alignment: .top) {
             MetalCanvas(renderer: renderer)
@@ -23,6 +25,14 @@ struct RootView: View {
             case .running, .idle, .noAudioYet:
                 ZStack {
                     HStack(spacing: 24) {
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                                .font(.title3)
+                        }
+                        .buttonStyle(.plain)
+                        .help(localizer.string(.settingsButton))
                         SourcePicker(vm: vm)
                         SceneToolbar(localizer: localizer,
                                      currentScene: Binding(
@@ -49,5 +59,9 @@ struct RootView: View {
             }
         }
         .onAppear { vm.onAppear() }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(localizer: localizer,
+                         onChange: { lang in vm.changeLanguage(lang) })
+        }
     }
 }

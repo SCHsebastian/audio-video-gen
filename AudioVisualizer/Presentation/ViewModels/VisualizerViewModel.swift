@@ -20,6 +20,7 @@ final class VisualizerViewModel {
     private let stop: StopVisualizationUseCase
     private let discovery: ProcessDiscovering
     private let renderer: MetalVisualizationRenderer
+    private let changeLanguageUseCase: ChangeLanguageUseCase
     private var streamTask: Task<Void, Never>?
     private var silenceTask: Task<Void, Never>?
     private var refreshTask: Task<Void, Never>?
@@ -32,7 +33,8 @@ final class VisualizerViewModel {
          stop: StopVisualizationUseCase,
          discovery: ProcessDiscovering,
          renderer: MetalVisualizationRenderer,
-         localizer: Localizing) {
+         localizer: Localizing,
+         changeLanguage: ChangeLanguageUseCase) {
         self.listSources = listSources
         self.selectSourceUseCase = selectSource
         self.changeScene = changeScene
@@ -41,6 +43,11 @@ final class VisualizerViewModel {
         self.discovery = discovery
         self.renderer = renderer
         self.localizer = localizer
+        self.changeLanguageUseCase = changeLanguage
+    }
+
+    func changeLanguage(_ lang: Language) {
+        changeLanguageUseCase.execute(lang)
     }
 
     func onAppear() {
