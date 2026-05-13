@@ -22,141 +22,146 @@ vertex SWOut synth_vertex(uint vid [[vertex_id]]) {
     return o;
 }
 
-// Synthwave / Miami sun + retreating neon grid floor.
+// Filtered grid line: returns a [0, 1] mask that's 1 *on* a grid line and
+// fades to 0 between them, with anti-aliasing pulled from the derivative of
+// the world coordinate. Same idea as the Godot reference shader — distant
+// lines fade automatically instead of moiréing.
+static inline float filteredGrid(float coord, float spacing, float thickness) {
+    float c = fmod(coord + 1000.0, spacing);           // wrap
+    float d = min(c, spacing - c);                     // distance to nearest line
+    float w = fwidth(coord);                           // per-pixel rate of change
+    return smoothstep(thickness + w, thickness - w, d);
+}
+
+// Synthwave / Outrun look — sky + half-sun + perspective neon grid.
 //
-// Layout:
-//   sky:    p.y > horizonY   — vertical gradient + half-sun w/ horizontal slits
-//   floor:  p.y < horizonY   — perspective grid that vanishes at the horizon
-//
-// The previous version had three bugs the user spotted: depth was inverted
-// (lines packed near the bottom instead of the horizon), the sun was drawn
-// in *both* branches (so half of it bled under the grid), and the column
-// lines aliased into a jittery mess at large depth because there was no
-// derivative-aware AA. This pass fixes all three and keeps the palette-LUT
-// convention so user palettes still tint the scene.
+// Implemented as a per-pixel ray-plane intersection (the technique used in
+// the well-known Shadertoy synthwave shaders): treat each fragment as a ray
+// from a virtual camera at y = 1 and intersect with a plane at y = 0 to
+// recover proper world coordinates on the floor. Perspective then comes for
+// free from the inverse of rayDir.y, and `fwidth` on the world coordinates
+// gives screen-space-correct anti-aliasing — no moiré at the horizon.
 fragment float4 synth_fragment(SWOut in [[stage_in]],
                                constant SWUniforms &u [[buffer(1)]],
                                texture2d<float> palette [[texture(0)]]) {
     constexpr sampler s(filter::linear);
-    float2 p = in.ndc;
-    p.x *= u.aspect;
 
-    // Horizon sits slightly below center. Tiny bass-driven sag for life.
-    float horizonY = -0.08 - u.bass * 0.06;
+    // Screen → camera ray. Shift uv.y so the horizon sits slightly below
+    // centre on screen; bass adds a tiny sag for life.
+    float2 uv = in.ndc;
+    uv.x *= u.aspect;
+    float pitch = 0.18 + u.bass * 0.04;                 // horizon offset
+    float3 ray = normalize(float3(uv.x, uv.y + pitch, -1.0));
 
-    // Palette samples — picked so any user palette still feels synthwave.
-    float3 skyTop    = palette.sample(s, float2(0.05, 0.5)).rgb;   // deep
-    float3 skyMid    = palette.sample(s, float2(0.40, 0.5)).rgb;   // mid hue
-    float3 skyWarm   = palette.sample(s, float2(0.78, 0.5)).rgb;   // horizon warm
-    float3 sunTopCol = palette.sample(s, float2(0.95, 0.5)).rgb;
-    float3 sunBotCol = palette.sample(s, float2(0.72, 0.5)).rgb;
-    float3 lineCol   = palette.sample(s, float2(0.58, 0.5)).rgb;   // neon
-    float3 floorDark = palette.sample(s, float2(0.10, 0.5)).rgb;
-    float3 floorMid  = palette.sample(s, float2(0.20, 0.5)).rgb;
+    // Palette samples — chosen so any user palette still reads as synthwave.
+    float3 skyTop  = palette.sample(s, float2(0.05, 0.5)).rgb;
+    float3 skyMid  = palette.sample(s, float2(0.40, 0.5)).rgb;
+    float3 skyWarm = palette.sample(s, float2(0.78, 0.5)).rgb;
+    float3 sunHot  = palette.sample(s, float2(0.95, 0.5)).rgb;
+    float3 sunWarm = palette.sample(s, float2(0.72, 0.5)).rgb;
+    float3 lineCol = palette.sample(s, float2(0.58, 0.5)).rgb;
+    float3 floorD  = palette.sample(s, float2(0.10, 0.5)).rgb;
+    float3 floorM  = palette.sample(s, float2(0.22, 0.5)).rgb;
 
     float3 col;
+    bool isFloor = (ray.y < 0.0);
 
-    if (p.y > horizonY) {
+    if (!isFloor) {
         // ============ SKY ============
-        float t = clamp((p.y - horizonY) / (1.0 - horizonY + 1e-4), 0.0, 1.0);
-        // Warm at horizon, mid in the middle, deep at the top.
+        // Gradient indexed by ray.y above the horizon (0 → 1).
+        float t = clamp(ray.y * 1.4, 0.0, 1.0);
         col = mix(skyWarm, mix(skyMid, skyTop, t), t);
 
-        // Twinkly stars in the upper half.
-        if (t > 0.25) {
-            float2 sp = float2(p.x * 9.0, p.y * 9.0);
-            float starN = fract(sin(dot(floor(sp), float2(127.1, 311.7))) * 43758.5453);
-            if (starN > 0.985) {
-                float tw = 0.5 + 0.5 * sin(u.time * (starN * 6.0) + starN * 30.0);
-                col += float3(1.0) * tw * (t - 0.25) * 0.6;
+        // Twinkling stars in the upper half only.
+        if (t > 0.30) {
+            float2 g  = floor(uv * 9.0);
+            float  n  = fract(sin(dot(g, float2(127.1, 311.7))) * 43758.5453);
+            if (n > 0.985) {
+                float tw = 0.5 + 0.5 * sin(u.time * (n * 6.0) + n * 30.0);
+                col += float3(1.0) * tw * (t - 0.30) * 0.55;
             }
         }
 
         // ============ SUN ============
-        // Centered on the horizon — only the upper half is visible (the rest
-        // would be below the floor, which we never draw in this branch).
-        float2 sunC = float2(0.0, horizonY);
-        float sunR  = 0.34;
-        float dSun  = length(p - sunC);
+        // Anchored to the horizon on screen — we project a point at world
+        // y = 0, z = -2 (in front of the camera) back to screen NDC by
+        // reversing the ray formula, then draw a screen-space disc there.
+        float horizonNDCy = -pitch;                     // where ray.y = 0 hits screen
+        float2 sunC = float2(0.0, horizonNDCy + 0.05);
+        float  sunR = 0.32;
+        float  dSun = length(float2(uv.x, in.ndc.y) - sunC);
 
-        if (dSun < sunR + 0.04) {
-            // Anti-aliased fill of the sun disc.
-            float aa = fwidth(dSun) + 0.001;
+        if (dSun < sunR + 0.06) {
+            float aa   = fwidth(dSun) + 0.001;
             float disc = 1.0 - smoothstep(sunR - aa, sunR + aa, dSun);
 
-            // Vertical position within the sun: 0 at horizon (= bottom of
-            // visible half), 1 at the top of the sun.
-            float yInSun = clamp((p.y - sunC.y) / sunR, 0.0, 1.0);
+            // 0 at horizon (= bottom of visible half-disc), 1 at the top.
+            float yIn = clamp((in.ndc.y - sunC.y) / sunR, 0.0, 1.0);
 
-            // Sun body: warm bottom → hot top.
-            float3 sunBody = mix(sunBotCol, sunTopCol, yInSun);
+            // Body: warm at horizon, hot at top.
+            float3 body = mix(sunWarm, sunHot, smoothstep(0.0, 1.0, yIn));
 
-            // Horizontal slits — only on the lower 60% of the visible half,
-            // 5 bands, getting wider as they approach the horizon.
+            // Slits: only the lower 70% of the visible half. Bands widen and
+            // become more open as they approach the horizon (the classic
+            // Miami-Vice taper).
             float slits = 1.0;
-            if (yInSun < 0.60) {
-                float band = yInSun / 0.60;                           // 0 horizon, 1 top of slits
-                float freq = mix(7.0, 14.0, band);                    // wider slits near horizon
-                float duty = mix(0.30, 0.55, band);                   // bigger gaps near horizon
-                slits = step(duty, fract(band * freq + 0.5));
+            if (yIn < 0.70) {
+                float b    = yIn / 0.70;                // 0 at horizon, 1 at top of slit band
+                float freq = mix(6.0, 16.0, b);
+                float duty = mix(0.28, 0.55, b);
+                slits = step(duty, fract(b * freq + 0.5));
             }
 
-            col = mix(col, sunBody, disc * slits);
+            col = mix(col, body, disc * slits);
 
-            // Outer rim glow — adds RMS-driven warmth, never strobes.
-            float rim = smoothstep(sunR, sunR - 0.06, dSun) *
-                        smoothstep(sunR + 0.04, sunR, dSun);
-            col += sunTopCol * rim * (0.20 + u.rms * 0.35);
+            // Outer rim — RMS-modulated, never strobes.
+            float rim = smoothstep(sunR + 0.06, sunR - 0.02, dSun) *
+                        smoothstep(sunR - 0.02, sunR + 0.06, dSun);
+            col += sunHot * rim * (0.20 + u.rms * 0.40);
         }
     } else {
         // ============ FLOOR ============
-        // depth → ∞ at horizon, ~1 at screen bottom. Inverse-screen-y mapping.
-        float depth = 1.0 / max(1e-4, horizonY - p.y);
+        // Ray-plane intersection with y = -1 (camera height = 1).
+        float t = -1.0 / ray.y;
+        float wx = ray.x * t;
+        float wz = ray.z * t;
 
-        // Scroll forward in time; bass pushes the throttle.
-        float scroll = u.time * (0.7 + u.bass * 1.8);
+        // Forward scroll. Bass gooses the throttle.
+        float scroll = u.time * (1.2 + u.bass * 2.4);
+        float gx = wx;
+        float gz = wz + scroll;
 
-        // ---- horizontal lines (rows) ----
-        // Lines at integer z; the fractional distance to the nearest one is
-        // anti-aliased via fwidth so the line stays one pixel thick at all
-        // depths instead of aliasing at the horizon.
-        float zPos    = depth + scroll;
-        float rowFrac = fract(zPos);
-        float rowDist = min(rowFrac, 1.0 - rowFrac);
-        float rowAA   = fwidth(rowDist) + 0.001;
-        float rowLine = 1.0 - smoothstep(rowAA, rowAA * 3.0, rowDist);
+        // Filtered AA grid in *world* space — perspective comes for free.
+        float spacing   = 1.0;
+        float thickness = 0.040;
+        float lineX = filteredGrid(gx, spacing, thickness);
+        float lineZ = filteredGrid(gz, spacing, thickness);
+        float grid  = max(lineX, lineZ);
 
-        // ---- vertical lines (columns) ----
-        // worldX = screen_x * depth gives lines that converge to a single
-        // vanishing point at the horizon — the classic Tron-floor look.
-        float worldX  = p.x * depth * 0.55;
-        float colFrac = fract(worldX);
-        float colDist = min(colFrac, 1.0 - colFrac);
-        float colAA   = fwidth(colDist) + 0.001;
-        float colLine = 1.0 - smoothstep(colAA, colAA * 3.0, colDist);
+        // Distance fade: grid melts into the horizon haze instead of
+        // aliasing into garbage as |t| grows.
+        float dist = abs(t);
+        float fade = exp(-dist * 0.06);
 
-        // Distance fade so the grid dissolves into the horizon haze rather
-        // than aliasing into noise.
-        float fade = exp(-depth * 0.045);
-        float grid = max(rowLine, colLine) * fade;
+        // Floor base: warmer/brighter up close, darker far away.
+        float closeness = 1.0 - clamp(dist * 0.025, 0.0, 1.0);
+        col = mix(floorD, floorM, closeness);
 
-        // Floor base: darker far away, slightly warmer up close.
-        float closeness = clamp(1.0 / depth, 0.0, 1.0);
-        col = mix(floorDark, floorMid, closeness);
+        // Composite the grid.
+        col = mix(col, lineCol, grid * fade);
 
-        // Composite grid.
-        col = mix(col, lineCol, grid);
+        // Neon bloom — adds glow around each line without changing its
+        // sharpness. Wider in screen space far away (because fwidth grew),
+        // narrower up close.
+        float bloom = smoothstep(0.15, 0.0,
+                                 min(min(fract(gx), 1.0 - fract(gx)),
+                                     min(fract(gz), 1.0 - fract(gz))));
+        col += lineCol * bloom * 0.18 * fade;
 
-        // Neon bloom around the lines.
-        float bloom = max(
-            exp(-rowDist * 22.0) * fade,
-            exp(-colDist * 22.0) * fade
-        ) * 0.30;
-        col += lineCol * bloom;
-
-        // Horizon haze — a warm band right at the horizon line.
-        float haze = exp(-(horizonY - p.y) * 18.0);
-        col = mix(col, skyWarm, haze * 0.55);
+        // Horizon haze — warm wash right at the horizon line so the grid
+        // dissolves smoothly into the sky.
+        float horizonFade = smoothstep(0.0, 0.18, -ray.y);
+        col = mix(skyWarm, col, horizonFade);
     }
 
     return float4(col, 1.0);
