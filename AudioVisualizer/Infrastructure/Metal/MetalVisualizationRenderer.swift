@@ -182,10 +182,15 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     }
 
     /// Smoothed beat strength in [0, 1] for use by ambient UI effects (e.g. vignette).
+    /// Attack and release are deliberately gentle: a hard attack reads as a
+    /// strobe on bright scenes and is fatiguing to look at. Bars are the only
+    /// scene whose own shader brightens with beats — the rest of the scenes
+    /// only react through these ambient overlays, so softening here calms
+    /// everything except Bars (which is what the user asked for).
     private var smoothedBeat: Float = 0
     func peekBeat() -> Float {
         let target = stateLock.withLock { s -> Float in s.beat?.strength ?? 0 }
-        let coef: Float = target > smoothedBeat ? 0.45 : 0.06   // attack fast, release slow
+        let coef: Float = target > smoothedBeat ? 0.22 : 0.05
         smoothedBeat += (target - smoothedBeat) * coef
         return min(1, smoothedBeat * beatSensitivity)
     }
