@@ -29,7 +29,7 @@ final class CompositionRoot {
         renderer.setScene(saved.lastScene)
 
         self.viewModel = VisualizerViewModel(listSources: list, selectSource: select, changeScene: change,
-                                             start: start, stop: stop)
+                                             start: start, stop: stop, renderer: renderer)
         self.viewModel.currentScene = saved.lastScene
         self.viewModel.selectedSource = saved.lastSource
         self.renderer = renderer

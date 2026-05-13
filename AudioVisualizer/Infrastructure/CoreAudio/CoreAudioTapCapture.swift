@@ -128,6 +128,8 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
             let chunkFrames = 1024
             var accumulator = [Float]()
             accumulator.reserveCapacity(chunkFrames)
+            var lastYield = CACurrentMediaTime()
+            let silentTimeout = 0.5
             while self.procID != nil {
                 let (ptr, bytes) = ring.peek()
                 if let ptr, bytes >= bpf {
@@ -145,6 +147,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                                                        timestamp: HostTime(machAbsolute: mach_absolute_time()))
                                 continuation.yield(frame)
                                 accumulator.removeAll(keepingCapacity: true)
+                                lastYield = CACurrentMediaTime()
                             }
                         }
                     } else {
@@ -161,6 +164,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                                                        timestamp: HostTime(machAbsolute: mach_absolute_time()))
                                 continuation.yield(frame)
                                 accumulator.removeAll(keepingCapacity: true)
+                                lastYield = CACurrentMediaTime()
                             }
                         }
                     }
@@ -168,6 +172,14 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                 } else {
                     // No data; sleep ~5 ms.
                     Thread.sleep(forTimeInterval: 0.005)
+                    let now = CACurrentMediaTime()
+                    if now - lastYield > silentTimeout {
+                        let silent = AudioFrame(samples: Array(repeating: 0, count: 1024),
+                                                sampleRate: SampleRate(hz: sr),
+                                                timestamp: HostTime(machAbsolute: mach_absolute_time()))
+                        continuation.yield(silent)
+                        lastYield = now
+                    }
                 }
             }
             continuation.finish()

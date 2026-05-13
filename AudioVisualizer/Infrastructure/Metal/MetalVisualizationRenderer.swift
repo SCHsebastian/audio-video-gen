@@ -58,6 +58,10 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         if let alch = scenes[.alchemy] as? AlchemyScene { try? alch.build(device: device, library: library, paletteTexture: pal) }
     }
 
+    func peekRMS() -> Float {
+        stateLock.withLock { $0.spectrum.rms }
+    }
+
     func consume(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?) {
         stateLock.withLock { s in
             s.spectrum = spectrum

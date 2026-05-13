@@ -16,10 +16,22 @@ struct RootView: View {
             case .error(.permissionDenied):
                 PermissionGate { Task { await requestPermission(); vm.onAppear() } }
             case .running, .idle, .noAudioYet:
-                SceneToolbar(currentScene: Binding(
-                    get: { vm.currentScene },
-                    set: { vm.selectScene($0) }))
-                    .padding(.top, 16)
+                ZStack {
+                    SceneToolbar(currentScene: Binding(
+                        get: { vm.currentScene },
+                        set: { vm.selectScene($0) }))
+                        .padding(.top, 16)
+                    if vm.isSilent {
+                        VStack {
+                            Spacer()
+                            Text("Waiting for audio\u{2026}")
+                                .foregroundStyle(.white.opacity(0.7))
+                                .padding()
+                                .background(Color.black.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+                            Spacer().frame(height: 80)
+                        }
+                    }
+                }
             case .error(let e):
                 Text("Error: \(String(describing: e))").foregroundStyle(.white)
             }
