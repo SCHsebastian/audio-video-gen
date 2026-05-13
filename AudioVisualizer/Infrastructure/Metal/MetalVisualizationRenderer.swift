@@ -9,7 +9,12 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     private let queue: MTLCommandQueue
     private let library: MTLLibrary
 
+    /// Built and cached on first navigation to a given scene. Empty at startup.
     private var scenes: [SceneKind: VisualizerScene] = [:]
+    /// Factory closures that lazily build & cache the scene for a given kind.
+    /// Populated once in `make()`. Reading from `sceneBuilders` never builds —
+    /// pipeline construction happens inside the closure.
+    private var sceneBuilders: [SceneKind: () throws -> VisualizerScene] = [:]
     private var currentKind: SceneKind = .bars
     private var paletteTexture: MTLTexture
     private(set) var currentPaletteName: String = PaletteFactory.xpNeon.name
@@ -62,12 +67,38 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
             throw RenderError.pipelineCreationFailed(name: "palette")
         }
         let renderer = MetalVisualizationRenderer(device: d, queue: q, library: lib, paletteTexture: pal)
-        let bars = BarsScene(); try bars.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.bars] = bars
-        let scope = ScopeScene(); try scope.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.scope] = scope
-        let alch = AlchemyScene(); try alch.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.alchemy] = alch
-        let tun = TunnelScene(); try tun.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.tunnel] = tun
-        let liss = LissajousScene(); try liss.build(device: d, library: lib, paletteTexture: pal); renderer.scenes[.lissajous] = liss
+        // Register lazy builders — scenes are constructed on first navigation
+        // so the app starts faster and never compiles pipelines the user
+        // doesn't visit. Each closure reads the current palette texture off
+        // `renderer` so palette changes take effect on build.
+        renderer.sceneBuilders[.bars]      = { [weak renderer] in try Self.build(BarsScene(),      with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.scope]     = { [weak renderer] in try Self.build(ScopeScene(),     with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.alchemy]   = { [weak renderer] in try Self.build(AlchemyScene(),   with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.tunnel]    = { [weak renderer] in try Self.build(TunnelScene(),    with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.lissajous] = { [weak renderer] in try Self.build(LissajousScene(), with: renderer, d: d, lib: lib) }
         return renderer
+    }
+
+    private static func build<S: VisualizerScene>(_ scene: S, with renderer: MetalVisualizationRenderer?, d: MTLDevice, lib: MTLLibrary) throws -> VisualizerScene {
+        let pal = renderer?.paletteTexture ?? PaletteFactory.texture(from: PaletteFactory.xpNeon, device: d)!
+        try scene.build(device: d, library: lib, paletteTexture: pal)
+        return scene
+    }
+
+    /// Build (or fetch from cache) the scene for `kind`. Logs once on first
+    /// build so a `log stream` clearly shows which scene a session touches.
+    private func materialize(_ kind: SceneKind) -> VisualizerScene? {
+        if let s = scenes[kind] { return s }
+        guard let builder = sceneBuilders[kind] else { return nil }
+        do {
+            let s = try builder()
+            scenes[kind] = s
+            Log.render.info("scene materialized: \(String(describing: kind), privacy: .public)")
+            return s
+        } catch {
+            Log.render.error("scene build failed: \(String(describing: kind), privacy: .public) \(String(describing: error), privacy: .public)")
+            return nil
+        }
     }
 
     func setScene(_ kind: SceneKind) {
@@ -80,12 +111,11 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         guard let pal = PaletteFactory.texture(from: palette, device: device) else { return }
         self.paletteTexture = pal
         self.currentPaletteName = palette.name
-        // Re-build scenes with new palette (cheap — pipelines are unchanged).
-        if let bars = scenes[.bars] as? BarsScene { try? bars.build(device: device, library: library, paletteTexture: pal) }
-        if let scope = scenes[.scope] as? ScopeScene { try? scope.build(device: device, library: library, paletteTexture: pal) }
-        if let alch = scenes[.alchemy] as? AlchemyScene { try? alch.build(device: device, library: library, paletteTexture: pal) }
-        if let tun = scenes[.tunnel] as? TunnelScene { try? tun.build(device: device, library: library, paletteTexture: pal) }
-        if let liss = scenes[.lissajous] as? LissajousScene { try? liss.build(device: device, library: library, paletteTexture: pal) }
+        // Only rebuild scenes that were already materialized. Un-visited
+        // scenes will pick up the new texture when they are first built.
+        for (_, scene) in scenes {
+            try? scene.build(device: device, library: library, paletteTexture: pal)
+        }
     }
 
     func setSpeed(_ s: Float) {
@@ -115,12 +145,12 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
     }
 
     func randomizeLissajous() {
-        (scenes[.lissajous] as? LissajousScene)?.randomize()
+        (materialize(.lissajous) as? LissajousScene)?.randomize()
         Log.render.info("randomizeLissajous")
     }
 
     func randomizeAlchemy() {
-        (scenes[.alchemy] as? AlchemyScene)?.randomize()
+        (materialize(.alchemy) as? AlchemyScene)?.randomize()
         Log.render.info("randomizeAlchemy")
     }
 
@@ -132,8 +162,8 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         switch currentKind {
         case .lissajous: randomizeLissajous(); return "Lissajous"
         case .alchemy:   randomizeAlchemy();   return "Alchemy"
-        case .tunnel:    (scenes[.tunnel] as? TunnelScene)?.randomize(); return "Tunnel"
-        case .bars:      (scenes[.bars]   as? BarsScene)?.randomize();   return "Bars"
+        case .tunnel:    (materialize(.tunnel) as? TunnelScene)?.randomize(); return "Tunnel"
+        case .bars:      (materialize(.bars)   as? BarsScene)?.randomize();   return "Bars"
         case .scope:     return nil
         }
     }
@@ -194,7 +224,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
             return (s.spectrum, s.waveform, b)
         }
         let (spectrum, waveform, beat) = snap
-        guard let scene = scenes[currentKind] else { return }
+        guard let scene = materialize(currentKind) else { return }
         scene.update(spectrum: spectrum, waveform: waveform, beat: beat, dt: dt)
 
         guard let drawable = view.currentDrawable,
