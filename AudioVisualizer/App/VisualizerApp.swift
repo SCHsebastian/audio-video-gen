@@ -24,7 +24,7 @@ struct VisualizerApp: App {
                     }
                 }
             }
-            .frame(minWidth: 1280, minHeight: 720)
+            .frame(minWidth: 200, minHeight: 120)
         }
         .commands {
             // File → Save Snapshot
