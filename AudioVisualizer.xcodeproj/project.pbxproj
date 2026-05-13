@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0506A1BDA246E4925D46A6E8 /* BundleLocalizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */; };
 		0FA043251EF2809F15167204 /* PingPongTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */; };
 		111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4713B55A89A6A7432CF90634 /* EnergyBeatDetector.swift */; };
 		26884600E006F72B2D17E67C /* VDSPSpectrumAnalyzer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */; };
@@ -31,6 +32,7 @@
 		8691A03CE3647051B86CAA42 /* AlchemyParticles.metal in Sources */ = {isa = PBXBuildFile; fileRef = AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
+		A2A9187AF93D659A01C1D538 /* BundleLocalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 029AC86646001C0332446F3A /* BundleLocalizer.swift */; };
 		AD2C439D80BEE74097C589D0 /* ScopeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */; };
 		B2FB5159CECB76EF4D4AE6FA /* TCCAudioCapturePermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */; };
 		B4595ECA5F58A0603D1160D8 /* PaletteTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881865058AC789F7F65FA676 /* PaletteTexture.swift */; };
@@ -57,6 +59,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		029AC86646001C0332446F3A /* BundleLocalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocalizer.swift; sourceTree = "<group>"; };
 		035DA89EE7600484208F4A1C /* VDSPSpectrumAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VDSPSpectrumAnalyzer.swift; sourceTree = "<group>"; };
 		079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferences.swift; sourceTree = "<group>"; };
 		2640C1355B4C74F25C877A4D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -89,6 +92,7 @@
 		D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAudioTapCapture.swift; sourceTree = "<group>"; };
 		D4CCF341189D337EEF681242 /* AudioVisualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioVisualizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PingPongTextures.swift; sourceTree = "<group>"; };
+		DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocalizerTests.swift; sourceTree = "<group>"; };
 		E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeScene.swift; sourceTree = "<group>"; };
 		EB42E07EF64ABEA50B4AF8B7 /* audio-video-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "audio-video-gen"; path = .; sourceTree = SOURCE_ROOT; };
 		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
@@ -124,6 +128,7 @@
 			children = (
 				7D4630AB1F70A58F44C09426 /* Analysis */,
 				24C1F88E6E4A5E797ACC378F /* CoreAudio */,
+				323461BC375FCB3F94131D6A /* Localization */,
 				E7B69D8BC87EEACD15030FF5 /* Metal */,
 				BC36BD45045DA0243540DC00 /* Persistence */,
 			);
@@ -149,6 +154,14 @@
 				CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */,
 			);
 			path = CoreAudio;
+			sourceTree = "<group>";
+		};
+		323461BC375FCB3F94131D6A /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				029AC86646001C0332446F3A /* BundleLocalizer.swift */,
+			);
+			path = Localization;
 			sourceTree = "<group>";
 		};
 		363A6BE602F6121524430472 /* AudioVisualizer */ = {
@@ -269,6 +282,7 @@
 		BF0C2C94C0910328D3CBCFE4 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */,
 				5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */,
 				B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */,
 				2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */,
@@ -424,6 +438,7 @@
 				347B9A224C78F75742827BB7 /* AudioObjectID+Properties.swift in Sources */,
 				4556350D218716AD953145D4 /* Bars.metal in Sources */,
 				7F0EBC6E0AA4DDDB47984B8B /* BarsScene.swift in Sources */,
+				A2A9187AF93D659A01C1D538 /* BundleLocalizer.swift in Sources */,
 				81D3E428750CD2E6DFAEF06B /* CompositionRoot.swift in Sources */,
 				FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */,
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
@@ -452,6 +467,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0506A1BDA246E4925D46A6E8 /* BundleLocalizerTests.swift in Sources */,
 				DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */,
 				42E2C620A618EC40CF48A1DD /* RunningApplicationsDiscoveryTests.swift in Sources */,
 				8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */,
