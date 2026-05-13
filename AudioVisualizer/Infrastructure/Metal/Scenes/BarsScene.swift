@@ -1,14 +1,16 @@
 import Metal
 import simd
 import Domain
+import VisualizerKernels
 
 final class BarsScene: VisualizerScene {
     private let barCount = 64
-    private var heights = [Float](repeating: 0, count: 64)
     private var displayed = [Float](repeating: 0, count: 64)
+    private var state = [Float](repeating: 0, count: 64)        // C++ smoothing state
     private var pipeline: MTLRenderPipelineState!
     private var heightsBuffer: MTLBuffer!
     private var paletteTexture: MTLTexture!
+    private var beat: Float = 0
 
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws {
         self.paletteTexture = paletteTexture
@@ -30,12 +32,19 @@ final class BarsScene: VisualizerScene {
 
     func update(spectrum: SpectrumFrame, waveform: [Float], beat: BeatEvent?, dt: Float) {
         let n = min(spectrum.bands.count, barCount)
-        for i in 0..<n {
-            let v = spectrum.bands[i]
-            displayed[i] = max(v, displayed[i] * 0.88)
+        if let b = beat { self.beat = max(self.beat, b.strength) }
+        self.beat *= 0.85
+        let beatStrength = self.beat
+
+        spectrum.bands.withUnsafeBufferPointer { inPtr in
+            displayed.withUnsafeMutableBufferPointer { outPtr in
+                state.withUnsafeMutableBufferPointer { statePtr in
+                    vk_bars_process(inPtr.baseAddress, outPtr.baseAddress,
+                                    statePtr.baseAddress, UInt32(n), dt, beatStrength)
+                }
+            }
         }
-        heights = displayed
-        memcpy(heightsBuffer.contents(), heights, n * MemoryLayout<Float>.size)
+        memcpy(heightsBuffer.contents(), displayed, n * MemoryLayout<Float>.size)
     }
 
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {

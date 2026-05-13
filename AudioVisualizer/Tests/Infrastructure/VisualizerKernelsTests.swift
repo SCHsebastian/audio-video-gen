@@ -18,6 +18,51 @@ final class VisualizerKernelsTests: XCTestCase {
         XCTAssertFalse(out.allSatisfy { $0 == 0 })
     }
 
+    func test_bars_process_rises_fast_decays_slowly() {
+        var state = [Float](repeating: 0, count: 8)
+        var out = [Float](repeating: 0, count: 8)
+        let hi: [Float] = Array(repeating: 1.0, count: 8)
+        let zero: [Float] = Array(repeating: 0, count: 8)
+        // Drive high once, observe rise.
+        hi.withUnsafeBufferPointer { ip in
+            out.withUnsafeMutableBufferPointer { op in
+                state.withUnsafeMutableBufferPointer { sp in
+                    vk_bars_process(ip.baseAddress, op.baseAddress, sp.baseAddress, 8, 0.016, 0)
+                }
+            }
+        }
+        let afterRise = out
+        XCTAssertGreaterThan(afterRise[0], 0.05)
+        // Then drop to zero and verify a slower decay.
+        for _ in 0..<3 {
+            zero.withUnsafeBufferPointer { ip in
+                out.withUnsafeMutableBufferPointer { op in
+                    state.withUnsafeMutableBufferPointer { sp in
+                        vk_bars_process(ip.baseAddress, op.baseAddress, sp.baseAddress, 8, 0.016, 0)
+                    }
+                }
+            }
+        }
+        // After 3 frames (48ms) with input=0, signal should still be above 30% of peak
+        // because release_tau ≈ 260ms. This is what makes the bars feel like meters.
+        XCTAssertGreaterThan(out[0], afterRise[0] * 0.3)
+        XCTAssertLessThan(out[0], afterRise[0])
+    }
+
+    func test_scope_envelope_removes_dc_offset() {
+        let n: UInt32 = 64
+        var input = [Float](repeating: 0.5, count: Int(n))    // pure DC
+        var out = [Float](repeating: 99, count: Int(n))
+        input.withUnsafeBufferPointer { ip in
+            out.withUnsafeMutableBufferPointer { op in
+                vk_scope_envelope(ip.baseAddress, op.baseAddress, n, 1.0)
+            }
+        }
+        // After DC removal, every sample should be near zero.
+        let maxAbs = out.map { abs($0) }.max() ?? 0
+        XCTAssertLessThan(maxAbs, 0.01)
+    }
+
     func test_rose_with_more_bass_grows_radius() {
         let n = 128
         var quiet = [Float](repeating: 0, count: n * 2)
