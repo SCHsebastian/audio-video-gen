@@ -10,6 +10,7 @@ struct RootView: View {
     @State private var showingSettings = false
     @State private var toolbarVisible = true
     @State private var hideTask: Task<Void, Never>? = nil
+    @FocusState private var keyboardFocused: Bool
 
     private let hideAfter: Duration = .milliseconds(2500)
 
@@ -77,10 +78,38 @@ struct RootView: View {
                     .foregroundStyle(.white)
             }
         }
-        .onAppear { vm.onAppear(); nudgeToolbar() }
+        .onAppear { vm.onAppear(); nudgeToolbar(); keyboardFocused = true }
         .sheet(isPresented: $showingSettings) {
             SettingsView(localizer: localizer,
                          onChange: { lang in vm.changeLanguage(lang) })
+        }
+        .focusable()
+        .focusEffectDisabled()
+        .focused($keyboardFocused)
+        .onKeyPress { press in handleKey(press) }
+    }
+
+    private func handleKey(_ press: KeyPress) -> KeyPress.Result {
+        // Number row maps to scenes in toolbar order.
+        let sceneByKey: [Character: SceneKind] = [
+            "1": .bars, "2": .scope, "3": .alchemy, "4": .tunnel, "5": .lissajous
+        ]
+        if let ch = press.characters.first, let s = sceneByKey[ch] {
+            vm.selectScene(s); nudgeToolbar(); return .handled
+        }
+        switch press.key {
+        case .space:
+            vm.randomizeCurrent(); nudgeToolbar(); return .handled
+        case .leftArrow, .rightArrow:
+            let order: [SceneKind] = [.bars, .scope, .alchemy, .tunnel, .lissajous]
+            if let idx = order.firstIndex(of: vm.currentScene) {
+                let next = press.key == .rightArrow ? (idx + 1) % order.count
+                                                    : (idx - 1 + order.count) % order.count
+                vm.selectScene(order[next]); nudgeToolbar()
+            }
+            return .handled
+        default:
+            return .ignored
         }
     }
 
