@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		368E756989688059F7A61697 /* VisualizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832E146FD2B148356484937B /* VisualizerApp.swift */; };
+		54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */; };
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
 		BC013271989B876F10199BA6 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 97B6E5018EBBCD6964AEEC50 /* Domain */; };
@@ -42,6 +43,7 @@
 			files = (
 				BC013271989B876F10199BA6 /* Domain in Frameworks */,
 				FFEE78CA3D545FAF887B76C1 /* Application in Frameworks */,
+				54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,6 +146,7 @@
 			packageProductDependencies = (
 				97B6E5018EBBCD6964AEEC50 /* Domain */,
 				2A0BA6759B8D541765628417 /* Application */,
+				6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */,
 			);
 			productName = AudioVisualizer;
 			productReference = D4CCF341189D337EEF681242 /* AudioVisualizer.app */;
@@ -484,6 +487,10 @@
 		2A0BA6759B8D541765628417 /* Application */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Application;
+		};
+		6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TPCircularBuffer;
 		};
 		97B6E5018EBBCD6964AEEC50 /* Domain */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -28,6 +28,8 @@ targets:
         product: Domain
       - package: AudioVisualizerCore
         product: Application
+      - package: AudioVisualizerCore
+        product: TPCircularBuffer
     info:
       path: AudioVisualizer/Resources/Info.plist
       properties:
