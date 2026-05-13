@@ -10,3 +10,4 @@ Pods/
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
 *.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcshareddata/IDEWorkspaceChecks.plist

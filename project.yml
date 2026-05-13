@@ -1,0 +1,68 @@
+name: AudioVisualizer
+options:
+  deploymentTarget:
+    macOS: "14.2"
+  bundleIdPrefix: dev.audiovideogen
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+packages:
+  AudioVisualizerCore:
+    path: .
+targets:
+  AudioVisualizer:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.2"
+    sources:
+      - path: AudioVisualizer
+        excludes:
+          - "Tests/**"
+    dependencies:
+      - package: AudioVisualizerCore
+        product: Domain
+      - package: AudioVisualizerCore
+        product: Application
+    info:
+      path: AudioVisualizer/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Audio Visualizer
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSMinimumSystemVersion: "14.2"
+        NSAudioCaptureUsageDescription: "AudioVisualizer needs to listen to what other apps are playing in order to draw visualizations of it."
+        NSHighResolutionCapable: true
+    entitlements:
+      path: AudioVisualizer/Resources/AudioVisualizer.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.device.audio-input: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.audiovideogen.AudioVisualizer
+        MACOSX_DEPLOYMENT_TARGET: "14.2"
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_ENTITLEMENTS: AudioVisualizer/Resources/AudioVisualizer.entitlements
+        INFOPLIST_FILE: AudioVisualizer/Resources/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+  AudioVisualizerTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "14.2"
+    sources:
+      - path: AudioVisualizer/Tests
+    dependencies:
+      - target: AudioVisualizer
+      - package: AudioVisualizerCore
+        product: Domain
+      - package: AudioVisualizerCore
+        product: Application
+    settings:
+      base:
+        BUNDLE_LOADER: $(TEST_HOST)
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/AudioVisualizer.app/Contents/MacOS/AudioVisualizer
