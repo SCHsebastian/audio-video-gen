@@ -2,6 +2,7 @@ import Foundation
 import Domain
 import Application
 import Observation
+import os.log
 
 @Observable
 final class VisualizerViewModel {
@@ -51,6 +52,7 @@ final class VisualizerViewModel {
     }
 
     func onAppear() {
+        Log.vm.info("onAppear")
         Task { @MainActor in
             await refreshSources()
             beginStream()
@@ -63,7 +65,9 @@ final class VisualizerViewModel {
         do {
             sources = try await listSources.execute()
             processInfos = (try? await discovery.listAudioProcesses()) ?? []
+            Log.vm.debug("refreshSources: \(self.sources.count) sources, \(self.processInfos.count) audio processes")
         } catch {
+            Log.vm.error("refreshSources failed: \(String(describing: error), privacy: .public)")
             state = .error(.permissionDenied)
         }
     }
@@ -78,23 +82,27 @@ final class VisualizerViewModel {
     }
 
     func selectScene(_ k: SceneKind) {
+        Log.vm.info("selectScene: \(k.rawValue, privacy: .public)")
         currentScene = k
         changeScene.execute(k)
     }
 
     func selectSource(_ s: AudioSource) {
+        Log.vm.info("selectSource: \(String(describing: s), privacy: .public)")
         selectedSource = s
         selectSourceUseCase.execute(s)
         beginStream()
     }
 
     private func beginStream() {
+        Log.vm.info("beginStream: chosen=\(String(describing: self.selectedSource), privacy: .public)")
         streamTask?.cancel()
         let useCase = start
         let chosen = selectedSource
         streamTask = Task { @MainActor in
             await stop.execute()
             for await s in await useCase.execute(source: chosen) {
+                Log.vm.info("state: \(String(describing: s), privacy: .public)")
                 self.state = s
             }
         }

@@ -25,6 +25,7 @@
 		546A8B74AFB831F013BDBFE9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A693DF52CB2769B94E01BD74 /* SettingsView.swift */; };
 		54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */; };
 		5D6C52878CFB145395739D64 /* RunningApplicationsDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5807E3F836F3BC8C88C6187F /* RunningApplicationsDiscovery.swift */; };
+		75F5939D9FBCCDE3BE7D330F /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B97ECD5E8A02079964E76AD /* Log.swift */; };
 		7ADB836CB11A1EB255048ED1 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D1929F0951B217438B6AB6 /* RootView.swift */; };
 		7B6FAA97AE00F3BB4B7EDD5B /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 17C111209B74E83285C9072E /* Application */; };
 		7F0EBC6E0AA4DDDB47984B8B /* BarsScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEDD2639B1779651F9867675 /* BarsScene.swift */; };
@@ -82,6 +83,7 @@
 		881865058AC789F7F65FA676 /* PaletteTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteTexture.swift; sourceTree = "<group>"; };
 		8A79CD1C85F3DFE42E4766D2 /* VisualizerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerViewModel.swift; sourceTree = "<group>"; };
 		8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlchemyScene.swift; sourceTree = "<group>"; };
+		8B97ECD5E8A02079964E76AD /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		925F2B6A9763EB6BF642AA83 /* PermissionGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionGate.swift; sourceTree = "<group>"; };
 		A693DF52CB2769B94E01BD74 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = AlchemyParticles.metal; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 				7D4630AB1F70A58F44C09426 /* Analysis */,
 				24C1F88E6E4A5E797ACC378F /* CoreAudio */,
 				323461BC375FCB3F94131D6A /* Localization */,
+				2BAE3580482A521421662B28 /* Logging */,
 				E7B69D8BC87EEACD15030FF5 /* Metal */,
 				BC36BD45045DA0243540DC00 /* Persistence */,
 			);
@@ -158,6 +161,14 @@
 				CAFFC3AC154F4F1837300814 /* TCCAudioCapturePermission.swift */,
 			);
 			path = CoreAudio;
+			sourceTree = "<group>";
+		};
+		2BAE3580482A521421662B28 /* Logging */ = {
+			isa = PBXGroup;
+			children = (
+				8B97ECD5E8A02079964E76AD /* Log.swift */,
+			);
+			path = Logging;
 			sourceTree = "<group>";
 		};
 		323461BC375FCB3F94131D6A /* Localization */ = {
@@ -448,6 +459,7 @@
 				81D3E428750CD2E6DFAEF06B /* CompositionRoot.swift in Sources */,
 				FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */,
 				111E59B03362A504B8B08D84 /* EnergyBeatDetector.swift in Sources */,
+				75F5939D9FBCCDE3BE7D330F /* Log.swift in Sources */,
 				51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */,
 				2E41DE7CB65832525BAF1A4F /* MetalDevice.swift in Sources */,
 				E891DF819BE4127C66ABE6AE /* MetalVisualizationRenderer.swift in Sources */,

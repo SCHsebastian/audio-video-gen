@@ -2,6 +2,7 @@ import Metal
 import MetalKit
 import Domain
 import os.lock
+import os.log
 
 final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKViewDelegate, @unchecked Sendable {
     private let device: MTLDevice
@@ -20,6 +21,14 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         var beat: BeatEvent?
         var beatConsumed = true
     }
+
+    // Periodic consume() stats — reset every second.
+    private struct ConsumeStats {
+        var count: Int = 0
+        var peakRMS: Float = 0
+        var lastLogTime: CFTimeInterval = 0
+    }
+    private var consumeStats = ConsumeStats()
 
     override init() {
         fatalError("Use MetalVisualizationRenderer.make() instead")
@@ -47,9 +56,13 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         return renderer
     }
 
-    func setScene(_ kind: SceneKind) { currentKind = kind }
+    func setScene(_ kind: SceneKind) {
+        Log.render.info("setScene: \(String(describing: kind), privacy: .public)")
+        currentKind = kind
+    }
 
     func setPalette(_ palette: ColorPalette) {
+        Log.render.info("setPalette: \(palette.name, privacy: .public)")
         guard let pal = PaletteFactory.texture(from: palette, device: device) else { return }
         self.paletteTexture = pal
         // Re-build scenes with new palette (cheap — pipelines are unchanged).
@@ -67,6 +80,13 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
             s.spectrum = spectrum
             s.waveform = waveform
             if let beat { s.beat = beat; s.beatConsumed = false }
+        }
+        consumeStats.count += 1
+        consumeStats.peakRMS = max(consumeStats.peakRMS, spectrum.rms)
+        let now = CACurrentMediaTime()
+        if now - consumeStats.lastLogTime >= 1.0 {
+            Log.render.info("consume: \(self.consumeStats.count, privacy: .public) frames/s peakRMS=\(self.consumeStats.peakRMS, privacy: .public)")
+            consumeStats = ConsumeStats(count: 0, peakRMS: 0, lastLogTime: now)
         }
     }
 

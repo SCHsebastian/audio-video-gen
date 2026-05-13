@@ -1,11 +1,18 @@
 import CoreAudio
 import AVFoundation
 import Foundation
-import os
+import os.log
 import Domain
 
+// Heap-allocated stats counters updated exclusively by the IOProc.
+// The drainer reads them once per second for logging (eventual consistency is fine).
+private final class IOStats {
+    var callbacks: Int64 = 0
+    var frames: Int64 = 0
+    var peakAmp: Float = 0
+}
+
 final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
-    private static let log = OSLog(subsystem: "dev.audiovideogen.AudioVisualizer", category: "capture")
     private var tapID: AudioObjectID = 0
     private var aggID: AudioObjectID = 0
     private var procID: AudioDeviceIOProcID?
@@ -15,6 +22,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
     private var channelCount: Int = 2
     private var deviceChangeListener: AudioObjectPropertyListenerBlock?
     private var currentSource: AudioSource?
+    private var ioStats: IOStats?
 
     private static func sweepStaleAggregates() {
         var addr = AudioObjectPropertyAddress(
@@ -35,12 +43,14 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
     }
 
     func start(source: AudioSource) async throws -> AsyncStream<AudioFrame> {
+        Log.capture.info("start: source=\(String(describing: source), privacy: .public)")
         CoreAudioTapCapture.sweepStaleAggregates()
         let desc: CATapDescription
         switch source {
         case .systemWide:
             // Global tap with no exclusions = tap every process on the default output.
             desc = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
+            Log.capture.info("desc: stereoGlobalTapButExcludeProcesses (system-wide)")
         case .process(_, let bundleID):
             // Lenient matching: find every audio process whose parent bundle ID matches
             // the parent of the requested bundle ID. Chrome can have multiple helpers
@@ -54,9 +64,10 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                 // still shows something. The user's picker selection is preserved; the
                 // next start() (after they re-select or refresh) may find it once the
                 // helper produces audio again. Logged for diagnostics.
-                os_log(.info, log: Self.log, "No audio processes match parent of %{public}@; falling back to system-wide", bundleID)
+                Log.capture.notice("no audio processes match \(bundleID, privacy: .public); falling back to system-wide")
                 desc = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
             } else {
+                Log.capture.info("desc: stereoMixdownOfProcesses with \(matches.count) processes for bundle \(bundleID, privacy: .public)")
                 desc = CATapDescription(stereoMixdownOfProcesses: matches)
             }
         }
@@ -65,12 +76,17 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
 
         var newTap: AudioObjectID = 0
         let tapStatus = AudioHardwareCreateProcessTap(desc, &newTap)
-        guard tapStatus == noErr else { throw CaptureError.tapCreationFailed(tapStatus) }
+        guard tapStatus == noErr else {
+            Log.capture.error("tap creation failed: status=\(tapStatus)")
+            throw CaptureError.tapCreationFailed(tapStatus)
+        }
         self.tapID = newTap
+        Log.capture.info("tap created: id=\(newTap), uuid=\(desc.uuid.uuidString, privacy: .public)")
 
         let outUID: String
         do { outUID = try AudioObjectID.defaultSystemOutputUID() }
         catch { AudioHardwareDestroyProcessTap(tapID); throw error }
+        Log.capture.info("default output UID: \(outUID, privacy: .public)")
 
         let dict: [String: Any] = [
             kAudioAggregateDeviceUIDKey:           UUID().uuidString,
@@ -87,10 +103,12 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         var newAgg: AudioObjectID = 0
         let aggStatus = AudioHardwareCreateAggregateDevice(dict as CFDictionary, &newAgg)
         guard aggStatus == noErr else {
+            Log.capture.error("aggregate device creation failed: status=\(aggStatus)")
             AudioHardwareDestroyProcessTap(tapID)
             throw CaptureError.aggregateDeviceCreationFailed(aggStatus)
         }
         self.aggID = newAgg
+        Log.capture.info("aggregate device created: id=\(newAgg)")
 
         // Read tap format.
         var addr = AudioObjectPropertyAddress(
@@ -107,6 +125,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         self.sampleRate = asbd.mSampleRate
         self.channelCount = Int(asbd.mChannelsPerFrame)
         let nonInterleaved = (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) != 0
+        Log.capture.info("tap format: sampleRate=\(asbd.mSampleRate, privacy: .public) channels=\(asbd.mChannelsPerFrame, privacy: .public) formatFlags=\(asbd.mFormatFlags, privacy: .public) nonInterleaved=\(nonInterleaved, privacy: .public)")
 
         // Issue 3 fix: ring always sized for mono Float32 output (4 bytes/frame), regardless of input format.
         // With mono mixdown in the IOProc, we write exactly 4 bytes per input frame.
@@ -124,12 +143,22 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         let unsafeRing = OpaquePointer(ringRef)
         let ch = channelCount
         let chF = Float(ch)
+
+        // Allocate stats on the heap; hand an opaque pointer to the IOProc so it can
+        // update counters without touching the Swift runtime (same pattern as unsafeRing above).
+        let stats = IOStats()
+        self.ioStats = stats
+        let statsRef = Unmanaged.passUnretained(stats).toOpaque()
+        let unsafeStats = OpaquePointer(statsRef)
+
         var newProc: AudioDeviceIOProcID?
         let ioStatus = AudioDeviceCreateIOProcIDWithBlock(&newProc, aggID, drainQueue) { _, inData, _, _, _ in
             let ablPtr = UnsafePointer<AudioBufferList>(OpaquePointer(inData))
             let buffers = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: ablPtr))
             let r = Unmanaged<RingBuffer>.fromOpaque(UnsafeRawPointer(unsafeRing)).takeUnretainedValue()
+            let s = Unmanaged<IOStats>.fromOpaque(UnsafeRawPointer(unsafeStats)).takeUnretainedValue()
 
+            s.callbacks &+= 1
             let bufferCount = buffers.count
             if !nonInterleaved {
                 // Interleaved: single buffer with layout [L, R, L, R, ...]
@@ -142,6 +171,8 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                     var sum: Float = 0
                     for c in 0..<ch { sum += p[i * ch + c] }
                     var mono = sum / chF
+                    s.peakAmp = s.peakAmp > abs(mono) ? s.peakAmp : abs(mono)
+                    s.frames &+= 1
                     _ = r.write(&mono, byteCount: 4)
                 }
             } else {
@@ -155,32 +186,40 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                         }
                     }
                     var mono = sum / chF
+                    s.peakAmp = s.peakAmp > abs(mono) ? s.peakAmp : abs(mono)
+                    s.frames &+= 1
                     _ = r.write(&mono, byteCount: 4)
                 }
             }
         }
         guard ioStatus == noErr, let pid = newProc else {
+            Log.capture.error("IOProc creation failed: status=\(ioStatus)")
             AudioHardwareDestroyAggregateDevice(aggID); AudioHardwareDestroyProcessTap(tapID)
             throw CaptureError.ioProcStartFailed(ioStatus)
         }
         self.procID = pid
+        Log.capture.info("IOProc registered")
 
         let startStatus = AudioDeviceStart(aggID, pid)
         guard startStatus == noErr else {
+            Log.capture.error("AudioDeviceStart failed: status=\(startStatus)")
             AudioDeviceDestroyIOProcID(aggID, pid)
             AudioHardwareDestroyAggregateDevice(aggID); AudioHardwareDestroyProcessTap(tapID)
             throw CaptureError.ioProcStartFailed(startStatus)
         }
+        Log.capture.info("AudioDeviceStart succeeded; capture is live")
 
         // Drainer: every ~5 ms, pull mono Float32 frames out of the ring and yield 1024-sample chunks.
         // Issue 2 fix: no more interleaved/non-interleaved branching — ring always holds mono Float32.
         let sr = sampleRate
         drainQueue.async { [weak self] in
             guard let self else { return }
+            Log.capture.info("drainer started")
             let chunkFrames = 1024
             var accumulator = [Float]()
             accumulator.reserveCapacity(chunkFrames)
             var lastYield = CACurrentMediaTime()
+            var lastStatLog = CACurrentMediaTime()
             let silentTimeout = 0.5
             // Issue 1 fix: procID is read only on drainQueue; stop() writes it on drainQueue too
             // (via drainQueue.async in stop()), so this check is properly serialized.
@@ -213,8 +252,19 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                         lastYield = now
                     }
                 }
+
+                // Periodic IO stats — once per second, read and reset counters set by the IOProc.
+                let statNow = CACurrentMediaTime()
+                if statNow - lastStatLog >= 1.0 {
+                    let cbs = stats.callbacks; stats.callbacks = 0
+                    let frs = stats.frames;    stats.frames = 0
+                    let peak = stats.peakAmp;  stats.peakAmp = 0
+                    Log.capture.info("io: callbacks/s=\(cbs, privacy: .public) frames/s=\(frs, privacy: .public) peakAmp=\(peak, privacy: .public)")
+                    lastStatLog = statNow
+                }
             }
             continuation.finish()
+            Log.capture.info("drainer exited")
         }
 
         continuation.onTermination = { [weak self] _ in Task { await self?.stop() } }
@@ -256,6 +306,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         // and the write (here) now happen on the same serial queue.
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             drainQueue.async {
+                Log.capture.info("stop")
                 // Remove the default-output-device change listener before tearing down hardware.
                 if let listener = self.deviceChangeListener {
                     var deviceAddr = AudioObjectPropertyAddress(
@@ -277,6 +328,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                 if self.aggID != 0 { AudioHardwareDestroyAggregateDevice(self.aggID); self.aggID = 0 }
                 if self.tapID != 0 { AudioHardwareDestroyProcessTap(self.tapID); self.tapID = 0 }
                 self.ring = nil
+                self.ioStats = nil
                 cont.resume()
             }
         }
