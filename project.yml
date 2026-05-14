@@ -48,6 +48,9 @@ targets:
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.device.audio-input: true
+        # Required so NSOpenPanel / NSSavePanel grant the app a read/write
+        # token on the user-picked audio file and .mp4 destination.
+        com.apple.security.files.user-selected.read-write: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: dev.audiovideogen.AudioVisualizer
@@ -74,3 +77,33 @@ targets:
         BUNDLE_LOADER: $(TEST_HOST)
         TEST_HOST: $(BUILT_PRODUCTS_DIR)/AudioVisualizer.app/Contents/MacOS/AudioVisualizer
         GENERATE_INFOPLIST_FILE: YES
+
+  # Command-line counterpart of the in-app Export sheet. Reuses the same
+  # Domain + Application code as the live visualizer and the GUI export; the
+  # only difference is the entry point (cli/Entry.swift) and the Infrastructure
+  # subset (no CoreAudio capture, no Persistence, no Presentation, no
+  # Localization — those are GUI-only). Lives outside the sandbox so the user
+  # can read/write arbitrary paths.
+  audiovis-render:
+    type: tool
+    platform: macOS
+    deploymentTarget: "14.2"
+    sources:
+      - path: cli
+      - path: AudioVisualizer/Infrastructure/Export
+      - path: AudioVisualizer/Infrastructure/Metal
+      - path: AudioVisualizer/Infrastructure/Analysis
+      - path: AudioVisualizer/Infrastructure/Logging
+    dependencies:
+      - package: AudioVisualizerCore
+        product: Domain
+      - package: AudioVisualizerCore
+        product: Application
+      - package: AudioVisualizerCore
+        product: VisualizerKernels
+    settings:
+      base:
+        PRODUCT_NAME: audiovis-render
+        MACOSX_DEPLOYMENT_TARGET: "14.2"
+        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_ENTITLEMENTS: ""

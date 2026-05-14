@@ -100,10 +100,17 @@ struct ExportSheetView: View {
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
-        if let audioType = UTType("public.audio") {
-            panel.allowedContentTypes = [audioType]
+        panel.title = localizer.string(.exportAudioSourceChoose)
+        // UTType.audio plus the specific container types covers anything the
+        // platform's AVAssetReader can decode. Mixing the deprecated
+        // `allowedFileTypes` string list with `allowedContentTypes` confuses
+        // the panel and is the documented cause of "panel never appears" on
+        // recent macOS — keep only the typed list.
+        var types: [UTType] = [.audio]
+        for name in ["mp3", "wav", "m4a", "mpeg-4-audio", "aiff-audio", "flac-audio"] {
+            if let t = UTType(filenameExtension: name) ?? UTType(name) { types.append(t) }
         }
-        panel.allowedFileTypes = ["mp3", "wav", "m4a", "aac", "flac", "aiff", "caf"]
+        panel.allowedContentTypes = types
         if panel.runModal() == .OK, let url = panel.url {
             vm.audioURL = url
             if vm.outputURL == nil {
