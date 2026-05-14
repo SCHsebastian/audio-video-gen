@@ -1,10 +1,11 @@
 # Audio Visualizer
 
 A native macOS app that taps **system audio output** in real time and renders
-Windows XP Media Player–style visualizations in Metal. Five scenes, six
-palettes, bilingual UI (EN/ES), no virtual audio device, no microphone, no
-kernel extension — just one TCC permission prompt and you're seeing your
-music.
+Windows XP Media Player–style visualizations in Metal — and exports those same
+visuals to a silent `.mp4` driven by any audio file you point it at. **Eleven
+scenes**, **seven palettes**, **stereo-aware** analysis, bilingual UI
+(EN/ES), no virtual audio device, no microphone, no kernel extension — just
+one TCC permission prompt and you're seeing your music.
 
 Built end-to-end with [Claude](https://www.anthropic.com/claude) by
 [Sebastián Cardona Henao](https://github.com/SCHsebastian).
@@ -17,20 +18,36 @@ Built end-to-end with [Claude](https://www.anthropic.com/claude) by
 
 - **System audio capture, no third-party driver.** Uses [Core Audio Taps](https://developer.apple.com/documentation/coreaudio/capturing-system-audio-with-core-audio-taps)
   (the public macOS 14.2+ API). No BlackHole, no Soundflower, no kext.
-- **Five scenes** rendered in [Metal](https://developer.apple.com/metal/):
-  Bars (spectrum), Scope (oscilloscope), Alchemy (80 000-particle compute
-  shader), Tunnel (raymarched), Lissajous (XY parametric).
-- **Six color palettes** with live preview swatches, cycle (P), random (⇧P),
-  and per-scene randomization (Space or click anywhere on the canvas).
+- **Eleven scenes** rendered in [Metal](https://developer.apple.com/metal/):
+  Bars, Scope, Alchemy (compute-shader particles), Tunnel (2D-trick + spiral
+  twist), Lissajous (parametric + stereo goniometer + Rose curve), Radial,
+  Rings, Synthwave (Outrun horizon — palette-driven sky / sun / mountains /
+  retrowave grid), Spectrogram (scrolling history), Milkdrop, Kaleidoscope.
+- **Stereo-aware analysis.** The capture IOProc preserves L / R channels;
+  the analyzer publishes per-channel sub-band energies; Scope draws two
+  trigger-synced traces with shared auto-gain; Lissajous renders a real
+  mid/side goniometer; Bars grows L upward and R downward from the centre;
+  Tunnel leans toward the heavier bass side; Synthwave's beat-driven palette
+  pulse warms grid / sun / mountain rim lights on hits.
+- **Split view.** Press `V` (or use the toolbar) to render any two scenes
+  side-by-side, each picking from the same shared audio bus.
+- **Seven palettes** (Synthwave, XP Neon, Aurora, Sunset, Inferno, Ocean,
+  Mono) with live preview swatches, cycle (`P`), random (`⇧P`), and per-scene
+  randomization (Space or click anywhere on the canvas).
+- **Export to video file** — render any scene + palette to a silent `.mp4`
+  driven by any audio file. Two entry points: an in-app **Export…** sheet
+  with a background-task progress chip, or a headless **`audiovis-render`**
+  CLI binary for batch / scripted renders. See [Export to video](#export-to-video).
 - **Real-time DSP** using Apple's [Accelerate / vDSP](https://developer.apple.com/documentation/accelerate/vdsp)
-  for spectrum analysis and a small energy-based beat detector that drives
-  ambient flashes.
-- **Diagnostics HUD** (⌘D) showing live FPS, RMS, beat strength, scene, and
-  palette so you can see exactly what the renderer is doing.
-- **Snapshot to Desktop** (⌘S) — grabs the next-presented drawable as a sRGB
-  PNG.
-- **Configurable frame-rate cap** (30 / 60 / 90 / 120 / unlimited) so you can
-  trade smoothness for battery on the go.
+  for spectrum analysis (64 log-spaced bands + spectral centroid + onset
+  flux) and a small energy-based beat detector that emits inter-beat
+  intervals and a smoothed BPM estimate.
+- **Diagnostics HUD** (`⌘D`) showing live FPS, RMS, beat strength, scene,
+  and palette so you can see exactly what the renderer is doing.
+- **Snapshot to Desktop** (`⌘S`) — grabs the next-presented drawable as a
+  sRGB PNG.
+- **Configurable frame-rate cap** (30 / 60 / 90 / 120 / unlimited) so you
+  can trade smoothness for battery on the go.
 - **Bilingual UI** (English + Spanish) via [Xcode 15 String Catalogs](https://developer.apple.com/documentation/xcode/localizing-and-varying-text-with-a-string-catalog),
   switchable live without restart.
 - **Clean Architecture + DDD** — pure-Swift Domain and Application layers
@@ -42,7 +59,8 @@ Built end-to-end with [Claude](https://www.anthropic.com/claude) by
 - macOS **14.2** or newer ([`CATapDescription`](https://developer.apple.com/documentation/coreaudio/catapdescription)
   was introduced in 14.2)
 - Apple Silicon or Intel
-- One TCC permission prompt on first launch ("Audio Capture")
+- One TCC permission prompt on first launch ("Audio Capture") — only required
+  for the live visualizer; the offline export reads its audio from a file.
 
 ## Install (pre-built)
 
@@ -76,10 +94,11 @@ result with `hdiutil convert -format UDZO`.
 
 | Shortcut | Action |
 |----------|--------|
-| `1`–`5`  | Switch scene (Bars / Scope / Alchemy / Tunnel / Lissajous) |
+| `1`–`9`, `0`, `-` | Switch scene (Bars / Scope / Alchemy / Tunnel / Lissajous / Radial / Rings / Synthwave / Spectrogram / Milkdrop / Kaleidoscope) |
 | `←` `→`  | Previous / next scene |
 | `Space` or click | Randomize the current scene |
 | `P` / `⇧P` | Cycle / randomize the color palette |
+| `V`      | Toggle split view (two scenes side-by-side) |
 | `⌘S`     | Save a PNG snapshot to the Desktop |
 | `⌘D`     | Toggle the diagnostics HUD |
 | `F` / `⌃⌘F` | Toggle fullscreen |
@@ -89,10 +108,74 @@ The **Settings** sheet (gear icon, four tabs):
 
 - **General** — language, reduce motion, diagnostics HUD, reset to defaults.
 - **Visuals** — palette swatch grid, default scene, animation speed, **FPS
-  cap** (30 / 60 / 90 / 120 / unlimited).
+  cap** (30 / 60 / 90 / 120 / unlimited), scene order + auto-shuffle timer.
 - **Audio** — gain (boost visual response without changing playback volume)
   and beat sensitivity.
 - **About** — author + Claude credits, full shortcut sheet, version.
+
+## Export to video
+
+The same scenes + palettes + analyzer + beat detector that drive the live
+canvas also power an offline pipeline that renders any audio file to a silent
+`.mp4`. The source audio is **not** embedded in the output — the deliverable
+is video-only.
+
+### From the app
+
+Click the **Export…** button in the toolbar. The export sheet asks for:
+
+- **Audio source** — any file the platform can decode (mp3, wav, m4a, aac,
+  flac, aiff, caf).
+- **Scene + palette** — independent of what the live preview shows.
+- **Resolution** — 720p / 1080p / 4K.
+- **Frame rate** — 30 / 60 fps.
+- **Output** — `.mp4` save location, default `<audio-basename>.mp4`.
+
+Hit **Start**. The sheet dismisses, a progress chip slides into the toolbar
+with percent + a Cancel button, and the live visualizer keeps running. When
+the encode finishes the chip shows **Done · Reveal** for ~3 s; click it to
+open Finder on the file.
+
+### From the command line
+
+`audiovis-render` is a standalone binary that runs the same offline pipeline
+without opening the app. It's not sandboxed so it can read / write any path.
+
+```bash
+# Build the CLI target (only needed once, or after pulling changes)
+xcodegen generate
+xcodebuild -project AudioVisualizer.xcodeproj -scheme audiovis-render \
+           -destination 'platform=macOS' build
+
+# Find it under DerivedData
+BIN=$(ls ~/Library/Developer/Xcode/DerivedData/AudioVisualizer-*/Build/Products/Debug/audiovis-render | head -1)
+
+# Render
+"$BIN" song.mp3 out.mp4
+"$BIN" song.wav out.mp4 --scene synthwave --resolution 1080p --fps 60
+"$BIN" song.flac out.mp4 --scene tunnel --palette "Aurora" --resolution 4k --fps 30
+"$BIN" --help
+```
+
+Options:
+
+| Flag | Values | Default |
+|------|--------|---------|
+| `--scene` | `bars` `scope` `alchemy` `tunnel` `lissajous` `radial` `rings` `synthwave` `spectrogram` `milkdrop` `kaleidoscope` | `bars` |
+| `--palette` | palette name (matches the in-app picker) | `Synthwave` |
+| `--resolution` | `720p` `1080p` `4k` | `1080p` |
+| `--fps` | `30` `60` | `60` |
+
+Drop a symlink on `$PATH` if you want it project-wide:
+
+```bash
+ln -sf "$BIN" /usr/local/bin/audiovis-render
+```
+
+H.264 in `.mp4`, hardware-encoded via VideoToolbox, BT.709 colour. The encoder
+runs in lock-step with a zero-copy IOSurface-backed `CVPixelBuffer` pool that
+Metal binds directly as a render target — no read-back, no CPU memcpy in the
+hot path.
 
 ## Build from source
 
@@ -106,15 +189,20 @@ swift test
 # Whole app (uses XcodeGen to regenerate the .xcodeproj from project.yml)
 brew install xcodegen
 xcodegen generate
+
+# Live visualizer app
 xcodebuild -project AudioVisualizer.xcodeproj -scheme AudioVisualizer \
            -destination 'platform=macOS' build
-
 open ~/Library/Developer/Xcode/DerivedData/AudioVisualizer-*/Build/Products/Debug/AudioVisualizer.app
+
+# Offline render CLI
+xcodebuild -project AudioVisualizer.xcodeproj -scheme audiovis-render \
+           -destination 'platform=macOS' build
 ```
 
 Regenerate the Xcode project (`xcodegen generate`) any time you add or move a
-source file under `AudioVisualizer/`, change `project.yml`, or modify
-`Package.swift`.
+source file under `AudioVisualizer/` or `cli/`, change `project.yml`, or
+modify `Package.swift`.
 
 ## Architecture
 
@@ -123,20 +211,36 @@ Clean Architecture, lightly DDD-flavored:
 ```
 Sources/Domain/        — pure Swift, only Foundation imports
                          value objects, errors, ports (protocols)
+  AudioAnalysis/         SpectrumFrame, BeatEvent, WaveformBuffer
+  AudioCapture/          AudioSource, capture port
+  Export/                AudioFileDecoding + OfflineVideoRendering ports,
+                         RenderOptions, ExportError
+  Visualization/         SceneKind, ColorPalette, rendering port
+  Localization/          L10nKey, language VO, localizer port
+  Preferences/           UserPreferences VO, preferences port
 Sources/Application/   — use cases (Start, Stop, SelectSource, ChangeScene,
-                         ChangeLanguage)
+                         ChangeLanguage, ExportVisualization)
 AudioVisualizer/
   Infrastructure/      — Apple framework adapters
     CoreAudio/           Core Audio Taps capture + TCC permission
     Analysis/            vDSP spectrum analyzer + energy beat detector
-    Metal/               renderer + 5 scenes + 6 palettes
+    Metal/               renderer + 11 scenes + 7 palettes
+    Export/              AVAssetReader-backed file decoder +
+                         AVAssetWriter-backed offline renderer
     Persistence/         UserDefaults-backed preferences
     Localization/        Xcode String Catalog → @Observable localizer
     Logging/             os.log subsystems
   Presentation/        — SwiftUI views + @Observable view models
+                         (live canvas + Export sheet + progress chip)
   App/                 — @main entry point + CompositionRoot
+cli/                   — audiovis-render @main entry point (CLI tool target)
 Vendor/TPCircularBuffer/ — BSD lock-free ring buffer (C)
 ```
+
+Both the in-app Export sheet and the `audiovis-render` CLI compose the same
+Domain + Application code, and the offline renderer shares its
+`MTLDevice` / `MTLCommandQueue` / `MTLLibrary` with the live renderer via the
+existing `makeSecondary`-style factory pattern.
 
 The **architectural invariant** is enforced by reading code, not tooling:
 
@@ -153,7 +257,8 @@ that constructs concrete adapters and hands them to use cases.
 See [`CLAUDE.md`](CLAUDE.md) for the developer-facing architecture notes
 (bounded contexts, port/adapter table, the non-obvious wiring rules around
 the IOProc thread and per-app capture), and `docs/superpowers/specs/` for the
-original design specs.
+original design specs (including [`2026-05-14-offline-render-pipeline-design.md`](docs/superpowers/specs/2026-05-14-offline-render-pipeline-design.md)
+for the export feature).
 
 ## How it works (90-second tour)
 
@@ -161,23 +266,33 @@ original design specs.
    creates a `CATapDescription` for the default output device, builds a
    private aggregate device around it, and registers an `AudioDeviceIOProc`
    that the OS calls on its dedicated IO thread (≈ every 5 ms).
-2. **RT-safe ring.** The IOProc downmixes the (interleaved or
-   non-interleaved) Float32 audio to mono and writes it into a
-   [TPCircularBuffer](https://github.com/michaeltyson/TPCircularBuffer)
+2. **RT-safe ring.** The IOProc writes interleaved L / R Float32 pairs
+   (`SIMD2<Float>`, documented stride 8) into a [TPCircularBuffer](https://github.com/michaeltyson/TPCircularBuffer)
    — a lock-free single-producer/single-consumer ring buffer. The IOProc never
    allocates, never touches the Swift runtime, never takes a lock.
-3. **Drain.** A user-interactive drain queue pulls 1024-sample mono frames
-   out of the ring buffer and yields them down an `AsyncStream`.
+3. **Drain.** A user-interactive drain queue pulls 1024-frame chunks out of
+   the ring buffer and yields them down an `AsyncStream<AudioFrame>` carrying
+   the mono mixdown + the L / R channels.
 4. **DSP.** Each frame is fed to [`VDSPSpectrumAnalyzer`](AudioVisualizer/Infrastructure/Analysis/VDSPSpectrumAnalyzer.swift)
-   (Hann window → real FFT → magnitudes → 64 log-spaced bands) and to
+   (Hann window → real FFT → magnitudes → 64 log-spaced bands, plus log-Hz
+   spectral centroid + positive spectral flux; two extra per-channel FFTs
+   produce `leftBands` / `rightBands` when the source is stereo) and to
    [`EnergyBeatDetector`](AudioVisualizer/Infrastructure/Analysis/EnergyBeatDetector.swift)
-   (short-window energy vs. running average).
+   (short-window energy vs. running average, plus mach-timebase derived
+   inter-beat interval + EMA-smoothed BPM).
 5. **Render.** Results are handed to
    [`MetalVisualizationRenderer`](AudioVisualizer/Infrastructure/Metal/MetalVisualizationRenderer.swift),
    which **lazily materializes** the active scene's pipelines on first
    navigation and releases the previous scene on switch. Each frame, the
    chosen scene encodes a [Metal](https://developer.apple.com/metal/) draw
    pass against a 256-pixel 1-D LUT palette texture.
+6. **Export (parallel pipeline).** Same analyzer + beat detector wired to
+   [`AVAudioFileDecoder`](AudioVisualizer/Infrastructure/Export/AVAudioFileDecoder.swift)
+   (AVAssetReader → 48 kHz Float32 interleaved stereo → the same 1024-frame
+   `AudioFrame` contract the live capture publishes) and to
+   [`AVOfflineVideoRenderer`](AudioVisualizer/Infrastructure/Export/AVOfflineVideoRenderer.swift)
+   (offscreen render to an IOSurface-backed `CVPixelBuffer` bound as an
+   `MTLTexture` via `CVMetalTextureCache`; H.264 encode via VideoToolbox).
 
 ## Diagnostic logging
 
@@ -201,6 +316,9 @@ Categories: `capture`, `analysis`, `render`, `vm`.
   `consume` framerate.
 - The **vm** category logs state transitions and snapshot results.
 
+`audiovis-render` prints percent-progress to stdout and errors to stderr; it
+does not emit `os.log` messages.
+
 ## Testing
 
 ```bash
@@ -210,6 +328,10 @@ xcodebuild test -project AudioVisualizer.xcodeproj \
                 -scheme AudioVisualizer \
                 -destination 'platform=macOS'           # full Xcode suite
 ```
+
+The Xcode test suite includes the offline-render infrastructure tests, which
+encode a real silent 720p30 `.mp4` via the actual Metal device and read it
+back through `AVURLAsset` to verify dimensions / duration / no audio track.
 
 ## Credits
 
