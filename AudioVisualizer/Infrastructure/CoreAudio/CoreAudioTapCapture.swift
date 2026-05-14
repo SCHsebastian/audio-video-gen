@@ -126,6 +126,11 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
         self.channelCount = Int(asbd.mChannelsPerFrame)
         let nonInterleaved = (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) != 0
         Log.capture.info("tap format: sampleRate=\(asbd.mSampleRate, privacy: .public) channels=\(asbd.mChannelsPerFrame, privacy: .public) formatFlags=\(asbd.mFormatFlags, privacy: .public) nonInterleaved=\(nonInterleaved, privacy: .public)")
+        if self.channelCount > 2 {
+            // Visualizer is L/R only — surround content is downmixed by selecting channels 0 and 1.
+            // A future LtRt downmix could fold C/Ls/Rs back in; for now we just say so.
+            Log.capture.notice("source has \(asbd.mChannelsPerFrame, privacy: .public) channels; only channels 0 (L) and 1 (R) are used — surround channels are dropped")
+        }
 
         // Ring stores stereo Float32 pairs — 8 bytes/frame regardless of source format.
         // Mono sources duplicate the single channel onto both L and R inside the IOProc
@@ -162,6 +167,9 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
 
             s.callbacks &+= 1
             let bufferCount = buffers.count
+            // SIMD2<Float> has documented size/stride of 8 bytes with contiguous L,R layout,
+            // unlike `(Float, Float)` whose layout is technically unspecified. Same RT cost
+            // (POD initializer, no allocation, no Swift runtime).
             if !nonInterleaved {
                 // Interleaved: single buffer with layout [c0, c1, ..., c0, c1, ...]
                 let buf = buffers[0]
@@ -172,7 +180,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                 for i in 0..<frames {
                     let l: Float = p[i * ch + 0]
                     let r2: Float = ch >= 2 ? p[i * ch + 1] : l
-                    var pair: (Float, Float) = (l, r2)
+                    var pair = SIMD2<Float>(l, r2)
                     let m = (l + r2) * 0.5
                     s.peakAmp = s.peakAmp > abs(m) ? s.peakAmp : abs(m)
                     s.frames &+= 1
@@ -187,7 +195,7 @@ final class CoreAudioTapCapture: SystemAudioCapturing, @unchecked Sendable {
                 for i in 0..<frames {
                     let l: Float = pL[i]
                     let r2: Float = pR?[i] ?? l
-                    var pair: (Float, Float) = (l, r2)
+                    var pair = SIMD2<Float>(l, r2)
                     let m = (l + r2) * 0.5
                     s.peakAmp = s.peakAmp > abs(m) ? s.peakAmp : abs(m)
                     s.frames &+= 1

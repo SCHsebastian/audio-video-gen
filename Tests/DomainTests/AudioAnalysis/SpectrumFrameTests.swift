@@ -28,4 +28,20 @@ final class SpectrumFrameTests: XCTestCase {
         XCTAssertEqual(f.centroid, 0.7)
         XCTAssertEqual(f.flux, 0.8)
     }
+
+    func test_stereo_bands_default_to_empty_for_mono() {
+        let f = SpectrumFrame(bands: [0.1, 0.2], rms: 0.3, timestamp: .zero)
+        XCTAssertTrue(f.leftBands.isEmpty)
+        XCTAssertTrue(f.rightBands.isEmpty)
+    }
+
+    func test_holds_stereo_bands_when_provided() {
+        let l: [Float] = [0.10, 0.20, 0.30, 0.40]
+        let r: [Float] = [0.50, 0.60, 0.70, 0.80]
+        let f = SpectrumFrame(bands: [0, 0, 0, 0], rms: 0.4, timestamp: .zero,
+                              leftBands: l, rightBands: r)
+        XCTAssertEqual(f.leftBands, l)
+        XCTAssertEqual(f.rightBands, r)
+        XCTAssertEqual(f.leftBands.count, f.rightBands.count, "stereo arrays must be the same length")
+    }
 }

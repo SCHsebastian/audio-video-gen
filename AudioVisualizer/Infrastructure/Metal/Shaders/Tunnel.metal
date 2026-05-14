@@ -20,8 +20,10 @@ struct TunnelUniforms {
     float nAng;          // angular checker cell count
     float nDep;          // depth checker cell count
     float direction;     // ±1 — flips scroll
+    float trebleL;       // smoothed treble of the left channel (0 for mono)
+    float trebleR;       // smoothed treble of the right channel (0 for mono)
+    float stereoBias;    // [-1, 1] L/R bass balance (0 for mono / centered)
     float _pad0;
-    float _pad1;
 };
 
 struct TVertexOut {
@@ -44,11 +46,14 @@ fragment float4 tunnel_fragment(TVertexOut in [[stage_in]],
     constexpr sampler s(filter::linear);
 
     // Aspect-correct fragment coord, then a slow audio-coupled camera roll.
+    // stereoBias adds a gentle steady lean toward the heavier bass side so
+    // the tunnel reads as panning with the music when the source is stereo.
     float2 p = in.uv;
     p.x *= u.aspect;
     float roll = u.time * 0.10
                + u.bass * 0.50 * sin(u.time * 0.30)
-               + 0.05 * sin(u.time * 0.70);
+               + 0.05 * sin(u.time * 0.70)
+               + u.stereoBias * 0.08;
     float cR = cos(roll), sR = sin(roll);
     p = float2(cR * p.x - sR * p.y, sR * p.x + cR * p.y);
 
@@ -59,12 +64,20 @@ fragment float4 tunnel_fragment(TVertexOut in [[stage_in]],
     float depthZ = u.depth / max(r, 1e-3);
     float scroll = u.time * u.direction * (0.35 + u.rms * 2.5);
 
+    // Per-side treble — cos(a) splits screen-left (≈ -1) from screen-right (≈ +1)
+    // so the hi-freq ripple modulates asymmetrically on a stereo source. With a
+    // mono source both halves of the mix are equal and this is a no-op.
+    float sideMask = 0.5 + 0.5 * cos(a);                              // 0 = left, 1 = right
+    float trebSide = mix(u.trebleL, u.trebleR, sideMask);
+    float trebMix  = max(u.treble, trebSide);                         // never below the mono treble
+
     // (u, v) cylinder coordinates with bass-driven depth-coupled twist.
     float angU = a / 3.14159265;
     float twistAmt = 0.40 + 1.20 * u.bass;
     float depthV = depthZ + scroll
-                 + u.treble * 0.04 * sin(a * 12.0 + u.time * 8.0);   // hi-freq ripple
-    angU += twistAmt * sin(depthV * 0.7);                            // spiral
+                 + trebMix * 0.04 * sin(a * 12.0 + u.time * 8.0);     // hi-freq ripple
+    // Spiral + a steady angular drift toward the heavier bass side.
+    angU += twistAmt * sin(depthV * 0.7) + u.stereoBias * 0.12;
 
     // Checkerboard in (u, v) — derivative-based AA via `fwidth(cell)`.
     float2 cell = float2(angU * u.nAng * 0.5, depthV * u.nDep);

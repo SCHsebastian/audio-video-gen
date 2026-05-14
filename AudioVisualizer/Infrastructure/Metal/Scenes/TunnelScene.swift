@@ -13,6 +13,11 @@ final class TunnelScene: VisualizerScene {
     private var rms: Float = 0
     private var bass: Float = 0
     private var treble: Float = 0
+    private var trebleL: Float = 0
+    private var trebleR: Float = 0
+    // Bass left/right balance, smoothed to [-1, 1]. -1 = bass on the left only,
+    // +1 = bass on the right only, 0 = centered or mono.
+    private var stereoBias: Float = 0
     private var beatEnv: Float = 0
     private var beatAge: Float = 1
     private var time: Float = 0
@@ -43,6 +48,25 @@ final class TunnelScene: VisualizerScene {
         bass   += (spectrum.bass   - bass)   * (1.0 - expf(-dt / 0.10))
         treble += (spectrum.treble - treble) * (1.0 - expf(-dt / 0.04))
 
+        // Per-side band reductions match the analyzer's 1/8, 1/2 split so trebleL/R
+        // and the bass-balance scalar read on the same scale as `bass` / `treble`.
+        let (lBass, lTreb) = Self.bassTreble(spectrum.leftBands)
+        let (rBass, rTreb) = Self.bassTreble(spectrum.rightBands)
+        let aTreb = 1.0 - expf(-dt / 0.04)
+        trebleL += (lTreb - trebleL) * aTreb
+        trebleR += (rTreb - trebleR) * aTreb
+
+        // Normalised L/R bass balance. Falls back to 0 when bands are absent (mono
+        // source) so the shader's stereoBias term contributes nothing.
+        let balanceTarget: Float
+        let denom = lBass + rBass
+        if denom > 1e-4 {
+            balanceTarget = max(-1, min(1, (rBass - lBass) / denom))
+        } else {
+            balanceTarget = 0
+        }
+        stereoBias += (balanceTarget - stereoBias) * (1.0 - expf(-dt / 0.20))
+
         if let b = beat {
             beatEnv = max(beatEnv, b.strength)
             beatAge = 0
@@ -50,6 +74,22 @@ final class TunnelScene: VisualizerScene {
             beatAge = min(1, beatAge + dt / 0.35)
         }
         beatEnv *= expf(-dt / 0.220)
+    }
+
+    /// Sub-band averages matching `VDSPSpectrumAnalyzer.subBandAverages` — bass is
+    /// the first 1/8 of bands, treble is the last 1/2. Empty input returns zero
+    /// pair, so a mono frame (no left/right bands) collapses to no stereo effect.
+    private static func bassTreble(_ bands: [Float]) -> (Float, Float) {
+        let n = bands.count
+        guard n > 0 else { return (0, 0) }
+        let bassEnd = max(1, n / 8)
+        let trebStart = max(bassEnd + 1, n / 2)
+        var bass: Float = 0, treb: Float = 0
+        for i in 0..<bassEnd     { bass += bands[i] }
+        for i in trebStart..<n   { treb += bands[i] }
+        bass /= Float(bassEnd)
+        treb /= Float(max(1, n - trebStart))
+        return (bass, treb)
     }
 
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {
@@ -66,7 +106,10 @@ final class TunnelScene: VisualizerScene {
                     nAng: nAng,
                     nDep: nDep,
                     direction: direction,
-                    _pad0: 0, _pad1: 0)
+                    trebleL: trebleL,
+                    trebleR: trebleR,
+                    stereoBias: stereoBias,
+                    _pad0: 0)
         enc.setFragmentBytes(&tu, length: MemoryLayout.size(ofValue: tu), index: 0)
         enc.setFragmentTexture(paletteTexture, index: 0)
         enc.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
@@ -93,7 +136,11 @@ final class TunnelScene: VisualizerScene {
         var nAng: Float
         var nDep: Float
         var direction: Float
+        // Stereo extension — mono source leaves these all at zero, which is the
+        // mathematical identity for the shader's stereo terms.
+        var trebleL: Float
+        var trebleR: Float
+        var stereoBias: Float
         var _pad0: Float
-        var _pad1: Float
     }
 }

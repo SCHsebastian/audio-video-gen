@@ -83,15 +83,20 @@ fragment float4 synth_fragment(SWOut in [[stage_in]],
     float horizonY = 0.05 + u.bass * 0.03;
 
     // Palette taps — every colour role driven by the user's chosen palette.
+    // The "hot" roles (neon, horizon, sun tip) slide upward along the palette on
+    // beats so the same palette pulses warmer on hits without us hardcoding any
+    // colour. Bass adds a small steady warmth bias to the halo/horizon.
+    float beatU = clamp(u.beat, 0.0, 1.0);
+    float bassU = clamp(u.bass, 0.0, 1.0);
     float3 colGround    = palette.sample(s, float2(0.00, 0.5)).rgb;
     float3 colSkyTop    = palette.sample(s, float2(0.12, 0.5)).rgb;
     float3 colBackEdge  = palette.sample(s, float2(0.22, 0.5)).rgb;
     float3 colSkyMid    = palette.sample(s, float2(0.35, 0.5)).rgb;
     float3 colMtFill    = palette.sample(s, float2(0.50, 0.5)).rgb;
-    float3 colNeon      = palette.sample(s, float2(0.65, 0.5)).rgb;
-    float3 colHorizon   = palette.sample(s, float2(0.78, 0.5)).rgb;
+    float3 colNeon      = palette.sample(s, float2(clamp(0.65 + beatU * 0.08, 0.0, 0.98), 0.5)).rgb;
+    float3 colHorizon   = palette.sample(s, float2(clamp(0.78 + beatU * 0.05 + bassU * 0.03, 0.0, 0.98), 0.5)).rgb;
     float3 colFrontEdge = palette.sample(s, float2(0.90, 0.5)).rgb;
-    float3 colSunHot    = palette.sample(s, float2(0.97, 0.5)).rgb;
+    float3 colSunHot    = palette.sample(s, float2(clamp(0.97 + beatU * 0.02, 0.0, 1.00), 0.5)).rgb;
 
     float3 col = colGround;
 
@@ -103,13 +108,16 @@ fragment float4 synth_fragment(SWOut in [[stage_in]],
         col = mix(col, colSkyMid, smoothstep(0.30, 0.65, t));
         col = mix(col, colSkyTop, smoothstep(0.65, 1.00, t));
 
-        // Sparse twinkling stars in the upper region only.
+        // Sparse twinkling stars in the upper region only. Tinted by the palette's
+        // hottest tap (with a tiny per-star palette wobble) so they sit inside the
+        // palette family rather than reading as pure white.
         if (t > 0.35) {
             float2 g = floor(ndc * float2(180.0, 90.0));
             float n = fract(sin(dot(g, float2(127.1, 311.7))) * 43758.5453);
             if (n > 0.997) {
                 float tw = 0.5 + 0.5 * sin(u.time * (n * 6.0) + n * 30.0);
-                col += float3(1.0) * tw * (t - 0.30) * 1.10;
+                float3 starTint = palette.sample(s, float2(0.85 + n * 0.12, 0.5)).rgb;
+                col += starTint * tw * (t - 0.30) * 1.20;
             }
         }
     }
