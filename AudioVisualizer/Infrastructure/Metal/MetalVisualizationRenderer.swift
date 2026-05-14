@@ -118,6 +118,34 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         return scene
     }
 
+    /// Build a single scene for a `kind` using a caller-supplied palette texture.
+    /// Exposed so the offline renderer can populate its own scene cache without
+    /// duplicating the eleven-way switch in this file.
+    static func buildScene(kind: SceneKind, device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws -> VisualizerScene {
+        let scene: VisualizerScene
+        switch kind {
+        case .bars:         scene = BarsScene()
+        case .scope:        scene = ScopeScene()
+        case .alchemy:      scene = AlchemyScene()
+        case .tunnel:       scene = TunnelScene()
+        case .lissajous:    scene = LissajousScene()
+        case .radial:       scene = RadialScene()
+        case .rings:        scene = RingsScene()
+        case .synthwave:    scene = SynthwaveScene()
+        case .spectrogram:  scene = SpectrogramScene()
+        case .milkdrop:     scene = MilkdropScene()
+        case .kaleidoscope: scene = KaleidoscopeScene()
+        }
+        try scene.build(device: device, library: library, paletteTexture: paletteTexture)
+        return scene
+    }
+
+    /// Build an offline video renderer that shares this renderer's device, queue,
+    /// and library but owns its own scene cache and `AVAssetWriter` session.
+    static func makeOfflineRenderer(device: MTLDevice, queue: MTLCommandQueue, library: MTLLibrary) -> AVOfflineVideoRenderer {
+        return AVOfflineVideoRenderer(device: device, queue: queue, library: library)
+    }
+
     /// Build (or fetch from cache) the scene for `kind`. Logs once on first
     /// build so a `log stream` clearly shows which scene a session touches.
     private func materialize(_ kind: SceneKind) -> VisualizerScene? {

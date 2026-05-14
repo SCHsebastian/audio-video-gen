@@ -20,6 +20,7 @@ struct VisualizerApp: App {
             Group {
                 if let root {
                     RootView(vm: root.viewModel,
+                             exportViewModel: root.exportViewModel,
                              renderer: root.renderer,
                              localizer: root.localizer,
                              requestPermission: {

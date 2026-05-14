@@ -9,6 +9,7 @@ final class CompositionRoot {
     let renderer: MetalVisualizationRenderer
     let permission: TCCAudioCapturePermission
     let localizer: BundleLocalizer
+    let exportViewModel: ExportViewModel
     /// Fan-out adapter. The capture pipeline writes audio frames into this
     /// bus, which broadcasts them to every registered renderer (primary +
     /// any secondary renderer the user spawns for split view).
@@ -57,6 +58,17 @@ final class CompositionRoot {
         self.device = renderer.deviceForSecondary
         self.queue = renderer.queueForSecondary
         self.library = renderer.libraryForSecondary
+
+        let decoder = AVAudioFileDecoder()
+        let exportAnalyzer = VDSPSpectrumAnalyzer(bandCount: 64, sampleRate: SampleRate(hz: 48_000))
+        let exportBeats = EnergyBeatDetector()
+        let offlineRenderer = MetalVisualizationRenderer.makeOfflineRenderer(
+            device: renderer.deviceForSecondary,
+            queue: renderer.queueForSecondary,
+            library: renderer.libraryForSecondary)
+        let exportUseCase = ExportVisualizationUseCase(
+            decoder: decoder, analyzer: exportAnalyzer, beats: exportBeats, renderer: offlineRenderer)
+        self.exportViewModel = ExportViewModel(useCase: exportUseCase, localizer: localizer)
     }
 
     /// Build a secondary renderer (for split view), pre-loaded with the

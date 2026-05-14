@@ -102,4 +102,23 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case languageSystem           = "language.system"
     case languageEnglish          = "language.english"
     case languageSpanish          = "language.spanish"
+
+    // Export
+    case exportButtonLabel        = "export.button.label"
+    case exportSheetTitle         = "export.sheet.title"
+    case exportAudioSourceSection = "export.section.audioSource"
+    case exportAudioSourceChoose  = "export.audioSource.choose"
+    case exportVisualsSection     = "export.section.visuals"
+    case exportVisualsScene       = "export.visuals.scene"
+    case exportVisualsPalette     = "export.visuals.palette"
+    case exportOutputSection      = "export.section.output"
+    case exportOutputResolution   = "export.output.resolution"
+    case exportOutputFps          = "export.output.fps"
+    case exportOutputLocation     = "export.output.location"
+    case exportStart              = "export.action.start"
+    case exportCancel             = "export.action.cancel"
+    case exportProgressInProgress = "export.progress.inProgress"
+    case exportProgressFinalizing = "export.progress.finalizing"
+    case exportProgressDoneReveal = "export.progress.doneReveal"
+    case exportProgressFailed     = "export.progress.failed"
 }

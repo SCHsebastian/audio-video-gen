@@ -4,6 +4,7 @@ import Domain
 
 struct RootView: View {
     @Bindable var vm: VisualizerViewModel
+    @Bindable var exportViewModel: ExportViewModel
     let renderer: MetalVisualizationRenderer
     @Bindable var localizer: BundleLocalizer
     let requestPermission: () async -> Void
@@ -89,6 +90,9 @@ struct RootView: View {
                 AboutView(localizer: localizer,
                           scrollToShortcuts: aboutScrollToShortcuts)
             }
+        }
+        .sheet(isPresented: $exportViewModel.isSheetPresented) {
+            ExportSheetView(vm: exportViewModel, localizer: localizer)
         }
         .onReceive(NotificationCenter.default.publisher(for: AppMenuNotification.showAbout)) { _ in
             aboutScrollToShortcuts = false
@@ -235,6 +239,24 @@ struct RootView: View {
             }
             .buttonStyle(.plain)
             .help(localizer.string(.paletteCycle))
+
+            Button {
+                exportViewModel.scene = vm.currentScene
+                exportViewModel.paletteName = vm.paletteName
+                exportViewModel.presentSheet()
+                nudgeToolbar()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "square.and.arrow.up")
+                    Text(localizer.string(.exportButtonLabel))
+                        .font(.caption.weight(.medium))
+                }
+                .foregroundStyle(.white.opacity(0.85))
+            }
+            .buttonStyle(.plain)
+            .help(localizer.string(.exportButtonLabel))
+
+            ExportProgressChip(vm: exportViewModel, localizer: localizer)
 
             Button {
                 toggleSplitView()

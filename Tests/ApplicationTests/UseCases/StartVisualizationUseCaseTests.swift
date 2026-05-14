@@ -36,6 +36,3 @@ final class StartVisualizationUseCaseTests: XCTestCase {
     }
 }
 
-final class FakeBeatDetecting: BeatDetecting, @unchecked Sendable {
-    func feed(_ spectrum: SpectrumFrame) -> BeatEvent? { nil }
-}

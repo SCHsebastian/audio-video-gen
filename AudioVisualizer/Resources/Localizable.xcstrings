@@ -690,6 +690,108 @@
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Snapshot failed" } },
         "es" : { "stringUnit" : { "state" : "translated", "value" : "Falló la captura" } }
       }
+    },
+    "export.action.cancel" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } }
+      }
+    },
+    "export.action.start" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Comenzar" } }
+      }
+    },
+    "export.audioSource.choose" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose audio file…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Elegir archivo de audio…" } }
+      }
+    },
+    "export.button.label" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Exportar…" } }
+      }
+    },
+    "export.output.fps" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Frame rate" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cuadros por segundo" } }
+      }
+    },
+    "export.output.location" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose output location…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Elegir ubicación de salida…" } }
+      }
+    },
+    "export.output.resolution" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Resolution" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Resolución" } }
+      }
+    },
+    "export.progress.doneReveal" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done · Reveal" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Listo · Mostrar" } }
+      }
+    },
+    "export.progress.failed" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export failed" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Falló la exportación" } }
+      }
+    },
+    "export.progress.finalizing" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Finalizing…" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Finalizando…" } }
+      }
+    },
+    "export.progress.inProgress" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Exporting" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Exportando" } }
+      }
+    },
+    "export.section.audioSource" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio source" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Fuente de audio" } }
+      }
+    },
+    "export.section.output" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Output" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Salida" } }
+      }
+    },
+    "export.section.visuals" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Visuals" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visuales" } }
+      }
+    },
+    "export.sheet.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export visualization" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Exportar visualización" } }
+      }
+    },
+    "export.visuals.palette" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Palette" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Paleta" } }
+      }
+    },
+    "export.visuals.scene" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scene" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Escena" } }
+      }
     }
   },
   "version" : "1.0"
