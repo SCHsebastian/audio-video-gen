@@ -117,6 +117,7 @@
 		F2DC6EA2A9237385B7512671 /* PingPongTextures.swift in Sources */ = {isa = PBXBuildFile; fileRef = D91935EFD871C6FDAC1D0769 /* PingPongTextures.swift */; };
 		F3A828B023E9036B941C9555 /* Milkdrop.metal in Sources */ = {isa = PBXBuildFile; fileRef = 964EFE3CF1CF12489A21124F /* Milkdrop.metal */; };
 		F4E423EA8C3A9BFC60E9FA6E /* SpeedSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054CEDD1B1CF79BF8E73FB61 /* SpeedSlider.swift */; };
+		F6B626F868ED1EBB84207F0D /* AIGameSceneSmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2706DA6FA319C77BB59918EC /* AIGameSceneSmokeTests.swift */; };
 		FE5D43FEB3CDC34C24B32DC1 /* CoreAudioTapCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = D42F3C4D5101AFC047FB9C67 /* CoreAudioTapCapture.swift */; };
 		FFB38984CF0FCFE22F434470 /* Milkdrop.metal in Sources */ = {isa = PBXBuildFile; fileRef = 964EFE3CF1CF12489A21124F /* Milkdrop.metal */; };
 		FFEE78CA3D545FAF887B76C1 /* Application in Frameworks */ = {isa = PBXBuildFile; productRef = 2A0BA6759B8D541765628417 /* Application */; };
@@ -143,6 +144,7 @@
 		1CCCA55E3F0BB3DAC4C98ADE /* TunnelScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelScene.swift; sourceTree = "<group>"; };
 		22E52450E429F24A59AF1CD8 /* audiovis-render */ = {isa = PBXFileReference; includeInIndex = 0; path = "audiovis-render"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2640C1355B4C74F25C877A4D /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		2706DA6FA319C77BB59918EC /* AIGameSceneSmokeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGameSceneSmokeTests.swift; sourceTree = "<group>"; };
 		27278EF1AECFD061183F26F5 /* MetalVisualizationRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalVisualizationRenderer.swift; sourceTree = "<group>"; };
 		281753387399B49B8FEFE387 /* SceneToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneToolbar.swift; sourceTree = "<group>"; };
 		2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Scope.metal; sourceTree = "<group>"; };
@@ -512,6 +514,7 @@
 		EE2A295646572E94C8AE0605 /* Smoke */ = {
 			isa = PBXGroup;
 			children = (
+				2706DA6FA319C77BB59918EC /* AIGameSceneSmokeTests.swift */,
 				4FB965E9116803E67E2A6371 /* SmokeTests.swift */,
 			);
 			path = Smoke;
@@ -757,6 +760,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6B626F868ED1EBB84207F0D /* AIGameSceneSmokeTests.swift in Sources */,
 				940A1B3F88FB84AD4547AF65 /* AVAudioFileDecoderTests.swift in Sources */,
 				F04FE2DDBD0789B5FB81BF05 /* AVOfflineVideoRendererTests.swift in Sources */,
 				0506A1BDA246E4925D46A6E8 /* BundleLocalizerTests.swift in Sources */,
