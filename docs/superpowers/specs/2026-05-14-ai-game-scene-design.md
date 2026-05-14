@@ -446,8 +446,339 @@ This is consistent with how other scenes interpret the preference.
 ## Out of scope (deferred)
 
 - Reward shaping / score curriculum.
-- Saving the best genome between sessions.
 - Multiple game modes.
 - Player input.
 - Variable population size in settings.
 - A 3D variant.
+
+---
+
+# Amendment 2026-05-14 — persistence + click events + seeded export
+
+Three additions on top of the original design (above). The base architecture
+holds; this section documents the deltas.
+
+## Goals (additive)
+
+1. **Persist learned AI state.** A user can save the current population's
+   genomes (with generation + best fitness) to disk and restore them later.
+2. **Random "world events" on click.** While the AI Game scene is active, a
+   canvas click (and the existing keyboard randomize shortcut) fires one of N
+   randomly-picked *events* that perturb the run, instead of doing a hard
+   reset. The hard reset still happens implicitly when you switch scenes
+   away and back.
+3. **Seeded exports.** When exporting a video of the AI Game scene, the user
+   may pick a previously-saved snapshot to seed the population so the AI
+   starts the export already-trained.
+
+## Locked decisions (additive)
+
+| Question | Choice |
+|---|---|
+| Save trigger | Manual button **+ silent auto-save every 5 generations** to a single rolling slot id `"auto"` |
+| Storage location | `Application Support/AudioVisualizer/AIGameProgress/<uuid>.json` (in-sandbox) |
+| Snapshot fields | `id (UUID)`, `label (String)`, `createdAt (Date)`, `generation (Int)`, `bestFitness (Float)`, `genomes ([Genome])`, `worldSeed (UInt64)` |
+| Default label | `"Gen N · yyyy-MM-dd HH:mm"` |
+| Click semantics in `.aigame` | Canvas tap **and** existing randomize shortcut → `triggerRandomEvent()` (never hard-reset) |
+| Hard reset | Implicit on scene re-build (switch away + back). No separate UI. |
+| Events (6) | `catastrophicMutation`, `cull`, `jumpBoost(5s)`, `earthquake`, `bonusObstacleWave`, `lineageSwap` |
+| Toast text | Localized event name (re-uses existing "randomize" toast surface) |
+| Export seed UI | "Starting AI" picker in the Export sheet, **shown only when the chosen scene == `.aigame`**. Default is "Random / fresh". |
+| Other scenes' click | Unchanged — they keep `randomize()` |
+
+## Persistence model
+
+### Domain
+
+```
+Sources/Domain/AIGame/
+  ValueObjects/
+    AIGameProgress.swift         // id, label, createdAt, generation, bestFitness, genomes, worldSeed
+  Ports/
+    AIGameProgressStoring.swift  // list / save / load / delete
+  Errors/
+    AIGameError.swift            // + .progressNotFound(UUID), .progressIOFailed(String)
+```
+
+```swift
+public struct AIGameProgress: Equatable, Sendable, Codable {
+    public let id: UUID
+    public let label: String
+    public let createdAt: Date
+    public let generation: Int
+    public let bestFitness: Float
+    public let genomes: [Genome]
+    public let worldSeed: UInt64
+}
+
+public protocol AIGameProgressStoring: Sendable {
+    func list() throws -> [AIGameProgress]
+    func save(_ progress: AIGameProgress) throws -> AIGameProgress
+    func load(id: UUID) throws -> AIGameProgress
+    func delete(id: UUID) throws
+}
+```
+
+`Genome` already conforms to `Equatable + Sendable`; we add `Codable` (its
+single `[Float]` field is already trivially codable).
+
+### Application
+
+```
+Sources/Application/UseCases/
+  SaveAIGameProgressUseCase.swift     // execute(label:, snapshotProvider:) -> AIGameProgress
+  ListAIGameProgressUseCase.swift     // execute() -> [AIGameProgress]
+  LoadAIGameProgressUseCase.swift     // execute(id:) -> AIGameProgress
+  DeleteAIGameProgressUseCase.swift   // execute(id:)
+```
+
+Each use case takes the `AIGameProgressStoring` port via constructor
+injection, exactly the same pattern as existing use cases.
+
+### Infrastructure
+
+```
+AudioVisualizer/Infrastructure/Persistence/
+  FileSystemAIGameProgressStore.swift
+```
+
+- Storage root: `FileManager.applicationSupportDirectory.appendingPathComponent("AudioVisualizer/AIGameProgress")`. Created on first use.
+- Format: one JSON file per snapshot named `<id>.json`, encoded with
+  `JSONEncoder` (default settings + `.iso8601` dates).
+- `list()` enumerates the directory, decodes each file, and **drops** any
+  file that fails to decode (with an `os.log` warning) so a corrupted file
+  doesn't crash the picker.
+- Thread-safety: all I/O goes through one `DispatchQueue` ("aigame.progress")
+  serial queue; the use cases call into it via `await`.
+
+### Domain extensions
+
+`Population` gains:
+
+```swift
+/// Build a snapshot of the current generation that can be persisted and
+/// later passed back into `init(restoring:source:)` to resume.
+public func snapshotProgress(label: String) -> AIGameProgress
+
+/// Construct a population from a saved snapshot. Honors the snapshot's
+/// `worldSeed` so the terrain feel is comparable; agents start at world
+/// origin with `generation` carried over and the loaded genomes installed.
+public init(restoring snapshot: AIGameProgress, source: RandomSource)
+```
+
+`AIGameScene` gains:
+
+```swift
+/// Pre-load the population from a saved snapshot. Must be called before the
+/// first `update(...)`; otherwise the call is a no-op (the live population
+/// is already running).
+func setSeedProgress(_ progress: AIGameProgress)
+
+/// Trigger one randomly-picked AIGameEvent. Returns the localized display
+/// label so the existing toast can show what happened.
+@discardableResult
+func triggerRandomEvent() -> String
+```
+
+## Random event roulette
+
+```swift
+public enum AIGameEvent: Equatable, Sendable, CaseIterable {
+    case catastrophicMutation     // every alive agent: mutate(rate=1.0, sigma=0.5)
+    case cull                     // half the alive agents die immediately
+    case jumpBoost                // jumpImpulse *= 1.5 for the next 5 sim-seconds
+    case earthquake               // re-seed terrain noise + clear all obstacles
+    case bonusObstacleWave        // spawn 3 obstacles in quick succession
+    case lineageSwap              // crossover every alive agent with the best dead one
+}
+
+public enum RandomEventRoulette {
+    public static func pick(using r: RandomSource) -> AIGameEvent {
+        let i = Int(r.nextUnit() * Float(AIGameEvent.allCases.count)) % AIGameEvent.allCases.count
+        return AIGameEvent.allCases[i]
+    }
+}
+```
+
+Application of an event mutates `Population` in-place via:
+
+```swift
+public func applyEvent(_ event: AIGameEvent, source: RandomSource)
+```
+
+Effects (in `Population`):
+
+| Event | Effect |
+|---|---|
+| `catastrophicMutation` | For each alive agent's genome: `mutate(rate: 1.0, sigma: 0.5)` and rebuild its `NeuralNetwork`. |
+| `cull` | Mark `floor(aliveCount / 2)` random alive agents `alive = false`. Their fitness is frozen at the death frame so the next evolution can still inherit from them. |
+| `jumpBoost` | Set `population.jumpBoostUntilSimTime = currentSimTime + 5.0`. `Agent.step` reads this multiplier and uses `jumpImpulse * 1.5` while active. (Plumbed via `AudioDrive`-adjacent struct `RuntimeOverrides`.) |
+| `earthquake` | `world.reseedTerrain()` (rotates `worldSeed`) and `world.obstacles.removeAll()`. `lastSpawnX = -.infinity`. |
+| `bonusObstacleWave` | Append 3 spike obstacles at `cameraX + 1.4`, `+1.7`, `+2.0` with `height = 0.25`. `lastSpawnX` updated to the last one. |
+| `lineageSwap` | Identify the highest-fitness dead agent (or, if none, the lowest-fitness alive agent); for every alive agent, replace its genome with `crossover(self, donor)` and rebuild the network. |
+
+Click → event flow:
+
+```
+RootView.onTapGesture
+  → vm.randomizeCurrent()
+    → renderer.randomizeCurrent()
+      → switch currentKind {
+          case .aigame: return aigameScene.triggerRandomEvent()  // returns localized event name
+          ... other scenes unchanged ...
+        }
+  → toast displays the returned label (existing UI, no change)
+```
+
+## Seeded export
+
+### Domain port extension
+
+`OfflineVideoRendering.begin(...)` gains an optional parameter:
+
+```swift
+func begin(output: URL, options: RenderOptions, scene: SceneKind,
+           palette: ColorPalette,
+           aiGameProgress: AIGameProgress? = nil) throws
+```
+
+(Default value preserves source-compatibility for non-AI-Game callers.)
+
+### Application use case
+
+`ExportVisualizationUseCase.execute(...)` gains:
+
+```swift
+public func execute(audio: URL,
+                    output: URL,
+                    scene: SceneKind,
+                    palette: ColorPalette,
+                    options: RenderOptions,
+                    aiGameProgress: AIGameProgress? = nil) -> AsyncStream<ExportState>
+```
+
+It passes `aiGameProgress` through to `renderer.begin(...)`. No other logic
+changes.
+
+### Infrastructure adapter
+
+`AVOfflineVideoRenderer.begin(...)`:
+
+1. Build the scene as today.
+2. **If `scene == .aigame` and `aiGameProgress != nil`**: down-cast the built
+   scene to `AIGameScene` and call `setSeedProgress(progress)` before the
+   first `consume`.
+3. Otherwise, behavior is unchanged.
+
+### Presentation
+
+`ExportViewModel`:
+
+- New `@Published var availableProgresses: [AIGameProgress] = []` populated
+  on sheet open via `ListAIGameProgressUseCase`.
+- New `@Published var selectedProgressID: UUID? = nil` (nil = "Random /
+  fresh").
+- Picker only renders when `selectedScene == .aigame`.
+
+`ExportSheetView`:
+
+- New section `"export.section.aiSeed"` (visible iff scene is `.aigame`)
+  containing a labelled `Picker` whose options are `["Random / fresh"] +
+  saved.map { $0.label }`.
+
+## Save/Load UI in the live preview
+
+A small toolbar group, shown only when `vm.currentScene == .aigame`:
+
+- **`Save AI`** button (label `aiGameSaveButton`). On click, calls
+  `vm.saveAIProgress()` which:
+  1. Asks the renderer for the live snapshot via
+     `aigameScene.population.snapshotProgress(label:)` (label auto-generated:
+     `"Gen \(N) · \(formattedDate)"`).
+  2. Calls `SaveAIGameProgressUseCase.execute`.
+  3. Surfaces the existing toast: "Saved · {label}".
+- **`Load AI`** menu (label `aiGameLoadMenu`) listing `availableProgresses`
+  by `label`. Selecting an entry calls `vm.loadAIProgress(id:)`, which:
+  1. Calls `LoadAIGameProgressUseCase.execute(id:)`.
+  2. Calls `aigameScene.setSeedProgress(progress)`. Because `setSeedProgress`
+     is a no-op when the scene is already running, **the load also calls
+     `aigameScene.rebuildPopulation()`** (new method that re-runs the same
+     init path used at scene-build time, this time honoring the seed).
+
+Auto-save: `Population.step(...)` fires `onGenerationDidIncrement` (new
+closure callback). `AIGameScene` subscribes; on every 5th increment it builds
+a snapshot with `label = "auto"` and writes it via
+`SaveAIGameProgressUseCase` (auto-save uses a fixed `id` so it overwrites in
+place). The save call is fire-and-forget; failures are logged, not surfaced.
+
+## Updated tests (deltas)
+
+Domain (additions):
+
+| Test | What it pins |
+|---|---|
+| `AIGameProgressTests.test_codable_round_trip` | JSON encode + decode preserves all fields |
+| `RandomEventRouletteTests.test_pick_returns_each_event_for_uniform_input` | Roulette is uniform over `[0,1)` |
+| `PopulationTests.test_snapshotProgress_round_trip_via_restoring_init` | snapshot → restore preserves genomes + generation |
+| `PopulationTests.test_apply_catastrophicMutation_changes_all_alive_genomes` | Mutation hits every alive agent |
+| `PopulationTests.test_apply_cull_kills_half_of_alive` | Cull math |
+| `PopulationTests.test_apply_jumpBoost_sets_window` | jumpBoostUntilSimTime is set |
+| `PopulationTests.test_apply_earthquake_clears_obstacles_and_reseeds_terrain` | Earthquake effect |
+| `PopulationTests.test_apply_bonusObstacleWave_appends_three` | Three obstacles spawned |
+| `PopulationTests.test_apply_lineageSwap_changes_alive_genomes_when_donor_exists` | Donor-driven crossover |
+| `PopulationTests.test_onGenerationDidIncrement_fires_after_evolution` | Callback fires |
+
+Infrastructure (additions):
+
+| Test | What it pins |
+|---|---|
+| `FileSystemAIGameProgressStoreTests.test_save_then_list_returns_one` | Round-trip on disk |
+| `FileSystemAIGameProgressStoreTests.test_corrupted_file_is_skipped_in_list` | Resilience |
+| `FileSystemAIGameProgressStoreTests.test_delete_removes_file` | Cleanup |
+| `AVOfflineVideoRendererTests.test_aigame_export_with_progress_seeds_population` | End-to-end seed honored |
+
+Application (additions):
+
+| Test | What it pins |
+|---|---|
+| `SaveAIGameProgressUseCaseTests.test_assigns_id_and_createdAt_when_missing` | UUID + timestamp generated |
+| `LoadAIGameProgressUseCaseTests.test_throws_when_id_unknown` | Maps store error to domain error |
+| `ExportVisualizationUseCaseTests.test_passes_aiGameProgress_through_to_renderer` | Plumbing |
+
+## L10n keys (additions)
+
+```
+toolbar.scene.aigame                  // already in original spec
+toolbar.aigame.save                   // "Save AI"     / "Guardar IA"
+toolbar.aigame.loadMenu               // "Load AI ▾"   / "Cargar IA ▾"
+toolbar.aigame.loadMenu.empty         // "(no saved progress yet)"  / "(sin progreso guardado)"
+overlay.aigame.saved                  // "Saved · %@"  / "Guardado · %@"
+overlay.aigame.loaded                 // "Loaded · %@" / "Cargado · %@"
+
+aigame.event.catastrophicMutation     // "Catastrophic mutation!" / "¡Mutación catastrófica!"
+aigame.event.cull                     // "Cull!"          / "¡Purga!"
+aigame.event.jumpBoost                // "Jump boost!"    / "¡Salto turbo!"
+aigame.event.earthquake               // "Earthquake!"    / "¡Terremoto!"
+aigame.event.bonusObstacleWave        // "Obstacle wave!" / "¡Oleada de obstáculos!"
+aigame.event.lineageSwap              // "Lineage swap!"  / "¡Cambio de linaje!"
+
+export.section.aiSeed                 // "Starting AI"    / "IA inicial"
+export.aiSeed.fresh                   // "Random / fresh" / "Aleatoria / desde cero"
+```
+
+## Open risks (additions)
+
+1. **Schema drift across versions.** A v2 build that adds NN inputs will
+   read an old snapshot's genomes with the wrong length. Mitigation: stamp
+   `AIGameProgress` with `genomeLength` on save; on load, throw
+   `AIGameError.invalidGenomeLength` if it doesn't match the current
+   `Genome.expectedLength`. UI surfaces a non-fatal error in the picker.
+2. **Sandbox container path drift between debug + release.** Both build
+   configurations land in the same per-app container, so this is a
+   non-issue today; documented here so a future `RELEASE_PRODUCT_BUNDLE_IDENTIFIER`
+   change isn't a surprise.
+3. **Auto-save under heavy generation churn.** If a scene burns through 5
+   generations in <1 s (unlikely but possible with very harsh events), the
+   fire-and-forget save can queue up. Mitigation: the serial dispatch queue
+   in `FileSystemAIGameProgressStore` naturally serialises; we simply accept
+   a slightly stale "auto" slot.
