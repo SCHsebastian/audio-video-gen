@@ -1,6 +1,8 @@
 import Metal
 import simd
+import Foundation
 import Domain
+import Application
 
 /// Side-scrolling runner with 6 ≤10-neuron agents evolving in real time inside
 /// a music-shaped procedural world. Holds a `Domain.Population` (pure Swift)
@@ -21,6 +23,14 @@ final class AIGameScene: VisualizerScene {
     private var agentBuffer: MTLBuffer!
 
     private(set) var population: Population!
+    /// Injected by the renderer so generation milestones can persist a rolling
+    /// snapshot to the fixed auto-save slot. Optional so unit tests can build
+    /// the scene without the use case.
+    var autoSaveUC: SaveAIGameProgressUseCase?
+    /// Stable sentinel UUID for the silent auto-save slot. Hex-only so the
+    /// `UUID(uuidString:)` parser accepts it; each auto-save overwrites the
+    /// previous one in this single rolling slot.
+    private let autoSaveSlotID = UUID(uuidString: "00000000-0000-0000-0000-A1170547EA1D")!
     private var simTime: Float = 0
     private var beatEnv: Float = 0
     private var bass: Float = 0
@@ -52,10 +62,44 @@ final class AIGameScene: VisualizerScene {
         }
         population = Population(restoring: snap, source: SystemRandomSource())
         lastSnapshot = population.snapshot()
+        installAutoSaveHook()
         #if DEBUG
         lastSeedProgressForTesting = snap
         #endif
         pendingSeedProgress = nil
+    }
+
+    /// Re-attach the every-5-generation auto-save callback to whatever the
+    /// current `population` instance is. Called after both fresh build and
+    /// snapshot-restoring replacements so loading a saved slot mid-session
+    /// keeps auto-save active.
+    private func installAutoSaveHook() {
+        population.onGenerationDidIncrement = { [weak self] gen in
+            guard let self else { return }
+            guard gen % 5 == 0 else { return }
+            self.performAutoSave(generation: gen)
+        }
+    }
+
+    private func performAutoSave(generation: Int) {
+        guard let uc = autoSaveUC else { return }
+        // Reuse Population's snapshotProgress for genomes/worldSeed/genomeLength,
+        // then re-stamp with the fixed sentinel ID + "auto" label so each save
+        // overwrites the prior one in the rolling slot.
+        let live = population.snapshotProgress(label: "auto")
+        let snap = AIGameProgress(
+            id: autoSaveSlotID,
+            label: "auto",
+            createdAt: Date(),
+            generation: generation,
+            bestFitness: population.snapshot().bestFitness,
+            genomes: live.genomes,
+            worldSeed: live.worldSeed,
+            genomeLength: Genome.expectedLength
+        )
+        DispatchQueue.global(qos: .utility).async {
+            _ = try? uc.execute(progress: snap)
+        }
     }
 
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws {
@@ -88,6 +132,7 @@ final class AIGameScene: VisualizerScene {
         population = Population(size: Self.populationSize, seed: seed,
                                 source: SystemRandomSource())
         lastSnapshot = population.snapshot()
+        installAutoSaveHook()
         applyPendingSeedIfAny()
     }
 

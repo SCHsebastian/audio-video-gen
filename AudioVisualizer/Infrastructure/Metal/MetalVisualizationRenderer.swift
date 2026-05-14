@@ -1,6 +1,7 @@
 import Metal
 import MetalKit
 import Domain
+import Application
 import os.lock
 import os.log
 
@@ -30,6 +31,11 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
 
     // Snapshot request: drained on the next draw.
     private var snapshotHandler: ((CGImage?) -> Void)?
+
+    /// Injected by the CompositionRoot. Each freshly-built AIGameScene picks
+    /// this up via the `.aigame` builder closure so generation milestones can
+    /// silently persist a rolling snapshot.
+    var aigameAutoSaveUC: SaveAIGameProgressUseCase?
 
     private let stateLock = OSAllocatedUnfairLock(initialState: State())
     private struct State {
@@ -83,7 +89,11 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         r.sceneBuilders[.spectrogram]  = { [weak r] in try Self.build(SpectrogramScene(),  with: r, d: d, lib: lib) }
         r.sceneBuilders[.milkdrop]     = { [weak r] in try Self.build(MilkdropScene(),     with: r, d: d, lib: lib) }
         r.sceneBuilders[.kaleidoscope] = { [weak r] in try Self.build(KaleidoscopeScene(), with: r, d: d, lib: lib) }
-        r.sceneBuilders[.aigame] = { [weak r] in try Self.build(AIGameScene(), with: r, d: d, lib: lib) }
+        r.sceneBuilders[.aigame] = { [weak r] in
+            let s = AIGameScene()
+            s.autoSaveUC = r?.aigameAutoSaveUC
+            return try Self.build(s, with: r, d: d, lib: lib)
+        }
         return r
     }
 
@@ -110,7 +120,11 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         renderer.sceneBuilders[.spectrogram]  = { [weak renderer] in try Self.build(SpectrogramScene(),  with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.milkdrop]     = { [weak renderer] in try Self.build(MilkdropScene(),     with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.kaleidoscope] = { [weak renderer] in try Self.build(KaleidoscopeScene(), with: renderer, d: d, lib: lib) }
-        renderer.sceneBuilders[.aigame] = { [weak renderer] in try Self.build(AIGameScene(), with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.aigame] = { [weak renderer] in
+            let s = AIGameScene()
+            s.autoSaveUC = renderer?.aigameAutoSaveUC
+            return try Self.build(s, with: renderer, d: d, lib: lib)
+        }
         return renderer
     }
 

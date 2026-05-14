@@ -52,6 +52,11 @@ final class CompositionRoot {
         let loadAIProgress = LoadAIGameProgressUseCase(store: aigameStore)
         let _ = DeleteAIGameProgressUseCase(store: aigameStore)
 
+        // Inject the auto-save use case so each freshly-built AIGameScene
+        // (built lazily by the renderer's `.aigame` builder closure) gets it
+        // without the scene needing to know about the CompositionRoot.
+        renderer.aigameAutoSaveUC = saveAIProgress
+
         self.viewModel = VisualizerViewModel(
             changeScene: change,
             start: start, stop: stop,
