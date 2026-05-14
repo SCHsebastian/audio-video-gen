@@ -14,6 +14,12 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case sceneMilkdrop            = "toolbar.scene.milkdrop"
     case sceneKaleidoscope        = "toolbar.scene.kaleidoscope"
     case sceneAIGame              = "toolbar.scene.aigame"
+    case aigameEventCatastrophicMutation = "aigame.event.catastrophicMutation"
+    case aigameEventCull                  = "aigame.event.cull"
+    case aigameEventJumpBoost             = "aigame.event.jumpBoost"
+    case aigameEventEarthquake            = "aigame.event.earthquake"
+    case aigameEventBonusObstacleWave     = "aigame.event.bonusObstacleWave"
+    case aigameEventLineageSwap           = "aigame.event.lineageSwap"
     case splitViewToggle          = "toolbar.splitView.toggle"
 
     // Settings — scene ordering & shuffle

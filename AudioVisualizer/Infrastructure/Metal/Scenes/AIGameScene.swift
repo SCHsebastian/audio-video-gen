@@ -78,7 +78,29 @@ final class AIGameScene: VisualizerScene {
     }
 
     func randomize() {
-        population.randomize()
+        // Click / shortcut path: trigger a random event instead of resetting.
+        _ = triggerRandomEvent()
+    }
+
+    /// Pick a random event, apply it to the live population, and return a
+    /// **L10nKey rawValue** the caller can localize for the existing toast.
+    @discardableResult
+    func triggerRandomEvent() -> String {
+        let r = SystemRandomSource()
+        let event = RandomEventRoulette.pick(using: r)
+        population.applyEvent(event, source: r)
+        return Self.l10nKey(for: event)
+    }
+
+    private static func l10nKey(for e: AIGameEvent) -> String {
+        switch e {
+        case .catastrophicMutation: return "aigame.event.catastrophicMutation"
+        case .cull:                  return "aigame.event.cull"
+        case .jumpBoost:             return "aigame.event.jumpBoost"
+        case .earthquake:            return "aigame.event.earthquake"
+        case .bonusObstacleWave:     return "aigame.event.bonusObstacleWave"
+        case .lineageSwap:           return "aigame.event.lineageSwap"
+        }
     }
 
     func encode(into enc: MTLRenderCommandEncoder, uniforms: inout SceneUniforms) {

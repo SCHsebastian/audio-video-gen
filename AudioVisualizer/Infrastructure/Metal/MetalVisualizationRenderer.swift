@@ -240,7 +240,9 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         case .rings:     (materialize(.rings)  as? RingsScene)?.randomize();  return "Rings"
         case .milkdrop:  (materialize(.milkdrop) as? MilkdropScene)?.randomize(); return "Milkdrop"
         case .kaleidoscope: (materialize(.kaleidoscope) as? KaleidoscopeScene)?.randomize(); return "Kaleidoscope"
-        case .aigame:    (materialize(.aigame) as? AIGameScene)?.randomize();    return "AI Game"
+        case .aigame:
+            let key = (materialize(.aigame) as? AIGameScene)?.triggerRandomEvent() ?? "AI Game"
+            return key
         case .scope, .synthwave, .spectrogram: return nil
         }
     }

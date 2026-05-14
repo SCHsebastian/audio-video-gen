@@ -1586,6 +1586,102 @@
           }
         }
       }
+    },
+    "aigame.event.catastrophicMutation": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Catastrophic mutation!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¡Mutación catastrófica!"
+          }
+        }
+      }
+    },
+    "aigame.event.cull": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cull!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¡Purga!"
+          }
+        }
+      }
+    },
+    "aigame.event.jumpBoost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jump boost!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¡Salto turbo!"
+          }
+        }
+      }
+    },
+    "aigame.event.earthquake": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Earthquake!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¡Terremoto!"
+          }
+        }
+      }
+    },
+    "aigame.event.bonusObstacleWave": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obstacle wave!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¡Oleada de obstáculos!"
+          }
+        }
+      }
+    },
+    "aigame.event.lineageSwap": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lineage swap!"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¡Cambio de linaje!"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

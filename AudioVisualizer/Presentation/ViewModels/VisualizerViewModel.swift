@@ -85,8 +85,14 @@ final class VisualizerViewModel {
     private var clearLabelTask: Task<Void, Never>? = nil
 
     func randomizeCurrent() {
-        if let label = renderer.randomizeCurrent() {
-            lastRandomizedLabel = label
+        if let labelOrKey = renderer.randomizeCurrent() {
+            // For the AI Game scene the value is an L10nKey rawValue; for the
+            // others it is already a display name. Try L10nKey first.
+            if let key = L10nKey(rawValue: labelOrKey) {
+                lastRandomizedLabel = localizer.string(key)
+            } else {
+                lastRandomizedLabel = labelOrKey
+            }
             clearLabelTask?.cancel()
             clearLabelTask = Task { @MainActor in
                 try? await Task.sleep(for: .milliseconds(1200))
