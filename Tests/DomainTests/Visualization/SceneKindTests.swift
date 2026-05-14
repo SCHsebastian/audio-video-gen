@@ -10,6 +10,6 @@ final class SceneKindTests: XCTestCase {
     func test_all_scenes_present() {
         XCTAssertEqual(Set(SceneKind.allCases),
                        [.bars, .scope, .alchemy, .tunnel, .lissajous, .radial, .rings,
-                        .synthwave, .spectrogram, .milkdrop, .kaleidoscope])
+                        .synthwave, .spectrogram, .milkdrop, .kaleidoscope, .aigame])
     }
 }
