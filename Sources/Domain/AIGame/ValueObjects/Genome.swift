@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Genome: Equatable, Sendable {
+public struct Genome: Equatable, Sendable, Codable {
     public static let inputCount  = 4
     public static let hiddenCount = 6
     public static let outputCount = 2
