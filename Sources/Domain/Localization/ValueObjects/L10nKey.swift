@@ -13,6 +13,7 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case sceneSpectrogram         = "toolbar.scene.spectrogram"
     case sceneMilkdrop            = "toolbar.scene.milkdrop"
     case sceneKaleidoscope        = "toolbar.scene.kaleidoscope"
+    case sceneAIGame              = "toolbar.scene.aigame"
     case splitViewToggle          = "toolbar.splitView.toggle"
 
     // Settings — scene ordering & shuffle

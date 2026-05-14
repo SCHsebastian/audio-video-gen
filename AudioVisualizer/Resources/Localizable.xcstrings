@@ -1,798 +1,1592 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "Failed to start: %@" : {
-
-    },
-    "language.english" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "English"
+  "sourceLanguage": "en",
+  "strings": {
+    "Failed to start: %@": {},
+    "language.english": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inglés"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inglés"
           }
         }
       }
     },
-    "language.spanish" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Spanish"
+    "language.spanish": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spanish"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Español"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Español"
           }
         }
       }
     },
-    "language.system" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "System default"
+    "language.system": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System default"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Predeterminado del sistema"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Predeterminado del sistema"
           }
         }
       }
     },
-    "overlay.errorPrefix" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error: "
+    "overlay.errorPrefix": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error: "
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Error: "
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error: "
           }
         }
       }
     },
-    "overlay.waitingForAudio" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Waiting for audio…"
+    "overlay.waitingForAudio": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for audio…"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esperando audio…"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando audio…"
           }
         }
       }
     },
-    "permission.grant" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grant Audio Capture access"
+    "permission.grant": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grant Audio Capture access"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conceder acceso de captura de audio"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conceder acceso de captura de audio"
           }
         }
       }
     },
-    "permission.openSettings" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open System Settings → Privacy → Audio Capture"
+    "permission.openSettings": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open System Settings → Privacy → Audio Capture"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Abrir Ajustes del Sistema → Privacidad → Captura de audio"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes del Sistema → Privacidad → Captura de audio"
           }
         }
       }
     },
-    "permission.title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Audio Visualizer needs permission to listen to system audio."
+    "permission.title": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio Visualizer needs permission to listen to system audio."
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El Visualizador de Audio necesita permiso para escuchar el audio del sistema."
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Visualizador de Audio necesita permiso para escuchar el audio del sistema."
           }
         }
       }
     },
-    "settings.close" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
+    "settings.close": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Listo"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listo"
           }
         }
       }
     },
-    "settings.language.label" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language"
+    "settings.language.label": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Idioma"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma"
           }
         }
       }
     },
-    "settings.title" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
+    "settings.title": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajustes"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes"
           }
         }
       }
     },
-    "toolbar.scene.alchemy" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alchemy"
+    "toolbar.scene.alchemy": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alchemy"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alquimia"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alquimia"
           }
         }
       }
     },
-    "toolbar.scene.bars" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bars"
+    "toolbar.scene.bars": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bars"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Barras"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barras"
           }
         }
       }
     },
-    "toolbar.scene.tunnel" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tunnel"
+    "toolbar.scene.tunnel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tunnel"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Túnel"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Túnel"
           }
         }
       }
     },
-    "toolbar.scene.lissajous" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Lissajous" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Lissajous" } }
-      }
-    },
-    "toolbar.scene.radial" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Radial" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Radial" } }
-      }
-    },
-    "toolbar.scene.rings" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rings" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Anillos" } }
-      }
-    },
-    "toolbar.scene.synthwave" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Synthwave" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Synthwave" } }
-      }
-    },
-    "toolbar.scene.spectrogram" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Spectrogram" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Espectrograma" } }
-      }
-    },
-    "toolbar.scene.milkdrop" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Milkdrop" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Milkdrop" } }
-      }
-    },
-    "toolbar.scene.kaleidoscope" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Kaleidoscope" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Caleidoscopio" } }
-      }
-    },
-    "settings.sceneOrder.section" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scene order" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Orden de escenas" } }
-      }
-    },
-    "settings.sceneOrder.hint" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Drag to reorder. This controls the segmented toolbar order, ←/→ cycle, and shuffle mode." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Arrastrá para reordenar. Define el orden en la barra, el ciclo con ←/→ y el modo aleatorio." } }
-      }
-    },
-    "settings.shuffle.enabled" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Shuffle scenes automatically" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar escenas automáticamente" } }
-      }
-    },
-    "settings.shuffle.hint" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Auto-advance through the scene order on a timer." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Avanza por el orden de escenas en un temporizador." } }
-      }
-    },
-    "settings.shuffle.interval" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Change every" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cambiar cada" } }
-      }
-    },
-    "settings.shuffle.minutes" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "min" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "min" } }
-      }
-    },
-    "overlay.shuffleSwitched" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "shuffle" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "aleatorio" } }
-      }
-    },
-    "toolbar.splitView.toggle" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Toggle split view (V)" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Alternar vista dividida (V)" } }
-      }
-    },
-    "toolbar.palette.cycle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cycle color palette (P)"
+    "toolbar.scene.lissajous": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lissajous"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cambiar paleta de colores (P)"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lissajous"
           }
         }
       }
     },
-    "toolbar.speed.label" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visualization speed"
+    "toolbar.scene.radial": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Radial"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Velocidad de la visualización"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Radial"
           }
         }
       }
     },
-    "toolbar.scene.scope" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scope"
+    "toolbar.scene.rings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rings"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Osciloscopio"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anillos"
           }
         }
       }
     },
-    "toolbar.settings.button" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
+    "toolbar.scene.synthwave": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synthwave"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ajustes"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synthwave"
           }
         }
       }
     },
-    "toolbar.source.label" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Source"
+    "toolbar.scene.spectrogram": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spectrogram"
           }
         },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fuente"
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espectrograma"
           }
         }
       }
     },
-    "toolbar.source.systemWide" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "All system audio" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Todo el audio del sistema" } }
+    "toolbar.scene.milkdrop": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Milkdrop"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Milkdrop"
+          }
+        }
       }
     },
-    "toolbar.help.button" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Help & About (?)" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ayuda y acerca de (?)" } }
+    "toolbar.scene.kaleidoscope": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaleidoscope"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caleidoscopio"
+          }
+        }
       }
     },
-    "overlay.randomized" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "randomized" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "aleatorizado" } }
+    "settings.sceneOrder.section": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scene order"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orden de escenas"
+          }
+        }
       }
     },
-    "settings.tab.general" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "General" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "General" } }
+    "settings.sceneOrder.hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag to reorder. This controls the segmented toolbar order, ←/→ cycle, and shuffle mode."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrastrá para reordenar. Define el orden en la barra, el ciclo con ←/→ y el modo aleatorio."
+          }
+        }
       }
     },
-    "settings.tab.visuals" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Visuals" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visuales" } }
+    "settings.shuffle.enabled": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shuffle scenes automatically"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar escenas automáticamente"
+          }
+        }
       }
     },
-    "settings.tab.audio" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Audio" } }
+    "settings.shuffle.hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-advance through the scene order on a timer."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avanza por el orden de escenas en un temporizador."
+          }
+        }
       }
     },
-    "settings.tab.help" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "About" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Acerca de" } }
+    "settings.shuffle.interval": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change every"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar cada"
+          }
+        }
       }
     },
-    "settings.reduceMotion" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reduce motion" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Reducir movimiento" } }
+    "settings.shuffle.minutes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "min"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "min"
+          }
+        }
       }
     },
-    "settings.reduceMotion.hint" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Softens ambient glow and beat flashes." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Suaviza el resplandor ambiental y los destellos del ritmo." } }
+    "overlay.shuffleSwitched": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "shuffle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aleatorio"
+          }
+        }
       }
     },
-    "settings.showDiagnostics" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Show diagnostics HUD" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Mostrar HUD de diagnóstico" } }
+    "toolbar.splitView.toggle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toggle split view (V)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternar vista dividida (V)"
+          }
+        }
       }
     },
-    "settings.showDiagnostics.hint" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Live FPS, RMS, beat strength and scene info. Toggle with ⌘D." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "FPS, RMS, intensidad de ritmo y escena en vivo. Alterna con ⌘D." } }
+    "toolbar.palette.cycle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle color palette (P)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar paleta de colores (P)"
+          }
+        }
       }
     },
-    "settings.palette.section" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Color palette" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Paleta de colores" } }
+    "toolbar.speed.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualization speed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velocidad de la visualización"
+          }
+        }
       }
     },
-    "settings.defaultScene.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Default scene" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Escena predeterminada" } }
+    "toolbar.scene.scope": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scope"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osciloscopio"
+          }
+        }
       }
     },
-    "settings.speed.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Animation speed" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Velocidad de animación" } }
+    "toolbar.settings.button": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes"
+          }
+        }
       }
     },
-    "settings.fps.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Frame rate cap" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Límite de FPS" } }
+    "toolbar.source.label": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuente"
+          }
+        }
       }
     },
-    "settings.fps.hint" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Lower caps save battery and GPU; higher feels smoother on ProMotion displays." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Límites más bajos ahorran batería y GPU; más altos se sienten más suaves en pantallas ProMotion." } }
+    "toolbar.source.systemWide": {
+      "extractionState": "stale",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All system audio"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo el audio del sistema"
+          }
+        }
       }
     },
-    "settings.fps.unlimited" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Unlimited (display max)" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sin límite (máx. de la pantalla)" } }
+    "toolbar.help.button": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help & About (?)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayuda y acerca de (?)"
+          }
+        }
       }
     },
-    "settings.audioGain.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio gain" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ganancia de audio" } }
+    "overlay.randomized": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "randomized"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aleatorizado"
+          }
+        }
       }
     },
-    "settings.audioGain.hint" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Boost visual response without changing playback volume." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Aumenta la respuesta visual sin cambiar el volumen." } }
+    "settings.tab.general": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        }
       }
     },
-    "settings.beatSensitivity.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Beat sensitivity" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sensibilidad al ritmo" } }
+    "settings.tab.visuals": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visuals"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visuales"
+          }
+        }
       }
     },
-    "settings.beatSensitivity.hint" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "How strongly beats brighten the scene and trigger ambient flashes." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Qué tanto los ritmos iluminan la escena y disparan destellos." } }
+    "settings.tab.audio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio"
+          }
+        }
       }
     },
-    "settings.reset" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Reset to defaults" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Restablecer valores" } }
+    "settings.tab.help": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acerca de"
+          }
+        }
       }
     },
-    "about.title" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio Visualizer" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visualizador de audio" } }
+    "settings.reduceMotion": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reduce motion"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reducir movimiento"
+          }
+        }
       }
     },
-    "about.tagline" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Windows XP–era visualizations, rebuilt for macOS with Core Audio Taps and Metal." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visualizaciones al estilo Windows XP, reconstruidas para macOS con Core Audio Taps y Metal." } }
+    "settings.reduceMotion.hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Softens ambient glow and beat flashes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suaviza el resplandor ambiental y los destellos del ritmo."
+          }
+        }
       }
     },
-    "about.author.header" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Author" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Autor" } }
+    "settings.showDiagnostics": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show diagnostics HUD"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar HUD de diagnóstico"
+          }
+        }
       }
     },
-    "about.author.body" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Sebastián Cardona Henao — software engineer building generative audio/video tools on macOS. This app started as a study of Core Audio Taps (macOS 14.2+) and grew into a full clean-architecture Metal visualizer with five scenes, six palettes, and bilingual UI." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Sebastián Cardona Henao — ingeniero de software que construye herramientas generativas de audio/video en macOS. Esta app empezó como un estudio de Core Audio Taps (macOS 14.2+) y creció hasta ser un visualizador Metal con cinco escenas, seis paletas e interfaz bilingüe." } }
+    "settings.showDiagnostics.hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live FPS, RMS, beat strength and scene info. Toggle with ⌘D."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FPS, RMS, intensidad de ritmo y escena en vivo. Alterna con ⌘D."
+          }
+        }
       }
     },
-    "about.assistant.header" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Built with Claude" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Construido con Claude" } }
+    "settings.palette.section": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Color palette"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paleta de colores"
+          }
+        }
       }
     },
-    "about.assistant.body" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Pair-programmed end-to-end with Claude (Anthropic). Highlights: real-time Core Audio Tap capture on the IO thread, lock-free TPCircularBuffer, vDSP spectrum analysis with energy-based beat detection, and a five-scene Metal renderer (Bars, Scope, Alchemy compute particles, Tunnel, Lissajous). Clean Architecture with strict Domain/Application purity, TDD-shaped plans under docs/superpowers/, and an @Observable bilingual localization layer." } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Programado en pareja de principio a fin con Claude (Anthropic). Lo destacado: captura Core Audio Tap en tiempo real en el hilo de IO, buffer circular sin bloqueos TPCircularBuffer, análisis de espectro vDSP con detección de ritmo basada en energía, y un renderizador Metal con cinco escenas (Barras, Osciloscopio, Alquimia con partículas de cómputo, Túnel, Lissajous). Clean Architecture con dominio puro, planes TDD en docs/superpowers/ y localización @Observable bilingüe." } }
+    "settings.defaultScene.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Default scene"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escena predeterminada"
+          }
+        }
       }
     },
-    "about.shortcuts.header" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Keyboard shortcuts" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Atajos de teclado" } }
+    "settings.speed.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Animation speed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velocidad de animación"
+          }
+        }
       }
     },
-    "about.shortcut.scenes" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "1–5  ·  Switch scene (Bars, Scope, Alchemy, Tunnel, Lissajous)" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "1–5  ·  Cambiar escena (Barras, Osciloscopio, Alquimia, Túnel, Lissajous)" } }
+    "settings.fps.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frame rate cap"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Límite de FPS"
+          }
+        }
       }
     },
-    "about.shortcut.cycle" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "← / →  ·  Previous / next scene" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "← / →  ·  Escena anterior / siguiente" } }
+    "settings.fps.hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lower caps save battery and GPU; higher feels smoother on ProMotion displays."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Límites más bajos ahorran batería y GPU; más altos se sienten más suaves en pantallas ProMotion."
+          }
+        }
       }
     },
-    "about.shortcut.space" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Space (or click)  ·  Randomize current scene" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Espacio (o clic)  ·  Aleatorizar la escena actual" } }
+    "settings.fps.unlimited": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlimited (display max)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sin límite (máx. de la pantalla)"
+          }
+        }
       }
     },
-    "about.shortcut.palette" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "P  ·  Cycle color palette" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "P  ·  Cambiar paleta de colores" } }
+    "settings.audioGain.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio gain"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ganancia de audio"
+          }
+        }
       }
     },
-    "about.shortcut.paletteRandom" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "⇧P  ·  Random palette" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "⇧P  ·  Paleta aleatoria" } }
+    "settings.audioGain.hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boost visual response without changing playback volume."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumenta la respuesta visual sin cambiar el volumen."
+          }
+        }
       }
     },
-    "about.shortcut.snapshot" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "⌘S  ·  Save snapshot to Desktop" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "⌘S  ·  Guardar captura en el Escritorio" } }
+    "settings.beatSensitivity.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beat sensitivity"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sensibilidad al ritmo"
+          }
+        }
       }
     },
-    "about.shortcut.fullscreen" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "F (or ⌃⌘F)  ·  Toggle fullscreen" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "F (o ⌃⌘F)  ·  Alternar pantalla completa" } }
+    "settings.beatSensitivity.hint": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How strongly beats brighten the scene and trigger ambient flashes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qué tanto los ritmos iluminan la escena y disparan destellos."
+          }
+        }
       }
     },
-    "about.shortcut.diagnostics" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "⌘D  ·  Toggle diagnostics HUD" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "⌘D  ·  Alternar HUD de diagnóstico" } }
+    "settings.reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset to defaults"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restablecer valores"
+          }
+        }
       }
     },
-    "about.shortcut.help" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "?  ·  Show this help sheet" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "?  ·  Mostrar esta ayuda" } }
+    "about.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio Visualizer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizador de audio"
+          }
+        }
       }
     },
-    "about.version" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Version" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Versión" } }
+    "about.tagline": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Windows XP–era visualizations, rebuilt for macOS with Core Audio Taps and Metal."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizaciones al estilo Windows XP, reconstruidas para macOS con Core Audio Taps y Metal."
+          }
+        }
       }
     },
-    "hud.fps" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "FPS" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "FPS" } }
+    "about.author.header": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Author"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autor"
+          }
+        }
       }
     },
-    "hud.rms" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "RMS" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "RMS" } }
+    "about.author.body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sebastián Cardona Henao — software engineer building generative audio/video tools on macOS. This app started as a study of Core Audio Taps (macOS 14.2+) and grew into a full clean-architecture Metal visualizer with five scenes, six palettes, and bilingual UI."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sebastián Cardona Henao — ingeniero de software que construye herramientas generativas de audio/video en macOS. Esta app empezó como un estudio de Core Audio Taps (macOS 14.2+) y creció hasta ser un visualizador Metal con cinco escenas, seis paletas e interfaz bilingüe."
+          }
+        }
       }
     },
-    "hud.beat" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Beat" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Ritmo" } }
+    "about.assistant.header": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Built with Claude"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Construido con Claude"
+          }
+        }
       }
     },
-    "hud.scene" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scene" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Escena" } }
+    "about.assistant.body": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pair-programmed end-to-end with Claude (Anthropic). Highlights: real-time Core Audio Tap capture on the IO thread, lock-free TPCircularBuffer, vDSP spectrum analysis with energy-based beat detection, and a five-scene Metal renderer (Bars, Scope, Alchemy compute particles, Tunnel, Lissajous). Clean Architecture with strict Domain/Application purity, TDD-shaped plans under docs/superpowers/, and an @Observable bilingual localization layer."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programado en pareja de principio a fin con Claude (Anthropic). Lo destacado: captura Core Audio Tap en tiempo real en el hilo de IO, buffer circular sin bloqueos TPCircularBuffer, análisis de espectro vDSP con detección de ritmo basada en energía, y un renderizador Metal con cinco escenas (Barras, Osciloscopio, Alquimia con partículas de cómputo, Túnel, Lissajous). Clean Architecture con dominio puro, planes TDD en docs/superpowers/ y localización @Observable bilingüe."
+          }
+        }
       }
     },
-    "hud.palette" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Palette" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Paleta" } }
+    "about.shortcuts.header": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keyboard shortcuts"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atajos de teclado"
+          }
+        }
       }
     },
-    "snapshot.saved" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Snapshot saved to Desktop" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Captura guardada en el Escritorio" } }
+    "about.shortcut.scenes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1–5  ·  Switch scene (Bars, Scope, Alchemy, Tunnel, Lissajous)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1–5  ·  Cambiar escena (Barras, Osciloscopio, Alquimia, Túnel, Lissajous)"
+          }
+        }
       }
     },
-    "snapshot.failed" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Snapshot failed" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Falló la captura" } }
+    "about.shortcut.cycle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "← / →  ·  Previous / next scene"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "← / →  ·  Escena anterior / siguiente"
+          }
+        }
       }
     },
-    "export.action.cancel" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cancelar" } }
+    "about.shortcut.space": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Space (or click)  ·  Randomize current scene"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espacio (o clic)  ·  Aleatorizar la escena actual"
+          }
+        }
       }
     },
-    "export.action.start" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Start" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Comenzar" } }
+    "about.shortcut.palette": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P  ·  Cycle color palette"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "P  ·  Cambiar paleta de colores"
+          }
+        }
       }
     },
-    "export.audioSource.choose" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose audio file…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Elegir archivo de audio…" } }
+    "about.shortcut.paletteRandom": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧P  ·  Random palette"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⇧P  ·  Paleta aleatoria"
+          }
+        }
       }
     },
-    "export.button.label" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Exportar…" } }
+    "about.shortcut.snapshot": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘S  ·  Save snapshot to Desktop"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘S  ·  Guardar captura en el Escritorio"
+          }
+        }
       }
     },
-    "export.output.fps" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Frame rate" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Cuadros por segundo" } }
+    "about.shortcut.fullscreen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "F (or ⌃⌘F)  ·  Toggle fullscreen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "F (o ⌃⌘F)  ·  Alternar pantalla completa"
+          }
+        }
       }
     },
-    "export.output.location" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose output location…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Elegir ubicación de salida…" } }
+    "about.shortcut.diagnostics": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘D  ·  Toggle diagnostics HUD"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘D  ·  Alternar HUD de diagnóstico"
+          }
+        }
       }
     },
-    "export.output.resolution" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Resolution" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Resolución" } }
+    "about.shortcut.help": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "?  ·  Show this help sheet"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "?  ·  Mostrar esta ayuda"
+          }
+        }
       }
     },
-    "export.progress.doneReveal" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done · Reveal" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Listo · Mostrar" } }
+    "about.version": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versión"
+          }
+        }
       }
     },
-    "export.progress.failed" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export failed" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Falló la exportación" } }
+    "hud.fps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FPS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FPS"
+          }
+        }
       }
     },
-    "export.progress.finalizing" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Finalizing…" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Finalizando…" } }
+    "hud.rms": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RMS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RMS"
+          }
+        }
       }
     },
-    "export.progress.inProgress" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Exporting" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Exportando" } }
+    "hud.beat": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beat"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ritmo"
+          }
+        }
       }
     },
-    "export.section.audioSource" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Audio source" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Fuente de audio" } }
+    "hud.scene": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scene"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escena"
+          }
+        }
       }
     },
-    "export.section.output" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Output" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Salida" } }
+    "hud.palette": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palette"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paleta"
+          }
+        }
       }
     },
-    "export.section.visuals" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Visuals" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Visuales" } }
+    "snapshot.saved": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snapshot saved to Desktop"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Captura guardada en el Escritorio"
+          }
+        }
       }
     },
-    "export.sheet.title" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export visualization" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Exportar visualización" } }
+    "snapshot.failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Snapshot failed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falló la captura"
+          }
+        }
       }
     },
-    "export.visuals.palette" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Palette" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Paleta" } }
+    "export.action.cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
+          }
+        }
       }
     },
-    "export.visuals.scene" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Scene" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "Escena" } }
+    "export.action.start": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comenzar"
+          }
+        }
+      }
+    },
+    "export.audioSource.choose": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose audio file…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elegir archivo de audio…"
+          }
+        }
+      }
+    },
+    "export.button.label": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportar…"
+          }
+        }
+      }
+    },
+    "export.output.fps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frame rate"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuadros por segundo"
+          }
+        }
+      }
+    },
+    "export.output.location": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose output location…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elegir ubicación de salida…"
+          }
+        }
+      }
+    },
+    "export.output.resolution": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resolution"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resolución"
+          }
+        }
+      }
+    },
+    "export.progress.doneReveal": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done · Reveal"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listo · Mostrar"
+          }
+        }
+      }
+    },
+    "export.progress.failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export failed"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falló la exportación"
+          }
+        }
+      }
+    },
+    "export.progress.finalizing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finalizing…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finalizando…"
+          }
+        }
+      }
+    },
+    "export.progress.inProgress": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exporting"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportando"
+          }
+        }
+      }
+    },
+    "export.section.audioSource": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio source"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuente de audio"
+          }
+        }
+      }
+    },
+    "export.section.output": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salida"
+          }
+        }
+      }
+    },
+    "export.section.visuals": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visuals"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visuales"
+          }
+        }
+      }
+    },
+    "export.sheet.title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export visualization"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exportar visualización"
+          }
+        }
+      }
+    },
+    "export.visuals.palette": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palette"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paleta"
+          }
+        }
+      }
+    },
+    "export.visuals.scene": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scene"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escena"
+          }
+        }
+      }
+    },
+    "toolbar.scene.aigame": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AI Game"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juego IA"
+          }
+        }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
