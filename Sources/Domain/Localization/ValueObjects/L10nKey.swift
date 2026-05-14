@@ -128,4 +128,6 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case exportProgressFinalizing = "export.progress.finalizing"
     case exportProgressDoneReveal = "export.progress.doneReveal"
     case exportProgressFailed     = "export.progress.failed"
+    case exportSectionAISeed      = "export.section.aiSeed"
+    case exportAISeedFresh        = "export.aiSeed.fresh"
 }

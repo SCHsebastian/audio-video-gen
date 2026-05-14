@@ -1682,6 +1682,38 @@
           }
         }
       }
+    },
+    "export.section.aiSeed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting AI"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IA inicial"
+          }
+        }
+      }
+    },
+    "export.aiSeed.fresh": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Random / fresh"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aleatoria / desde cero"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -68,7 +68,21 @@ final class CompositionRoot {
             library: renderer.libraryForSecondary)
         let exportUseCase = ExportVisualizationUseCase(
             decoder: decoder, analyzer: exportAnalyzer, beats: exportBeats, renderer: offlineRenderer)
-        self.exportViewModel = ExportViewModel(useCase: exportUseCase, localizer: localizer)
+
+        // AI Game progress store — single instance backs both the live
+        // VisualizerViewModel (Phase 9 will wire save/delete) and the
+        // ExportViewModel (list/load for the seed picker today).
+        let aigameStore = FileSystemAIGameProgressStore()
+        _ = SaveAIGameProgressUseCase(store: aigameStore)
+        let listAIProgress = ListAIGameProgressUseCase(store: aigameStore)
+        let loadAIProgress = LoadAIGameProgressUseCase(store: aigameStore)
+        _ = DeleteAIGameProgressUseCase(store: aigameStore)
+
+        self.exportViewModel = ExportViewModel(
+            useCase: exportUseCase,
+            localizer: localizer,
+            listProgresses: listAIProgress,
+            loadProgress: loadAIProgress)
     }
 
     /// Build a secondary renderer (for split view), pre-loaded with the

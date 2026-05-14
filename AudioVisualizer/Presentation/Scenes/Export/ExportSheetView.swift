@@ -47,6 +47,21 @@ struct ExportSheetView: View {
                     .pickerStyle(.menu)
                 }
 
+                if vm.scene == .aigame {
+                    Section(localizer.string(.exportSectionAISeed)) {
+                        Picker(selection: $vm.selectedProgressID) {
+                            Text(localizer.string(.exportAISeedFresh))
+                                .tag(UUID?.none)
+                            ForEach(vm.availableProgresses, id: \.id) { p in
+                                Text(p.label).tag(UUID?.some(p.id))
+                            }
+                        } label: {
+                            Text(localizer.string(.exportSectionAISeed))
+                        }
+                        .pickerStyle(.menu)
+                    }
+                }
+
                 Section(localizer.string(.exportOutputSection)) {
                     Picker(localizer.string(.exportOutputResolution),
                            selection: $vm.resolution) {
@@ -93,6 +108,7 @@ struct ExportSheetView: View {
         }
         .padding(20)
         .frame(width: 480)
+        .onAppear { vm.reloadAvailableProgresses() }
     }
 
     private func chooseAudioFile() {
