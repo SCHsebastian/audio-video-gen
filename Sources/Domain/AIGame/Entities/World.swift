@@ -115,6 +115,26 @@ public final class World {
     }
 
     fileprivate func spawnIfBeat(_ audio: AudioDrive) {
-        // Implemented in Task 2.2.
+        guard audio.beatTriggered else { return }
+
+        let spawnP: Float = max(0, min(0.85, 0.35 + 0.4 * audio.mid))
+        if source.nextUnit() >= spawnP { return }
+
+        let bpmForSpacing = audio.bpm > 0 ? audio.bpm : 60
+        let minSpacing = max(Float(0.8), 60.0 / max(bpmForSpacing, 60))
+        if cameraX + 1.4 - lastSpawnX < minSpacing { return }
+
+        let kind: ObstacleKind = {
+            if audio.treble > 0.55 && audio.flux > 0.4 { return .ceiling }
+            if audio.bass > 0.5 { return .pit }
+            return .spike
+        }()
+        let height: Float = 0.18 + 0.32 * audio.flux
+        let width: Float = {
+            switch kind { case .spike: return 0.12; case .ceiling: return 0.40; case .pit: return 0.45 }
+        }()
+        let spawnX = cameraX + 1.4
+        obstacles.append(Obstacle(xStart: spawnX, width: width, height: height, kind: kind))
+        lastSpawnX = spawnX
     }
 }
