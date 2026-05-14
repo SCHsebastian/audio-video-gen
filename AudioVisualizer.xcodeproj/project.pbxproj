@@ -51,6 +51,7 @@
 		4D5571514430D0E18DC04B12 /* RingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BD4350024811F6CAF800549 /* RingBuffer.swift */; };
 		51295BF6E67EC5B93F63B305 /* MetalCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7EF2518C9DE9AAE618476A0 /* MetalCanvas.swift */; };
 		51C85BEE2231D0FF266EF913 /* AlchemyParticles.metal in Sources */ = {isa = PBXBuildFile; fileRef = AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */; };
+		51CF05084478CF1413C47149 /* FileSystemAIGameProgressStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB157DC9503B98D01C1D4C47 /* FileSystemAIGameProgressStoreTests.swift */; };
 		53646F1B3FE86356AC47B1E5 /* Kaleidoscope.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5C3A2EAD959F591A13EF43B3 /* Kaleidoscope.metal */; };
 		546A8B74AFB831F013BDBFE9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A693DF52CB2769B94E01BD74 /* SettingsView.swift */; };
 		54C96732B516CE769682F073 /* TPCircularBuffer in Frameworks */ = {isa = PBXBuildFile; productRef = 6541EA25DA0B99BAF8789D1B /* TPCircularBuffer */; };
@@ -81,6 +82,7 @@
 		940A1B3F88FB84AD4547AF65 /* AVAudioFileDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6EBEFDE7246AC1AB6C2FD2 /* AVAudioFileDecoderTests.swift */; };
 		9A64FC7DCEA767098B80FF52 /* Radial.metal in Sources */ = {isa = PBXBuildFile; fileRef = 42D1036DBED480B1C1314B4B /* Radial.metal */; };
 		9BF0A749A42F5F345B5A5744 /* Kaleidoscope.metal in Sources */ = {isa = PBXBuildFile; fileRef = 5C3A2EAD959F591A13EF43B3 /* Kaleidoscope.metal */; };
+		9BF16B7E7F0C16ADE356CE16 /* FileSystemAIGameProgressStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D1217C1584FAF663099FBE1 /* FileSystemAIGameProgressStore.swift */; };
 		9C40F8461358CF856CA5238E /* KaleidoscopeScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBC1625348C2D5F027A335DF /* KaleidoscopeScene.swift */; };
 		9E54725BEEB5F2EB248EC52B /* ExportSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56BF00B4311CF1533E3A4166 /* ExportSheetView.swift */; };
 		9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */; };
@@ -148,6 +150,7 @@
 		27278EF1AECFD061183F26F5 /* MetalVisualizationRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalVisualizationRenderer.swift; sourceTree = "<group>"; };
 		281753387399B49B8FEFE387 /* SceneToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneToolbar.swift; sourceTree = "<group>"; };
 		2A9B09BE2CB58C4B46BDD5F8 /* Scope.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Scope.metal; sourceTree = "<group>"; };
+		2D1217C1584FAF663099FBE1 /* FileSystemAIGameProgressStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemAIGameProgressStore.swift; sourceTree = "<group>"; };
 		2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferencesTests.swift; sourceTree = "<group>"; };
 		3252C032DFB3A9BD39318D61 /* VisualizerScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualizerScene.swift; sourceTree = "<group>"; };
 		4272C3F4212C49A23281F643 /* AudioVisualizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AudioVisualizer.entitlements; sourceTree = "<group>"; };
@@ -210,6 +213,7 @@
 		F75F8A3548BB5D0D36D382F4 /* LissajousScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LissajousScene.swift; sourceTree = "<group>"; };
 		F7F29A8475A18296EBA0CBDF /* AVAudioFileDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVAudioFileDecoder.swift; sourceTree = "<group>"; };
 		F9B3F03FAAD7299C32274CFA /* AudioVisualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AudioVisualizerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB157DC9503B98D01C1D4C47 /* FileSystemAIGameProgressStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemAIGameProgressStoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -441,6 +445,7 @@
 		BC36BD45045DA0243540DC00 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
+				2D1217C1584FAF663099FBE1 /* FileSystemAIGameProgressStore.swift */,
 				079CB4007E545A8FDB63A533 /* UserDefaultsPreferences.swift */,
 			);
 			path = Persistence;
@@ -464,6 +469,7 @@
 				C5D45FC7EB9415FD61D94BB4 /* AVOfflineVideoRendererTests.swift */,
 				DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */,
 				5FB715B895A4A1887E86A5DB /* EnergyBeatDetectorTests.swift */,
+				FB157DC9503B98D01C1D4C47 /* FileSystemAIGameProgressStoreTests.swift */,
 				B6D519804C8C3DD254FD9B32 /* RunningApplicationsDiscoveryTests.swift */,
 				2DDBCB53194EBCA359DCED28 /* UserDefaultsPreferencesTests.swift */,
 				47830BB5EB67565ECDB10B8A /* VDSPSpectrumAnalyzerTests.swift */,
@@ -715,6 +721,7 @@
 				5AC9AE7283D29CDC079DD805 /* ExportProgressChip.swift in Sources */,
 				9E54725BEEB5F2EB248EC52B /* ExportSheetView.swift in Sources */,
 				65F7BA9337480BEDF0EF9E2B /* ExportViewModel.swift in Sources */,
+				9BF16B7E7F0C16ADE356CE16 /* FileSystemAIGameProgressStore.swift in Sources */,
 				9BF0A749A42F5F345B5A5744 /* Kaleidoscope.metal in Sources */,
 				9C40F8461358CF856CA5238E /* KaleidoscopeScene.swift in Sources */,
 				E3DBD43A7314963896335142 /* Lissajous.metal in Sources */,
@@ -765,6 +772,7 @@
 				F04FE2DDBD0789B5FB81BF05 /* AVOfflineVideoRendererTests.swift in Sources */,
 				0506A1BDA246E4925D46A6E8 /* BundleLocalizerTests.swift in Sources */,
 				DD730EF261B7CBB5BDCDF42C /* EnergyBeatDetectorTests.swift in Sources */,
+				51CF05084478CF1413C47149 /* FileSystemAIGameProgressStoreTests.swift in Sources */,
 				42E2C620A618EC40CF48A1DD /* RunningApplicationsDiscoveryTests.swift in Sources */,
 				8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */,
 				9F3C9097E965C12491F7E477 /* UserDefaultsPreferencesTests.swift in Sources */,
