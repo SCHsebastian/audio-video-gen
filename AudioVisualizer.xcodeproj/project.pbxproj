@@ -75,6 +75,7 @@
 		81D3E428750CD2E6DFAEF06B /* CompositionRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7531C1C10C4294CC4EBFE9F /* CompositionRoot.swift */; };
 		8691A03CE3647051B86CAA42 /* AlchemyParticles.metal in Sources */ = {isa = PBXBuildFile; fileRef = AC8F44C34B47B7B12BE0C8B5 /* AlchemyParticles.metal */; };
 		8B4DB9DD92BB315DB033D865 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FB965E9116803E67E2A6371 /* SmokeTests.swift */; };
+		8B61A79C3E1F984DAAE86146 /* AIGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E786D6D89EC3AC4EC89620E0 /* AIGameScene.swift */; };
 		8D71F31D08D725098E95C22E /* PaletteTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 881865058AC789F7F65FA676 /* PaletteTexture.swift */; };
 		8EB8D004AECF9A936028CC8B /* Spectrogram.metal in Sources */ = {isa = PBXBuildFile; fileRef = F6EA0DBE9C60674B4F1F3FC3 /* Spectrogram.metal */; };
 		940A1B3F88FB84AD4547AF65 /* AVAudioFileDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6EBEFDE7246AC1AB6C2FD2 /* AVAudioFileDecoderTests.swift */; };
@@ -100,6 +101,7 @@
 		BF0D59E270EB9FAEA26C9EDE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7BCB1CCD72A80E75A623AEA /* Assets.xcassets */; };
 		CCD58907E94B757E4A9A6B4A /* AIGame.metal in Sources */ = {isa = PBXBuildFile; fileRef = D639DBE410AFE568DF011AB2 /* AIGame.metal */; };
 		CF89B31678B4FDA335617C56 /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03E0DD61CB8364D25CED809 /* AboutView.swift */; };
+		D64686E344C9357B6562D500 /* AIGameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = E786D6D89EC3AC4EC89620E0 /* AIGameScene.swift */; };
 		D677B1ECAE09C8AEFECF2AC2 /* Radial.metal in Sources */ = {isa = PBXBuildFile; fileRef = 42D1036DBED480B1C1314B4B /* Radial.metal */; };
 		D6817663EEDC6248B46F4A7D /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B04A780DEAC34244E71F08F1 /* Domain */; };
 		D9520693C42C2AE7391E7E85 /* VisualizerKernels in Frameworks */ = {isa = PBXBuildFile; productRef = F198029B36B21E4C6906260D /* VisualizerKernels */; };
@@ -196,6 +198,7 @@
 		DD6EBEFDE7246AC1AB6C2FD2 /* AVAudioFileDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVAudioFileDecoderTests.swift; sourceTree = "<group>"; };
 		DEA2D5EA539253F098F73900 /* BundleLocalizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundleLocalizerTests.swift; sourceTree = "<group>"; };
 		E55688D8CBF43EC77CA8F3C9 /* ScopeScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScopeScene.swift; sourceTree = "<group>"; };
+		E786D6D89EC3AC4EC89620E0 /* AIGameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIGameScene.swift; sourceTree = "<group>"; };
 		E7BCB1CCD72A80E75A623AEA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EA1A56682300E3400874BE4F /* RingsScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingsScene.swift; sourceTree = "<group>"; };
 		EC128BC985BCBC8C18B2FC94 /* MetalDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalDevice.swift; sourceTree = "<group>"; };
@@ -372,6 +375,7 @@
 		A6E633D6CCFADDF55DAF262D /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				E786D6D89EC3AC4EC89620E0 /* AIGameScene.swift */,
 				8B8DB9B24B697D4F6A7C19DE /* AlchemyScene.swift */,
 				BEDD2639B1779651F9867675 /* BarsScene.swift */,
 				BBC1625348C2D5F027A335DF /* KaleidoscopeScene.swift */,
@@ -647,6 +651,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CCD58907E94B757E4A9A6B4A /* AIGame.metal in Sources */,
+				D64686E344C9357B6562D500 /* AIGameScene.swift in Sources */,
 				2B1D4F192E99CB49E573C8F8 /* AVAudioFileDecoder.swift in Sources */,
 				6418534B8D6DC2883B37D8D8 /* AVOfflineVideoRenderer.swift in Sources */,
 				51C85BEE2231D0FF266EF913 /* AlchemyParticles.metal in Sources */,
@@ -689,6 +694,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				19013F5F4077236B20343C0F /* AIGame.metal in Sources */,
+				8B61A79C3E1F984DAAE86146 /* AIGameScene.swift in Sources */,
 				67872E10D3C59BE770067824 /* AVAudioFileDecoder.swift in Sources */,
 				232D079EEF84457C57CAD5E0 /* AVOfflineVideoRenderer.swift in Sources */,
 				CF89B31678B4FDA335617C56 /* AboutView.swift in Sources */,
