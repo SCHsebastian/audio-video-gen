@@ -42,4 +42,36 @@ final class PopulationTests: XCTestCase {
         XCTAssertEqual(p.snapshot().generation, 1)
         XCTAssertEqual(p.snapshot().aliveCount, 6)
     }
+
+    func test_snapshotProgress_carries_generation_and_genome_length() {
+        let p = Population(size: 6, seed: 1, source: rng())
+        let snap = p.snapshotProgress(label: "x")
+        XCTAssertEqual(snap.generation, 1)
+        XCTAssertEqual(snap.genomes.count, 6)
+        XCTAssertEqual(snap.genomeLength, Genome.expectedLength)
+        XCTAssertEqual(snap.label, "x")
+    }
+
+    func test_snapshotProgress_round_trip_via_restoring_init() {
+        let p = Population(size: 6, seed: 1, source: rng())
+        // Force a couple of evolution rounds so generation > 1.
+        for _ in 0..<3 {
+            p.killAllForTesting()
+            _ = p.step(dt: 1.0/60.0, audio: .silence)
+        }
+        let snap = p.snapshotProgress(label: "trained")
+        let restored = Population(restoring: snap, source: rng())
+        let s = restored.snapshot()
+        XCTAssertEqual(s.generation, snap.generation)
+        XCTAssertEqual(s.aliveCount, 6)
+    }
+
+    func test_onGenerationDidIncrement_fires_after_evolution() {
+        let p = Population(size: 6, seed: 1, source: rng())
+        var gens: [Int] = []
+        p.onGenerationDidIncrement = { gens.append($0) }
+        p.killAllForTesting()
+        _ = p.step(dt: 1.0/60.0, audio: .silence)
+        XCTAssertEqual(gens, [2])
+    }
 }

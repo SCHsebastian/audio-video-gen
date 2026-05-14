@@ -3,7 +3,7 @@ import Foundation
 public final class Population {
     public let size: Int
     private let source: RandomSource
-    private let worldSeed: UInt64
+    public private(set) var worldSeed: UInt64
 
     private var world: World
     private var genomes: [Genome]
@@ -12,6 +12,8 @@ public final class Population {
     private var jumpLatches: [Bool]
     private(set) public var generation: Int = 1
     private var bestFitness: Float = 0
+
+    public var onGenerationDidIncrement: ((Int) -> Void)?
 
     public init(size: Int, seed: UInt64, source: RandomSource) {
         self.size = size
@@ -23,6 +25,22 @@ public final class Population {
         self.agents = []
         self.jumpLatches = []
         seedFreshGenomes()
+    }
+
+    public convenience init(restoring snapshot: AIGameProgress,
+                            source: RandomSource) {
+        precondition(snapshot.genomes.count > 0)
+        self.init(size: snapshot.genomes.count,
+                  seed: snapshot.worldSeed,
+                  source: source)
+        self.genomes = snapshot.genomes
+        self.networks = snapshot.genomes.map { try! NeuralNetwork(genome: $0) }
+        self.agents = (0..<snapshot.genomes.count).map { i in
+            AgentState.spawn(colorSeed: Float(i) / Float(snapshot.genomes.count))
+        }
+        self.jumpLatches = Array(repeating: false, count: snapshot.genomes.count)
+        self.generation = snapshot.generation
+        self.bestFitness = snapshot.bestFitness
     }
 
     public func step(dt: Float, audio: AudioDrive) -> PopulationSnapshot {
@@ -43,6 +61,15 @@ public final class Population {
             agents: agents, obstacles: world.obstacles,
             terrainSamples: world.terrainSamples(), cameraX: world.cameraX,
             generation: generation, bestFitness: bestFitness, aliveCount: alive
+        )
+    }
+
+    public func snapshotProgress(label: String) -> AIGameProgress {
+        AIGameProgress(
+            id: UUID(), label: label, createdAt: Date(),
+            generation: generation, bestFitness: bestFitness,
+            genomes: genomes, worldSeed: worldSeed,
+            genomeLength: Genome.expectedLength
         )
     }
 
@@ -90,5 +117,6 @@ public final class Population {
         }
         jumpLatches = Array(repeating: false, count: size)
         generation += 1
+        onGenerationDidIncrement?(generation)
     }
 }
