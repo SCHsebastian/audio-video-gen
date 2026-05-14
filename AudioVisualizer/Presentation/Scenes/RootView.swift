@@ -258,6 +258,44 @@ struct RootView: View {
 
             ExportProgressChip(vm: exportViewModel, localizer: localizer)
 
+            if vm.currentScene == .aigame {
+                Button {
+                    vm.saveAIProgress(); nudgeToolbar()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "square.and.arrow.down")
+                        Text(localizer.string(.toolbarAIGameSave))
+                            .font(.caption.weight(.medium))
+                    }
+                    .foregroundStyle(.white.opacity(0.85))
+                }
+                .buttonStyle(.plain)
+                .help(localizer.string(.toolbarAIGameSave))
+
+                Menu {
+                    if vm.savedAIProgresses.isEmpty {
+                        Text(localizer.string(.toolbarAIGameLoadEmpty))
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(vm.savedAIProgresses, id: \.id) { p in
+                            Button(p.label) { vm.loadAIProgress(id: p.id); nudgeToolbar() }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "tray.and.arrow.up")
+                        Text(localizer.string(.toolbarAIGameLoadMenu))
+                            .font(.caption.weight(.medium))
+                    }
+                    .foregroundStyle(.white.opacity(0.85))
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
+                .help(localizer.string(.toolbarAIGameLoadMenu))
+                .onAppear { vm.reloadAIProgresses() }
+            }
+
             Button {
                 toggleSplitView()
                 nudgeToolbar()
