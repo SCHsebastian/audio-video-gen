@@ -83,6 +83,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         r.sceneBuilders[.spectrogram]  = { [weak r] in try Self.build(SpectrogramScene(),  with: r, d: d, lib: lib) }
         r.sceneBuilders[.milkdrop]     = { [weak r] in try Self.build(MilkdropScene(),     with: r, d: d, lib: lib) }
         r.sceneBuilders[.kaleidoscope] = { [weak r] in try Self.build(KaleidoscopeScene(), with: r, d: d, lib: lib) }
+        r.sceneBuilders[.aigame] = { [weak r] in try Self.build(AIGameScene(), with: r, d: d, lib: lib) }
         return r
     }
 
@@ -109,6 +110,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         renderer.sceneBuilders[.spectrogram]  = { [weak renderer] in try Self.build(SpectrogramScene(),  with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.milkdrop]     = { [weak renderer] in try Self.build(MilkdropScene(),     with: renderer, d: d, lib: lib) }
         renderer.sceneBuilders[.kaleidoscope] = { [weak renderer] in try Self.build(KaleidoscopeScene(), with: renderer, d: d, lib: lib) }
+        renderer.sceneBuilders[.aigame] = { [weak renderer] in try Self.build(AIGameScene(), with: renderer, d: d, lib: lib) }
         return renderer
     }
 
@@ -135,6 +137,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         case .spectrogram:  scene = SpectrogramScene()
         case .milkdrop:     scene = MilkdropScene()
         case .kaleidoscope: scene = KaleidoscopeScene()
+        case .aigame:       scene = AIGameScene()
         }
         try scene.build(device: device, library: library, paletteTexture: paletteTexture)
         return scene
@@ -237,6 +240,7 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         case .rings:     (materialize(.rings)  as? RingsScene)?.randomize();  return "Rings"
         case .milkdrop:  (materialize(.milkdrop) as? MilkdropScene)?.randomize(); return "Milkdrop"
         case .kaleidoscope: (materialize(.kaleidoscope) as? KaleidoscopeScene)?.randomize(); return "Kaleidoscope"
+        case .aigame:    (materialize(.aigame) as? AIGameScene)?.randomize();    return "AI Game"
         case .scope, .synthwave, .spectrogram: return nil
         }
     }

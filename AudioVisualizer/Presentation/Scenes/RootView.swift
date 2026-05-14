@@ -365,6 +365,7 @@ struct RootView: View {
         case .spectrogram: return localizer.string(.sceneSpectrogram)
         case .milkdrop: return localizer.string(.sceneMilkdrop)
         case .kaleidoscope: return localizer.string(.sceneKaleidoscope)
+        case .aigame: return localizer.string(.sceneAIGame)
         }
     }
 

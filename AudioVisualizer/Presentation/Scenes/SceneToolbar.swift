@@ -55,6 +55,7 @@ struct SceneToolbar: View {
         case .spectrogram: return localizer.string(.sceneSpectrogram)
         case .milkdrop: return localizer.string(.sceneMilkdrop)
         case .kaleidoscope: return localizer.string(.sceneKaleidoscope)
+        case .aigame: return localizer.string(.sceneAIGame)
         }
     }
 
@@ -72,6 +73,7 @@ struct SceneToolbar: View {
         case .spectrogram: return "rectangle.split.3x3"
         case .milkdrop: return "cloud.fill"
         case .kaleidoscope: return "snowflake"
+        case .aigame: return "gamecontroller.fill"
         }
     }
 }
