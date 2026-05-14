@@ -86,6 +86,7 @@ struct SettingsView: View {
                     Text(localizer.string(.sceneSpectrogram)).tag(SceneKind.spectrogram)
                     Text(localizer.string(.sceneMilkdrop)).tag(SceneKind.milkdrop)
                     Text(localizer.string(.sceneKaleidoscope)).tag(SceneKind.kaleidoscope)
+                    Text(localizer.string(.sceneAIGame)).tag(SceneKind.aigame)
                 }
                 .pickerStyle(.menu)
             }
