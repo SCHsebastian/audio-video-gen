@@ -29,7 +29,13 @@ final class AVOfflineVideoRenderer: OfflineVideoRendering, @unchecked Sendable {
         self.library = library
     }
 
-    func begin(output: URL, options: RenderOptions, scene: SceneKind, palette: ColorPalette) throws {
+    func begin(output: URL, options: RenderOptions, scene: SceneKind,
+               palette: ColorPalette,
+               aiGameProgress: AIGameProgress?) throws {
+        // Threading `aiGameProgress` into AI Game scene seeding lands in
+        // Task 8.2 — for now keep the parameter on the signature so the port
+        // contract holds, and discard the value.
+        _ = aiGameProgress
         guard let pal = PaletteFactory.texture(from: palette, device: device)
               ?? PaletteFactory.texture(from: PaletteFactory.xpNeon, device: device) else {
             throw ExportError.metalUnavailable

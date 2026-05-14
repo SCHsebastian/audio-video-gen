@@ -40,7 +40,8 @@ final class AVOfflineVideoRendererTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: url) }
 
         let options = RenderOptions.make(.hd720, .fps30)
-        try renderer.begin(output: url, options: options, scene: .bars, palette: PaletteFactory.xpNeon)
+        try renderer.begin(output: url, options: options, scene: .bars,
+                           palette: PaletteFactory.xpNeon, aiGameProgress: nil)
 
         let spectrum = silentSpectrum()
         let waveform = silentWaveform()
@@ -74,7 +75,8 @@ final class AVOfflineVideoRendererTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: url) }
 
         let options = RenderOptions.make(.hd720, .fps30)
-        try renderer.begin(output: url, options: options, scene: .bars, palette: PaletteFactory.xpNeon)
+        try renderer.begin(output: url, options: options, scene: .bars,
+                           palette: PaletteFactory.xpNeon, aiGameProgress: nil)
 
         let spectrum = silentSpectrum()
         let waveform = silentWaveform()

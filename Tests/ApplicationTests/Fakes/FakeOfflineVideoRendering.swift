@@ -8,13 +8,17 @@ final class FakeOfflineVideoRendering: OfflineVideoRendering, @unchecked Sendabl
     var finishURLOverride: URL?
 
     private(set) var beginCalls: [(URL, RenderOptions, SceneKind, String)] = []
+    private(set) var beginAIGameProgress: [AIGameProgress?] = []
     private(set) var consumedFrames = 0
     private(set) var finishCalls = 0
     private(set) var cancelCalls = 0
 
-    func begin(output: URL, options: RenderOptions, scene: SceneKind, palette: ColorPalette) throws {
+    func begin(output: URL, options: RenderOptions, scene: SceneKind,
+               palette: ColorPalette,
+               aiGameProgress: AIGameProgress?) throws {
         if let e = beginError { throw e }
         beginCalls.append((output, options, scene, palette.name))
+        beginAIGameProgress.append(aiGameProgress)
     }
 
     func consume(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) async throws {

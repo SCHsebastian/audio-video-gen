@@ -98,6 +98,47 @@ final class ExportVisualizationUseCaseTests: XCTestCase {
         XCTAssertEqual(lastTotal, .some(.some(120)))
     }
 
+    func test_passes_aiGameProgress_through_to_renderer() async {
+        let dec = FakeAudioFileDecoding()
+        // No frames — the use case calls begin once, drains zero audio frames,
+        // then finishes. Enough to assert the optional was forwarded.
+        let r = FakeOfflineVideoRendering()
+        let progress = AIGameProgress(
+            id: UUID(), label: "x", createdAt: Date(),
+            generation: 3, bestFitness: 1,
+            genomes: [Genome(weights: Array(repeating: 0, count: Genome.expectedLength))],
+            worldSeed: 1, genomeLength: Genome.expectedLength)
+
+        let uc = ExportVisualizationUseCase(
+            decoder: dec, analyzer: FakeAudioSpectrumAnalyzing(),
+            beats: FakeBeatDetecting(), renderer: r)
+        let stream = uc.execute(audio: URL(fileURLWithPath: "/dev/null"),
+                                output: URL(fileURLWithPath: "/tmp/x.mp4"),
+                                scene: .aigame,
+                                palette: ColorPalette(name: "T", stops: [.init(r: 0, g: 0, b: 0)]),
+                                options: .make(.hd720, .fps30),
+                                aiGameProgress: progress)
+        for await _ in stream { }
+        XCTAssertEqual(r.beginAIGameProgress.count, 1)
+        XCTAssertEqual(r.beginAIGameProgress.first??.id, progress.id)
+    }
+
+    func test_omitting_aiGameProgress_passes_nil_to_renderer() async {
+        let dec = FakeAudioFileDecoding()
+        let r = FakeOfflineVideoRendering()
+        let uc = ExportVisualizationUseCase(
+            decoder: dec, analyzer: FakeAudioSpectrumAnalyzing(),
+            beats: FakeBeatDetecting(), renderer: r)
+        let stream = uc.execute(audio: URL(fileURLWithPath: "/dev/null"),
+                                output: URL(fileURLWithPath: "/tmp/y.mp4"),
+                                scene: .bars,
+                                palette: ColorPalette(name: "T", stops: [.init(r: 0, g: 0, b: 0)]),
+                                options: .make(.hd720, .fps30))
+        for await _ in stream { }
+        XCTAssertEqual(r.beginAIGameProgress.count, 1)
+        XCTAssertNil(r.beginAIGameProgress.first ?? nil)
+    }
+
     func test_progress_state_total_is_nil_when_decoder_estimate_is_nil() async {
         let dec = FakeAudioFileDecoding()
         dec.estimatedTotal = nil

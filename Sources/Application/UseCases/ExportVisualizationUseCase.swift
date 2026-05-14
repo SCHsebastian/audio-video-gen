@@ -28,8 +28,9 @@ public struct ExportVisualizationUseCase: Sendable {
                         output: URL,
                         scene: SceneKind,
                         palette: ColorPalette,
-                        options: RenderOptions) -> AsyncStream<ExportState> {
-        AsyncStream { continuation in
+                        options: RenderOptions,
+                        aiGameProgress: AIGameProgress? = nil) -> AsyncStream<ExportState> {
+        AsyncStream<ExportState> { (continuation: AsyncStream<ExportState>.Continuation) in
             let task = Task {
                 continuation.yield(.preparing)
 
@@ -54,7 +55,9 @@ public struct ExportVisualizationUseCase: Sendable {
                 }
 
                 do {
-                    try renderer.begin(output: output, options: options, scene: scene, palette: palette)
+                    try renderer.begin(output: output, options: options,
+                                       scene: scene, palette: palette,
+                                       aiGameProgress: aiGameProgress)
                 } catch let e as ExportError {
                     continuation.yield(.failed(e))
                     continuation.finish()
