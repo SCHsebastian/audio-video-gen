@@ -32,10 +32,6 @@ final class AVOfflineVideoRenderer: OfflineVideoRendering, @unchecked Sendable {
     func begin(output: URL, options: RenderOptions, scene: SceneKind,
                palette: ColorPalette,
                aiGameProgress: AIGameProgress?) throws {
-        // Threading `aiGameProgress` into AI Game scene seeding lands in
-        // Task 8.2 — for now keep the parameter on the signature so the port
-        // contract holds, and discard the value.
-        _ = aiGameProgress
         guard let pal = PaletteFactory.texture(from: palette, device: device)
               ?? PaletteFactory.texture(from: PaletteFactory.xpNeon, device: device) else {
             throw ExportError.metalUnavailable
@@ -46,6 +42,13 @@ final class AVOfflineVideoRenderer: OfflineVideoRendering, @unchecked Sendable {
                 kind: scene, device: device, library: library, paletteTexture: pal)
         } catch {
             throw ExportError.metalUnavailable
+        }
+
+        // Seed the AI Game population from a saved snapshot when one is
+        // supplied. Honored before the first frame is encoded.
+        if scene == .aigame, let progress = aiGameProgress,
+           let aig = visualizerScene as? AIGameScene {
+            aig.setSeedProgress(progress)
         }
 
         if FileManager.default.fileExists(atPath: output.path) {
@@ -232,4 +235,12 @@ final class AVOfflineVideoRenderer: OfflineVideoRendering, @unchecked Sendable {
         scene = nil
         paletteTexture = nil
     }
+
+    #if DEBUG
+    /// Test hook: returns the `AIGameProgress` last applied as a seed to the
+    /// retained `AIGameScene`, or `nil` if the active scene isn't AI Game.
+    func peekAIGameSeedProgress() -> AIGameProgress? {
+        (scene as? AIGameScene)?.lastSeedProgressForTesting
+    }
+    #endif
 }

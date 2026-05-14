@@ -27,6 +27,36 @@ final class AIGameScene: VisualizerScene {
     private var mid: Float = 0
     private var treble: Float = 0
     private var lastSnapshot: PopulationSnapshot!
+    private var pendingSeedProgress: AIGameProgress?
+
+    #if DEBUG
+    private(set) var lastSeedProgressForTesting: AIGameProgress?
+    #endif
+
+    /// Seed the live population from a previously-saved `AIGameProgress`.
+    /// Honored on the very next `build`/`update`. If `population` already
+    /// exists at call time, replaces it immediately.
+    func setSeedProgress(_ progress: AIGameProgress) {
+        pendingSeedProgress = progress
+        if population != nil {
+            applyPendingSeedIfAny()
+        }
+    }
+
+    private func applyPendingSeedIfAny() {
+        guard let snap = pendingSeedProgress else { return }
+        guard snap.genomeLength == Genome.expectedLength else {
+            // Schema drift — ignore the snapshot; live population stays.
+            pendingSeedProgress = nil
+            return
+        }
+        population = Population(restoring: snap, source: SystemRandomSource())
+        lastSnapshot = population.snapshot()
+        #if DEBUG
+        lastSeedProgressForTesting = snap
+        #endif
+        pendingSeedProgress = nil
+    }
 
     func build(device: MTLDevice, library: MTLLibrary, paletteTexture: MTLTexture) throws {
         self.device = device
@@ -58,9 +88,11 @@ final class AIGameScene: VisualizerScene {
         population = Population(size: Self.populationSize, seed: seed,
                                 source: SystemRandomSource())
         lastSnapshot = population.snapshot()
+        applyPendingSeedIfAny()
     }
 
     func update(spectrum: SpectrumFrame, waveform: WaveformBuffer, beat: BeatEvent?, dt: Float) {
+        applyPendingSeedIfAny()
         bass   = max(spectrum.bass,   bass   * 0.88)
         mid    = max(spectrum.mid,    mid    * 0.85)
         treble = max(spectrum.treble, treble * 0.80)
