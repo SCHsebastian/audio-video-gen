@@ -8,7 +8,10 @@ public final class World {
     private let source: RandomSource
 
     public private(set) var cameraX: Float = 0
-    public private(set) var obstacles: [Obstacle] = []
+    /// Mutable from inside the Domain module so `Population` (Task 7.2) can
+    /// append forced obstacles and tests can stage scenarios. External
+    /// modules still see read-only access.
+    public internal(set) var obstacles: [Obstacle] = []
     private var samples: [Float] = []                 // y values, length = terrainSampleCount
     private var ringStart: Int = 0                    // index of leftmost sample
 
