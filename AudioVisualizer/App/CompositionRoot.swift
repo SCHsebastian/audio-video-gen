@@ -41,16 +41,31 @@ final class CompositionRoot {
 
         renderer.setScene(saved.lastScene)
         renderer.setSpeed(saved.speed)
+
+        // AI Game progress store — single instance backs both the live
+        // VisualizerViewModel (save / list / load) and the ExportViewModel
+        // (list + load for the seed picker). `deleteAIProgress` has no UI
+        // consumer yet — kept as `let _` so the dependency arrow is visible.
+        let aigameStore = FileSystemAIGameProgressStore()
+        let saveAIProgress = SaveAIGameProgressUseCase(store: aigameStore)
+        let listAIProgress = ListAIGameProgressUseCase(store: aigameStore)
+        let loadAIProgress = LoadAIGameProgressUseCase(store: aigameStore)
+        let _ = DeleteAIGameProgressUseCase(store: aigameStore)
+
         self.viewModel = VisualizerViewModel(
             changeScene: change,
             start: start, stop: stop,
             renderer: renderer,
             preferences: prefs,
-            localizer: localizer, changeLanguage: changeLanguage)
+            localizer: localizer, changeLanguage: changeLanguage,
+            saveAIProgressUC: saveAIProgress,
+            loadAIProgressUC: loadAIProgress,
+            listAIProgressUC: listAIProgress)
         self.viewModel.currentScene = saved.lastScene
         self.viewModel.speed = saved.speed
         self.viewModel.applyInitialPalette(named: saved.lastPaletteName)
         self.viewModel.applyInitial(prefs: saved)
+        self.viewModel.reloadAIProgresses()
         self.renderer = renderer
         self.permission = permission
         self.localizer = localizer
@@ -68,15 +83,6 @@ final class CompositionRoot {
             library: renderer.libraryForSecondary)
         let exportUseCase = ExportVisualizationUseCase(
             decoder: decoder, analyzer: exportAnalyzer, beats: exportBeats, renderer: offlineRenderer)
-
-        // AI Game progress store — single instance backs both the live
-        // VisualizerViewModel (Phase 9 will wire save/delete) and the
-        // ExportViewModel (list/load for the seed picker today).
-        let aigameStore = FileSystemAIGameProgressStore()
-        _ = SaveAIGameProgressUseCase(store: aigameStore)
-        let listAIProgress = ListAIGameProgressUseCase(store: aigameStore)
-        let loadAIProgress = LoadAIGameProgressUseCase(store: aigameStore)
-        _ = DeleteAIGameProgressUseCase(store: aigameStore)
 
         self.exportViewModel = ExportViewModel(
             useCase: exportUseCase,

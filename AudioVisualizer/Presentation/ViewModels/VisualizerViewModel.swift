@@ -37,9 +37,16 @@ final class VisualizerViewModel {
     private let renderer: MetalVisualizationRenderer
     private let preferences: PreferencesStoring
     private let changeLanguageUseCase: ChangeLanguageUseCase
+    private let saveAIProgressUC: SaveAIGameProgressUseCase
+    private let loadAIProgressUC: LoadAIGameProgressUseCase
+    private let listAIProgressUC: ListAIGameProgressUseCase
     private var streamTask: Task<Void, Never>?
     private var silenceTask: Task<Void, Never>?
     private(set) var isSilent: Bool = false
+
+    /// AI Game progress entries surfaced in the toolbar load menu.
+    /// Refreshed by `reloadAIProgresses()` and after every save.
+    private(set) var savedAIProgresses: [AIGameProgress] = []
 
     init(changeScene: ChangeSceneUseCase,
          start: StartVisualizationUseCase,
@@ -47,7 +54,10 @@ final class VisualizerViewModel {
          renderer: MetalVisualizationRenderer,
          preferences: PreferencesStoring,
          localizer: Localizing,
-         changeLanguage: ChangeLanguageUseCase) {
+         changeLanguage: ChangeLanguageUseCase,
+         saveAIProgressUC: SaveAIGameProgressUseCase,
+         loadAIProgressUC: LoadAIGameProgressUseCase,
+         listAIProgressUC: ListAIGameProgressUseCase) {
         self.changeScene = changeScene
         self.start = start
         self.stop = stop
@@ -55,6 +65,36 @@ final class VisualizerViewModel {
         self.preferences = preferences
         self.localizer = localizer
         self.changeLanguageUseCase = changeLanguage
+        self.saveAIProgressUC = saveAIProgressUC
+        self.loadAIProgressUC = loadAIProgressUC
+        self.listAIProgressUC = listAIProgressUC
+    }
+
+    func saveAIProgress() {
+        guard currentScene == .aigame,
+              let scene = renderer.peekAIGameScene() else { return }
+        let label = defaultAILabel(scene: scene)
+        let snap = scene.population.snapshotProgress(label: label)
+        if let saved = try? saveAIProgressUC.execute(progress: snap) {
+            self.lastRandomizedLabel = String(format: localizer.string(.overlayAIGameSaved), saved.label)
+            reloadAIProgresses()
+        }
+    }
+
+    func loadAIProgress(id: UUID) {
+        guard let scene = renderer.peekAIGameScene(),
+              let p = try? loadAIProgressUC.execute(id: id) else { return }
+        scene.setSeedProgress(p)
+        self.lastRandomizedLabel = String(format: localizer.string(.overlayAIGameLoaded), p.label)
+    }
+
+    func reloadAIProgresses() {
+        savedAIProgresses = (try? listAIProgressUC.execute()) ?? []
+    }
+
+    private func defaultAILabel(scene: AIGameScene) -> String {
+        let f = DateFormatter(); f.dateFormat = "yyyy-MM-dd HH:mm"
+        return "Gen \(scene.population.generation) · \(f.string(from: Date()))"
     }
 
     func changeLanguage(_ lang: Language) {

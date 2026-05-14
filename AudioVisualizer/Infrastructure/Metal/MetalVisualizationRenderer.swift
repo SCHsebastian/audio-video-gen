@@ -252,6 +252,8 @@ final class MetalVisualizationRenderer: NSObject, VisualizationRendering, MTKVie
         return min(1, raw * audioGain)
     }
 
+    func peekAIGameScene() -> AIGameScene? { scenes[.aigame] as? AIGameScene }
+
     // Time-based beat envelope state. peekBeat() shapes a one-shot pulse on
     // every new beat: ramp from the current value up to the peak over
     // `attackDuration`, then ease back down to zero over `releaseDuration`.

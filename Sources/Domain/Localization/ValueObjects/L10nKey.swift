@@ -130,4 +130,11 @@ public enum L10nKey: String, CaseIterable, Sendable {
     case exportProgressFailed     = "export.progress.failed"
     case exportSectionAISeed      = "export.section.aiSeed"
     case exportAISeedFresh        = "export.aiSeed.fresh"
+
+    // AI Game — Save/Load
+    case toolbarAIGameSave         = "toolbar.aigame.save"
+    case toolbarAIGameLoadMenu     = "toolbar.aigame.loadMenu"
+    case toolbarAIGameLoadEmpty    = "toolbar.aigame.loadMenu.empty"
+    case overlayAIGameSaved        = "overlay.aigame.saved"
+    case overlayAIGameLoaded       = "overlay.aigame.loaded"
 }

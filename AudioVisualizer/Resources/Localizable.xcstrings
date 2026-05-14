@@ -1714,6 +1714,86 @@
           }
         }
       }
+    },
+    "toolbar.aigame.save": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save AI"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar IA"
+          }
+        }
+      }
+    },
+    "toolbar.aigame.loadMenu": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Load AI"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cargar IA"
+          }
+        }
+      }
+    },
+    "toolbar.aigame.loadMenu.empty": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(no saved progress yet)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(sin progreso guardado)"
+          }
+        }
+      }
+    },
+    "overlay.aigame.saved": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved · %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardado · %@"
+          }
+        }
+      }
+    },
+    "overlay.aigame.loaded": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loaded · %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cargado · %@"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

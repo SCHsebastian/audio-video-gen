@@ -20,7 +20,7 @@ final class AIGameScene: VisualizerScene {
     private var obstacleBuffer: MTLBuffer!
     private var agentBuffer: MTLBuffer!
 
-    private var population: Population!
+    private(set) var population: Population!
     private var simTime: Float = 0
     private var beatEnv: Float = 0
     private var bass: Float = 0
