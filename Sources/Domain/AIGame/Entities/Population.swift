@@ -15,6 +15,10 @@ public final class Population {
 
     public var onGenerationDidIncrement: ((Int) -> Void)?
 
+    /// Sim-time threshold past which the jumpBoost effect expires. 0 = no boost.
+    public private(set) var jumpBoostUntilSimTime: Float = 0
+    public private(set) var simTime: Float = 0
+
     public init(size: Int, seed: UInt64, source: RandomSource) {
         self.size = size
         self.source = source
@@ -44,11 +48,14 @@ public final class Population {
     }
 
     public func step(dt: Float, audio: AudioDrive) -> PopulationSnapshot {
+        simTime += dt
         world.advance(dt: dt, audio: audio)
+        let jumpMul: Float = (simTime < jumpBoostUntilSimTime) ? 1.5 : 1.0
         for i in 0..<size {
             let next = Agent.step(state: agents[i], world: world,
                                   nn: networks[i], dt: dt,
-                                  jumpHeld: &jumpLatches[i], audio: audio)
+                                  jumpHeld: &jumpLatches[i], audio: audio,
+                                  jumpImpulseMultiplier: jumpMul)
             agents[i] = next
             if next.fitness > bestFitness { bestFitness = next.fitness }
         }
@@ -82,10 +89,70 @@ public final class Population {
         seedFreshGenomes()
     }
 
+    // MARK: events (Task 7.2)
+
+    public func applyEvent(_ event: AIGameEvent, source r: RandomSource) {
+        switch event {
+        case .catastrophicMutation:
+            for i in 0..<size where agents[i].alive {
+                genomes[i] = GeneticEvolver.mutate(genomes[i],
+                                                  rate: 1.0, sigma: 0.5,
+                                                  using: r)
+                networks[i] = try! NeuralNetwork(genome: genomes[i])
+            }
+        case .cull:
+            let aliveIdx = (0..<size).filter { agents[$0].alive }
+            let killCount = aliveIdx.count / 2
+            let toKill = Array(aliveIdx.shuffled().prefix(killCount))
+            for i in toKill { agents[i].alive = false }
+        case .jumpBoost:
+            jumpBoostUntilSimTime = simTime + 5.0
+        case .earthquake:
+            world.reseedTerrainAndClearObstacles(newSeed: worldSeed &+ 7919)
+            worldSeed = worldSeed &+ 7919
+        case .bonusObstacleWave:
+            for k in 0..<3 {
+                let dx = 1.4 + Float(k) * 0.3
+                world.appendForcedObstacle(
+                    Obstacle(xStart: world.cameraX + dx, width: 0.12,
+                             height: 0.25, kind: .spike)
+                )
+            }
+        case .lineageSwap:
+            let donor = donorGenomeForLineageSwap()
+            for i in 0..<size where agents[i].alive {
+                genomes[i] = GeneticEvolver.crossover(genomes[i], donor, using: r)
+                networks[i] = try! NeuralNetwork(genome: genomes[i])
+            }
+        }
+    }
+
+    private func donorGenomeForLineageSwap() -> Genome {
+        if let bestDeadIdx = (0..<size)
+            .filter({ !agents[$0].alive })
+            .max(by: { agents[$0].fitness < agents[$1].fitness }) {
+            return genomes[bestDeadIdx]
+        }
+        // Fallback: lowest-fitness alive (so we still perturb the lineage).
+        let worstAliveIdx = (0..<size)
+            .filter { agents[$0].alive }
+            .min(by: { agents[$0].fitness < agents[$1].fitness }) ?? 0
+        return genomes[worstAliveIdx]
+    }
+
     // MARK: testing hooks
     public func killAllForTesting() {
         for i in 0..<size { agents[i].alive = false }
     }
+
+    public func killOneForTesting() {
+        for i in 0..<size {
+            if agents[i].alive { agents[i].alive = false; return }
+        }
+    }
+
+    public func genomesForTesting() -> [Genome] { genomes }
+    public var jumpBoostUntilForTesting: Float { jumpBoostUntilSimTime }
 
     // MARK: privates
     private var alive: Int { agents.lazy.filter { $0.alive }.count }

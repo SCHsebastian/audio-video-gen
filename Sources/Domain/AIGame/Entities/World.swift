@@ -4,7 +4,7 @@ public final class World {
     public static let terrainSampleCount = 256
     public static let terrainStrideX: Float = 0.05    // world units per sample
 
-    public let seed: UInt64
+    public internal(set) var seed: UInt64
     private let source: RandomSource
 
     public private(set) var cameraX: Float = 0
@@ -109,6 +109,27 @@ public final class World {
         h ^= (h >> 33)
         let unit = Float(h % 1_000_000) / 1_000_000.0
         return unit * 2 - 1
+    }
+
+    // MARK: forced spawn + reseed (Task 7.2)
+
+    public func appendForcedObstacle(_ o: Obstacle) {
+        obstacles.append(o)
+        lastSpawnX = max(lastSpawnX, o.xStart)
+    }
+
+    public func reseedTerrainAndClearObstacles(newSeed: UInt64) {
+        // Re-derive every sample under a new seed using the current bass = 0
+        // baseline; this shifts the visible profile immediately.
+        seed = newSeed
+        for i in 0..<Self.terrainSampleCount {
+            let worldIndex = baseIndex + i
+            let x = Float(worldIndex) * Self.terrainStrideX
+            samples[(ringStart + i) % Self.terrainSampleCount] =
+                Self.heightAt(worldX: x, seed: newSeed, bass: 0)
+        }
+        obstacles.removeAll()
+        lastSpawnX = -.infinity
     }
 
     // MARK: obstacles (filled in Task 2.2)

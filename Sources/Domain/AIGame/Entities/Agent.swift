@@ -11,7 +11,8 @@ public enum Agent {
     /// the same Bool for the same agent across frames).
     public static func step(state: AgentState, world: World, nn: NeuralNetwork,
                             dt: Float, jumpHeld: inout Bool,
-                            audio: AudioDrive = .silence) -> AgentState {
+                            audio: AudioDrive = .silence,
+                            jumpImpulseMultiplier: Float = 1.0) -> AgentState {
         var s = state
         guard s.alive else { return s }
 
@@ -29,7 +30,7 @@ public enum Agent {
         let onGround = (s.posY - groundY) <= groundEpsilon
         let pressed = jumpOut > 0.55
         if pressed, onGround, !jumpHeld {
-            s.velY = jumpImpulse
+            s.velY = jumpImpulse * jumpImpulseMultiplier
         }
         jumpHeld = pressed
 
